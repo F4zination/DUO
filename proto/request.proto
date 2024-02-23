@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "github.com/duo/pb";
+
+message Request {
+  string name = 1;
+}

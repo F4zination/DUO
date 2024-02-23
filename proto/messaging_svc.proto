@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package pb;
+
+import "request.proto";
+
+option go_package = "github.com/duo/pb";
+
+
+service MessagingService {
+    rpc Send(stream Request) returns (stream Request);
+}
