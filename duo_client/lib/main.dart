@@ -1,3 +1,4 @@
+import 'package:duo_client/pb/request.pb.dart';
 import 'package:flutter/material.dart';
 import 'package:grpc/grpc.dart';
 import 'package:duo_client/utils/conectivity.dart' as connectivity;
@@ -34,13 +35,13 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  late final ClientChannel channel;
-  late final MessagingServiceClient messagingServiceClient;
+  late ClientChannel channel;
+  bool _connected = false;
+  late MessagingServiceClient messagingServiceClient;
+  late ResponseStream responseStream;
   String message = 'No Message Received!';
 
-  @override
-  void initState() {
-    super.initState();
+  Future<void> connect() async {
     channel = ClientChannel(
       connectivity.host,
       port: connectivity.port,
@@ -49,18 +50,42 @@ class _MyHomePageState extends State<MyHomePage> {
     messagingServiceClient = MessagingServiceClient(channel);
   }
 
-  Future<String> awaitServerResponse() async {
+  void sendMessage(String _name) async {
+    final request = Request()..name = _name;
+    try {
+      await messagingServiceClient.send(request);
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  Future<void> disconnect() async {
+    _connected = false;
+    responseStream.cancel();
+    await channel.shutdown();
+  }
+
+  Future<void> awaitServerResponse() async {
     print('Awaiting Stream!');
     final empty = Empty();
-    var responseStream = messagingServiceClient.connect(empty);
-    await for (var response in responseStream) {
-      print('Received: ${response.name}');
-      setState(() {
-        message = response.name;
-      });
-    }
-    await channel.shutdown();
-    return 'No Message Received!';
+    responseStream = messagingServiceClient.connect(empty);
+    responseStream.listen(
+      (event) {
+        debugPrint('Received: ${event.name}');
+        setState(() {
+          message = event.name;
+        });
+      },
+      onDone: () {
+        setState(() {
+          message = 'End of Stream!';
+        });
+        debugPrint('End of Stream!');
+      },
+      onError: (e) {
+        debugPrint('Error: $e');
+      },
+    );
   }
 
   @override
@@ -77,12 +102,43 @@ class _MyHomePageState extends State<MyHomePage> {
               message,
               style: Theme.of(context).textTheme.titleLarge,
             ),
-            ElevatedButton(
-                onPressed: () async {
-                  // Add code to send Hello World! to the server
-                  awaitServerResponse();
-                },
-                child: const Text('Click to await Stream!')),
+            const SizedBox(
+              height: 20,
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.7,
+              child: ElevatedButton(
+                  onPressed: () async {
+                    if (_connected) {
+                      print('Already connected to server!');
+                      return;
+                    }
+                    // Add code to send Hello World! to the server
+                    await connect();
+                    _connected = true;
+
+                    awaitServerResponse();
+                  },
+                  child: const Text('Click to await Stream!')),
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.7,
+              child: ElevatedButton(
+                  onPressed: () {
+                    // disconnect from the server
+                    disconnect();
+                  },
+                  child: const Text('Disconnect from Server')),
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.7,
+              child: ElevatedButton(
+                  onPressed: () {
+                    // send Hello World! to all clients
+                    sendMessage('44er Bizeps');
+                  },
+                  child: const Text('Send Hello World! to all clients')),
+            )
           ],
         ),
       ),
