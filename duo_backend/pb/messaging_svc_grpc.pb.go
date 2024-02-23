@@ -22,7 +22,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MessagingServiceClient interface {
-	Send(ctx context.Context, opts ...grpc.CallOption) (MessagingService_SendClient, error)
+	Connect(ctx context.Context, in *Empty, opts ...grpc.CallOption) (MessagingService_ConnectClient, error)
+	Send(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type messagingServiceClient struct {
@@ -33,30 +34,31 @@ func NewMessagingServiceClient(cc grpc.ClientConnInterface) MessagingServiceClie
 	return &messagingServiceClient{cc}
 }
 
-func (c *messagingServiceClient) Send(ctx context.Context, opts ...grpc.CallOption) (MessagingService_SendClient, error) {
-	stream, err := c.cc.NewStream(ctx, &MessagingService_ServiceDesc.Streams[0], "/pb.MessagingService/Send", opts...)
+func (c *messagingServiceClient) Connect(ctx context.Context, in *Empty, opts ...grpc.CallOption) (MessagingService_ConnectClient, error) {
+	stream, err := c.cc.NewStream(ctx, &MessagingService_ServiceDesc.Streams[0], "/pb.MessagingService/connect", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &messagingServiceSendClient{stream}
+	x := &messagingServiceConnectClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
 	return x, nil
 }
 
-type MessagingService_SendClient interface {
-	Send(*Request) error
+type MessagingService_ConnectClient interface {
 	Recv() (*Request, error)
 	grpc.ClientStream
 }
 
-type messagingServiceSendClient struct {
+type messagingServiceConnectClient struct {
 	grpc.ClientStream
 }
 
-func (x *messagingServiceSendClient) Send(m *Request) error {
-	return x.ClientStream.SendMsg(m)
-}
-
-func (x *messagingServiceSendClient) Recv() (*Request, error) {
+func (x *messagingServiceConnectClient) Recv() (*Request, error) {
 	m := new(Request)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -64,11 +66,21 @@ func (x *messagingServiceSendClient) Recv() (*Request, error) {
 	return m, nil
 }
 
+func (c *messagingServiceClient) Send(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, "/pb.MessagingService/send", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MessagingServiceServer is the server API for MessagingService service.
 // All implementations must embed UnimplementedMessagingServiceServer
 // for forward compatibility
 type MessagingServiceServer interface {
-	Send(MessagingService_SendServer) error
+	Connect(*Empty, MessagingService_ConnectServer) error
+	Send(context.Context, *Request) (*Empty, error)
 	mustEmbedUnimplementedMessagingServiceServer()
 }
 
@@ -76,8 +88,11 @@ type MessagingServiceServer interface {
 type UnimplementedMessagingServiceServer struct {
 }
 
-func (UnimplementedMessagingServiceServer) Send(MessagingService_SendServer) error {
-	return status.Errorf(codes.Unimplemented, "method Send not implemented")
+func (UnimplementedMessagingServiceServer) Connect(*Empty, MessagingService_ConnectServer) error {
+	return status.Errorf(codes.Unimplemented, "method Connect not implemented")
+}
+func (UnimplementedMessagingServiceServer) Send(context.Context, *Request) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Send not implemented")
 }
 func (UnimplementedMessagingServiceServer) mustEmbedUnimplementedMessagingServiceServer() {}
 
@@ -92,30 +107,43 @@ func RegisterMessagingServiceServer(s grpc.ServiceRegistrar, srv MessagingServic
 	s.RegisterService(&MessagingService_ServiceDesc, srv)
 }
 
-func _MessagingService_Send_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(MessagingServiceServer).Send(&messagingServiceSendServer{stream})
+func _MessagingService_Connect_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(Empty)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(MessagingServiceServer).Connect(m, &messagingServiceConnectServer{stream})
 }
 
-type MessagingService_SendServer interface {
+type MessagingService_ConnectServer interface {
 	Send(*Request) error
-	Recv() (*Request, error)
 	grpc.ServerStream
 }
 
-type messagingServiceSendServer struct {
+type messagingServiceConnectServer struct {
 	grpc.ServerStream
 }
 
-func (x *messagingServiceSendServer) Send(m *Request) error {
+func (x *messagingServiceConnectServer) Send(m *Request) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func (x *messagingServiceSendServer) Recv() (*Request, error) {
-	m := new(Request)
-	if err := x.ServerStream.RecvMsg(m); err != nil {
+func _MessagingService_Send_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Request)
+	if err := dec(in); err != nil {
 		return nil, err
 	}
-	return m, nil
+	if interceptor == nil {
+		return srv.(MessagingServiceServer).Send(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.MessagingService/send",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MessagingServiceServer).Send(ctx, req.(*Request))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 // MessagingService_ServiceDesc is the grpc.ServiceDesc for MessagingService service.
@@ -124,13 +152,17 @@ func (x *messagingServiceSendServer) Recv() (*Request, error) {
 var MessagingService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "pb.MessagingService",
 	HandlerType: (*MessagingServiceServer)(nil),
-	Methods:     []grpc.MethodDesc{},
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "send",
+			Handler:    _MessagingService_Send_Handler,
+		},
+	},
 	Streams: []grpc.StreamDesc{
 		{
-			StreamName:    "Send",
-			Handler:       _MessagingService_Send_Handler,
+			StreamName:    "connect",
+			Handler:       _MessagingService_Connect_Handler,
 			ServerStreams: true,
-			ClientStreams: true,
 		},
 	},
 	Metadata: "messaging_svc.proto",

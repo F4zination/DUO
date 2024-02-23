@@ -14,14 +14,18 @@ import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
-import 'request.pb.dart' as $0;
+import 'empty.pb.dart' as $0;
+import 'request.pb.dart' as $1;
 
 class MessagingServiceApi {
   $pb.RpcClient _client;
   MessagingServiceApi(this._client);
 
-  $async.Future<$0.Request> send($pb.ClientContext? ctx, $0.Request request) =>
-    _client.invoke<$0.Request>(ctx, 'MessagingService', 'Send', request, $0.Request())
+  $async.Future<$1.Request> connect($pb.ClientContext? ctx, $0.Empty request) =>
+    _client.invoke<$1.Request>(ctx, 'MessagingService', 'connect', request, $1.Request())
+  ;
+  $async.Future<$0.Empty> send($pb.ClientContext? ctx, $1.Request request) =>
+    _client.invoke<$0.Empty>(ctx, 'MessagingService', 'send', request, $0.Empty())
   ;
 }
 

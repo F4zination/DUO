@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "github.com/duo/pb";
+
+
+message Empty {
+    
+}
