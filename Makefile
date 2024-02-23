@@ -7,7 +7,7 @@ goprotoc:
 
 dartprotoc:
 	del /S /Q $(shell cd)\duo_client\lib\pb\*
-	docker run --rm -v $(shell cd)/duo_client/lib/pb:/out -v $(shell cd)/proto:/proto protoc_container "protoc --proto_path=/proto --dart_out=/out /proto/*.proto"
+	docker run --rm -v $(shell cd)/duo_client/lib/pb:/out -v $(shell cd)/proto:/proto protoc_container "protoc --proto_path=/proto --dart_out=grpc:/out /proto/*.proto"
 
 allprotoc:
 	make goprotoc

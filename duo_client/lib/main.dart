@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:grpc/grpc.dart';
 import 'package:duo_client/utils/conectivity.dart' as connectivity;
+import 'package:duo_client/pb/messaging_svc.pbgrpc.dart';
+import 'package:duo_client/pb/empty.pb.dart';
 
 void main() {
   runApp(const MyApp());
@@ -33,6 +35,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   late final ClientChannel channel;
+  late final MessagingServiceClient messagingServiceClient;
   String message = 'No Message Received!';
 
   @override
@@ -43,10 +46,21 @@ class _MyHomePageState extends State<MyHomePage> {
       port: connectivity.port,
       options: const ChannelOptions(credentials: ChannelCredentials.insecure()),
     );
+    messagingServiceClient = MessagingServiceClient(channel);
   }
 
-  Future<String> _sendHelloWorld() async {
-    return 'Hello World!';
+  Future<String> awaitServerResponse() async {
+    print('Awaiting Stream!');
+    final empty = Empty();
+    var responseStream = messagingServiceClient.connect(empty);
+    await for (var response in responseStream) {
+      print('Received: ${response.name}');
+      setState(() {
+        message = response.name;
+      });
+    }
+    await channel.shutdown();
+    return 'No Message Received!';
   }
 
   @override
@@ -66,12 +80,9 @@ class _MyHomePageState extends State<MyHomePage> {
             ElevatedButton(
                 onPressed: () async {
                   // Add code to send Hello World! to the server
-                  String receivedMessage = await _sendHelloWorld();
-                  setState(() {
-                    message = receivedMessage;
-                  });
+                  awaitServerResponse();
                 },
-                child: const Text('Click to send Hello World!')),
+                child: const Text('Click to await Stream!')),
           ],
         ),
       ),
