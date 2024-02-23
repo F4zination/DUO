@@ -2,12 +2,14 @@ package api
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/duo/pb"
 )
 
 func (server *Server) Connect(empty *pb.Empty, stream pb.MessagingService_ConnectServer) error {
+	log.Printf("Client connected")
 	go func() {
 		i := 0
 		for {
@@ -15,6 +17,7 @@ func (server *Server) Connect(empty *pb.Empty, stream pb.MessagingService_Connec
 			if err != nil {
 				return
 			}
+			log.Printf("Sent message %d", i)
 			i++
 			time.Sleep(1 * time.Second)
 		}
