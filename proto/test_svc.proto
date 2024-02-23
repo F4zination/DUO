@@ -1,0 +1,5 @@
+import "test_msg.proto";
+
+service Nachrichtendienst {
+    rpc Senden(stream Nachricht) returns (stream Nachricht);
+}
