@@ -2,39 +2,39 @@ package api
 
 import (
 	"context"
-	"fmt"
 	"log"
-	"time"
 
 	"github.com/duo/pb"
+	"github.com/google/uuid"
 )
 
 func (server *Server) Connect(empty *pb.Empty, stream pb.MessagingService_ConnectServer) error {
 	log.Printf("Client connected")
-	reqChan := make(chan *pb.Request)
-	go func() {
-		i := 0
-		for {
-			log.Printf("Sending request %d", i)
-			reqChan <- &pb.Request{Name: fmt.Sprintf("Num: %d", i)}
-			i++
-			time.Sleep(1 * time.Second)
-		}
-	}()
-	for {
-		select {
-		case req := <-reqChan:
-			err := stream.Send(req)
-			if err != nil {
-				return err
-			}
-		case <-stream.Context().Done():
-			log.Printf("Client disconnected")
-			return nil
-		}
-	}
+	clientID := uuid.New().String()
+
+	server.Mu.Lock()
+	server.ConnectedClients[clientID] = stream
+	server.Mu.Unlock()
+
+	//Wait for client to disconnect
+	<-stream.Context().Done()
+
+	server.Mu.Lock()
+	delete(server.ConnectedClients, clientID)
+	server.Mu.Unlock()
+
+	return nil
 }
 
 func (server *Server) Send(context context.Context, request *pb.Request) (*pb.Empty, error) {
+	server.Mu.Lock()
+	defer server.Mu.Unlock()
+
+	for clientID, stream := range server.ConnectedClients {
+		if err := stream.Send(request); err != nil {
+			log.Printf("Error sending message to client %s: %v", clientID, err)
+			return nil, err
+		}
+	}
 	return &pb.Empty{}, nil
 }
