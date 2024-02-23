@@ -5,7 +5,8 @@ import (
 )
 
 type Config struct {
-	Output string `mapstructure:"OUTPUT"`
+	Output        string `mapstructure:"OUTPUT"`
+	ServerAddress string `mapstructure:"SERVER_ADDRESS"`
 }
 
 func LoadConfig(path string) (config Config, err error) {

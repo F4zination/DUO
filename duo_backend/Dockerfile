@@ -18,3 +18,5 @@ COPY --from=builder /duo_backend /duo_backend
 
 CMD ["/duo_backend"]
 
+EXPOSE 8080
+
