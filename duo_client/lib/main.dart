@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:grpc/grpc.dart';
+import 'package:duo_client/utils/conectivity.dart' as connectivity;
 
 void main() {
   runApp(const MyApp());
@@ -7,11 +9,10 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'DUO Client',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -31,19 +32,46 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  late final ClientChannel channel;
+  String message = 'No Message Received!';
+
+  @override
+  void initState() {
+    super.initState();
+    channel = ClientChannel(
+      connectivity.host,
+      port: connectivity.port,
+      options: const ChannelOptions(credentials: ChannelCredentials.insecure()),
+    );
+  }
+
+  Future<String> _sendHelloWorld() async {
+    return 'Hello World!';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: const Center(
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'You have pushed the button this many times:',
+              message,
+              style: Theme.of(context).textTheme.titleLarge,
             ),
+            ElevatedButton(
+                onPressed: () async {
+                  // Add code to send Hello World! to the server
+                  String receivedMessage = await _sendHelloWorld();
+                  setState(() {
+                    message = receivedMessage;
+                  });
+                },
+                child: const Text('Click to send Hello World!')),
           ],
         ),
       ),
