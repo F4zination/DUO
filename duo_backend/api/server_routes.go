@@ -19,6 +19,7 @@ func (server *Server) Connect(empty *pb.Empty, stream pb.MessagingService_Connec
 	//Wait for client to disconnect
 	<-stream.Context().Done()
 
+	log.Printf("Client disconnected")
 	server.Mu.Lock()
 	delete(server.ConnectedClients, clientID)
 	server.Mu.Unlock()
@@ -30,6 +31,7 @@ func (server *Server) Send(context context.Context, request *pb.Request) (*pb.Em
 	server.Mu.Lock()
 	defer server.Mu.Unlock()
 
+	log.Printf("Sending message to %d clients", len(server.ConnectedClients))
 	for clientID, stream := range server.ConnectedClients {
 		if err := stream.Send(request); err != nil {
 			log.Printf("Error sending message to client %s: %v", clientID, err)
