@@ -16,6 +16,7 @@ service DUOService {
 
     rpc CreateSession(CreateSessionRequest) returns (stream SessionStream) {}
     rpc JoinSession(JoinSessionRequest) returns (stream SessionStream) {}
+    rpc DisconnectSession(DisconnectSessionRequest) returns (DisconnectSessionResponse) {}  
     rpc DeleteSession(DeleteSessionRequest) returns (DeleteSessionResponse) {}
 
 }

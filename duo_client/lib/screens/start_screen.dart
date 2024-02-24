@@ -47,14 +47,17 @@ class _StartScreenState extends ConsumerState<StartScreen> {
             const SizedBox(height: 20),
             ElevatedButton(
                 onPressed: () async {
-                  // Add code to send Hello World! to the server
-                  Navigator.pushReplacementNamed(context, '/login');
+                  Navigator.pushNamed(context, '/session_test');
+                },
+                child: const Text('Go to Session Test')),
+            ElevatedButton(
+                onPressed: () async {
+                  Navigator.pushNamed(context, '/login');
                 },
                 child: const Text('Go to Login')),
             ElevatedButton(
                 onPressed: () async {
-                  // Add code to send Hello World! to the server
-                  Navigator.pushReplacementNamed(context, '/register');
+                  Navigator.pushNamed(context, '/register');
                 },
                 child: const Text('Go to Registration')),
           ],

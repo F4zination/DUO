@@ -9,25 +9,42 @@ message GameState{
 
 }
 
+message SessionState{
+    string joined_user_uuids = 1;
+    string disconnected_user_uuids = 2;
+}
+
 
 message CreateSessionRequest{
-    string user_uuid = 1;
+    string token = 1;
     int32 pin = 2;
 }
 
 message JoinSessionRequest{
-    string user_uuid = 1;
+    string token = 1;
     int32 session_id = 2;
-    int32 pin = 2;
+    int32 pin = 3;
 }
 
 message SessionStream{
-    GameState state = 1;
+    int32 session_id = 1;
+    GameState game_state = 2;
+    SessionState session_state = 3;
+}
+
+message DisconnectSessionRequest{
+    string token = 1;
+    int32 session_id = 2;
+}
+
+message DisconnectSessionResponse{
+    bool success = 1;
 }
 
 
 message DeleteSessionRequest{
-    string uuid = 1;
+    string token = 1;
+    int32 session_id = 2;
 }
 
 message DeleteSessionResponse{

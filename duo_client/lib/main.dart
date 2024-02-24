@@ -1,9 +1,9 @@
 import 'package:duo_client/screens/login_screen.dart';
 import 'package:duo_client/screens/registration_screen.dart';
+import 'package:duo_client/screens/session_test_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:duo_client/screens/start_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:logging/logging.dart';
 
 void main() {
   runApp(const ProviderScope(
@@ -25,6 +25,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => const StartScreen(title: 'Duo Client'),
+        '/testSession': (context) => const SessionTestScreen(),
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegistrationScreen()
       },

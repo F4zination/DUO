@@ -16,6 +16,7 @@ import 'package:grpc/service_api.dart' as $grpc;
 import 'package:protobuf/protobuf.dart' as $pb;
 
 import 'auth_messages.pb.dart' as $0;
+import 'session_messages.pb.dart' as $1;
 
 export 'duo_service.pb.dart';
 
@@ -33,6 +34,22 @@ class DUOServiceClient extends $grpc.Client {
       '/pb.DUOService/SubmitLoginChallenge',
       ($0.LoginChallengeResponse value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.LoginResponse.fromBuffer(value));
+  static final _$createSession = $grpc.ClientMethod<$1.CreateSessionRequest, $1.SessionStream>(
+      '/pb.DUOService/CreateSession',
+      ($1.CreateSessionRequest value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $1.SessionStream.fromBuffer(value));
+  static final _$joinSession = $grpc.ClientMethod<$1.JoinSessionRequest, $1.SessionStream>(
+      '/pb.DUOService/JoinSession',
+      ($1.JoinSessionRequest value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $1.SessionStream.fromBuffer(value));
+  static final _$disconnectSession = $grpc.ClientMethod<$1.DisconnectSessionRequest, $1.DisconnectSessionResponse>(
+      '/pb.DUOService/DisconnectSession',
+      ($1.DisconnectSessionRequest value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $1.DisconnectSessionResponse.fromBuffer(value));
+  static final _$deleteSession = $grpc.ClientMethod<$1.DeleteSessionRequest, $1.DeleteSessionResponse>(
+      '/pb.DUOService/DeleteSession',
+      ($1.DeleteSessionRequest value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $1.DeleteSessionResponse.fromBuffer(value));
 
   DUOServiceClient($grpc.ClientChannel channel,
       {$grpc.CallOptions? options,
@@ -50,6 +67,22 @@ class DUOServiceClient extends $grpc.Client {
 
   $grpc.ResponseFuture<$0.LoginResponse> submitLoginChallenge($0.LoginChallengeResponse request, {$grpc.CallOptions? options}) {
     return $createUnaryCall(_$submitLoginChallenge, request, options: options);
+  }
+
+  $grpc.ResponseStream<$1.SessionStream> createSession($1.CreateSessionRequest request, {$grpc.CallOptions? options}) {
+    return $createStreamingCall(_$createSession, $async.Stream.fromIterable([request]), options: options);
+  }
+
+  $grpc.ResponseStream<$1.SessionStream> joinSession($1.JoinSessionRequest request, {$grpc.CallOptions? options}) {
+    return $createStreamingCall(_$joinSession, $async.Stream.fromIterable([request]), options: options);
+  }
+
+  $grpc.ResponseFuture<$1.DisconnectSessionResponse> disconnectSession($1.DisconnectSessionRequest request, {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$disconnectSession, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$1.DeleteSessionResponse> deleteSession($1.DeleteSessionRequest request, {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$deleteSession, request, options: options);
   }
 }
 
@@ -79,6 +112,34 @@ abstract class DUOServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $0.LoginChallengeResponse.fromBuffer(value),
         ($0.LoginResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$1.CreateSessionRequest, $1.SessionStream>(
+        'CreateSession',
+        createSession_Pre,
+        false,
+        true,
+        ($core.List<$core.int> value) => $1.CreateSessionRequest.fromBuffer(value),
+        ($1.SessionStream value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$1.JoinSessionRequest, $1.SessionStream>(
+        'JoinSession',
+        joinSession_Pre,
+        false,
+        true,
+        ($core.List<$core.int> value) => $1.JoinSessionRequest.fromBuffer(value),
+        ($1.SessionStream value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$1.DisconnectSessionRequest, $1.DisconnectSessionResponse>(
+        'DisconnectSession',
+        disconnectSession_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $1.DisconnectSessionRequest.fromBuffer(value),
+        ($1.DisconnectSessionResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$1.DeleteSessionRequest, $1.DeleteSessionResponse>(
+        'DeleteSession',
+        deleteSession_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $1.DeleteSessionRequest.fromBuffer(value),
+        ($1.DeleteSessionResponse value) => value.writeToBuffer()));
   }
 
   $async.Future<$0.RegisterResponse> register_Pre($grpc.ServiceCall call, $async.Future<$0.RegisterRequest> request) async {
@@ -93,7 +154,27 @@ abstract class DUOServiceBase extends $grpc.Service {
     return submitLoginChallenge(call, await request);
   }
 
+  $async.Stream<$1.SessionStream> createSession_Pre($grpc.ServiceCall call, $async.Future<$1.CreateSessionRequest> request) async* {
+    yield* createSession(call, await request);
+  }
+
+  $async.Stream<$1.SessionStream> joinSession_Pre($grpc.ServiceCall call, $async.Future<$1.JoinSessionRequest> request) async* {
+    yield* joinSession(call, await request);
+  }
+
+  $async.Future<$1.DisconnectSessionResponse> disconnectSession_Pre($grpc.ServiceCall call, $async.Future<$1.DisconnectSessionRequest> request) async {
+    return disconnectSession(call, await request);
+  }
+
+  $async.Future<$1.DeleteSessionResponse> deleteSession_Pre($grpc.ServiceCall call, $async.Future<$1.DeleteSessionRequest> request) async {
+    return deleteSession(call, await request);
+  }
+
   $async.Future<$0.RegisterResponse> register($grpc.ServiceCall call, $0.RegisterRequest request);
   $async.Future<$0.LoginChallengeRequest> requestLoginChallenge($grpc.ServiceCall call, $0.LoginRequest request);
   $async.Future<$0.LoginResponse> submitLoginChallenge($grpc.ServiceCall call, $0.LoginChallengeResponse request);
+  $async.Stream<$1.SessionStream> createSession($grpc.ServiceCall call, $1.CreateSessionRequest request);
+  $async.Stream<$1.SessionStream> joinSession($grpc.ServiceCall call, $1.JoinSessionRequest request);
+  $async.Future<$1.DisconnectSessionResponse> disconnectSession($grpc.ServiceCall call, $1.DisconnectSessionRequest request);
+  $async.Future<$1.DeleteSessionResponse> deleteSession($grpc.ServiceCall call, $1.DeleteSessionRequest request);
 }
