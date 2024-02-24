@@ -1,8 +1,35 @@
 package util
 
-/// CreateLoginChallenge creates a login challenge and encrypts it with the user's public key
-/// Returns the encrypted challenge and the challenge itself (plaintext, encrypted, error)
+import (
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/x509"
+	"encoding/pem"
+	"fmt"
+)
+
+// / CreateLoginChallenge creates a login challenge and encrypts it with the user's public key
+// / Returns the encrypted challenge and the challenge itself (plaintext, encrypted, error)
 func CreateLoginChallenge(publicKey string) (string, string, error) {
-	//TODO implement
-	return "", "", nil
+	challenge, challengeErr := CryptoRandomString(32)
+	if challengeErr != nil {
+		return "", "", challengeErr
+	}
+
+	publicKeyBlock, _ := pem.Decode([]byte(publicKey))
+	if publicKeyBlock == nil || publicKeyBlock.Type != "RSA PUBLIC KEY" {
+		return "", "", fmt.Errorf("invalid public key, maybe not an rsa key")
+	}
+
+	rsaKey, parseErr := x509.ParsePKCS1PublicKey(publicKeyBlock.Bytes)
+	if parseErr != nil {
+		return "", "", parseErr
+	}
+
+	encryptedText, encErr := rsa.EncryptPKCS1v15(rand.Reader, rsaKey, []byte(challenge))
+	if encErr != nil {
+		return "", "", encErr
+	}
+
+	return challenge, string(encryptedText), nil
 }

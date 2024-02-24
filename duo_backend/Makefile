@@ -24,18 +24,18 @@ sqlc:
 	docker run --rm -v "$(shell cd):/src" -w /src kjconroy/sqlc generate 
 
 migrateup:
-	docker run -v $(shell cd)/db/migration:/migrations --network host migrate/migrate \
+	docker run -v $(shell cd)/db/migration:/migrations --rm --network host migrate/migrate \
     -path=/migrations/ -database $(db_conn) up 1
 
 migratedown:
-	docker run -v $(shell cd)/db/migration:/migrations --network host migrate/migrate \
+	docker run -v $(shell cd)/db/migration:/migrations --rm --network host migrate/migrate \
     -path=/migrations/ -database $(db_conn) down 1
 
 migratecreate:
-	docker run -v $(shell cd)/db/migration:/migrations --network host migrate/migrate create -seq -ext sql -dir /migrations $(name)
+	docker run -v $(shell cd)/db/migration:/migrations --rm --network host migrate/migrate create -seq -ext sql -dir /migrations $(name)
 
 migrateupall:
-	docker run -v $(shell cd)/db/migration:/migrations --network host migrate/migrate \
+	docker run -v $(shell cd)/db/migration:/migrations --rm --network host migrate/migrate \
     -path=/migrations/ -database $(db_conn) up
 
 .PHONY: run runNative rebuild build delete rerun migrateup migratedown migratecreate migrateupall sqlc
