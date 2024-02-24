@@ -11,7 +11,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE IF NOT EXISTS duouser (
     uuid UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     username VARCHAR(255) NOT NULL,
-    public_key VARCHAR(255) NOT NULL
+    public_key TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS user_login (
