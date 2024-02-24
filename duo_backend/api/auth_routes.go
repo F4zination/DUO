@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"database/sql"
+	"log"
 	"time"
 
 	db "github.com/duo/db/sqlc"
@@ -53,6 +54,9 @@ func (server *Server) RequestLoginChallenge(ctx context.Context, req *pb.LoginRe
 	}
 
 	plainChallenge, encryptedChallenge, encryptErr := util.CreateLoginChallenge(dbUser.PublicKey)
+	//TODO delete
+	log.Printf("Created Challenge: %s", plainChallenge)
+
 	if encryptErr != nil {
 		server.OnError(encryptErr)
 		return nil, status.Errorf(codes.Internal, "An error occurred while creating the login challenge")
