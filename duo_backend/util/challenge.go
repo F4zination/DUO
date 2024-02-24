@@ -32,7 +32,9 @@ func CreateLoginChallenge(publicKey string) (string, string, error) {
 		return "", "", encErr
 	}
 
-	return challenge, string(encryptedText), nil
+	encryptedChallenge := EncodeBase64(encryptedText)
+
+	return challenge, encryptedChallenge, nil
 }
 
 func EncodeBase64(b []byte) string {

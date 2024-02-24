@@ -73,7 +73,7 @@ func (server *Server) RequestLoginChallenge(ctx context.Context, req *pb.LoginRe
 	}
 
 	return &pb.LoginChallengeRequest{
-		Challenge: util.EncodeBase64([]byte(encryptedChallenge)),
+		Challenge: encryptedChallenge,
 	}, nil
 }
 
