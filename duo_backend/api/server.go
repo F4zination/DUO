@@ -1,23 +1,20 @@
 package api
 
 import (
-	"sync"
-
+	db "github.com/duo/db/sqlc"
 	"github.com/duo/pb"
 	"github.com/duo/util"
 )
 
 type Server struct {
 	pb.UnimplementedMessagingServiceServer
-	Config           util.Config
-	ConnectedClients map[string]pb.MessagingService_ConnectServer
-	Mu               sync.Mutex
+	Config util.Config
+	Store  db.Store
 }
 
-func NewServer(config util.Config) *Server {
+func NewServer(store db.Store, config util.Config) *Server {
 	return &Server{
-		Config:           config,
-		ConnectedClients: make(map[string]pb.MessagingService_ConnectServer),
-		Mu:               sync.Mutex{},
+		Store:  store,
+		Config: config,
 	}
 }

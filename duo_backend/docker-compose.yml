@@ -1,0 +1,25 @@
+version: "3.8"
+services:
+  duo_api:
+    container_name: "duo_server"
+    build:
+      context: "."
+      dockerfile: "Dockerfile"
+    ports:
+      - "8080:8080"
+    env_file:
+      - app.env
+    depends_on:
+      - "duo_db"
+  duo_db:
+    container_name: "duo_db"
+    image: "postgres"
+    ports:
+      - "5432:5432"
+    env_file:
+      - db.env
+    volumes:
+      - "duo_db:/var/lib/postgresql/data"
+
+volumes:
+  duo_db:

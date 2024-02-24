@@ -1,5 +1,6 @@
 containerName=duo_server
 imageName=duo_backend
+db_conn=postgres://duo_user:Testimesti123@0.0.0.0:5432/duo?sslmode=disable
 
 runNative:
 	go run main.go
@@ -19,4 +20,22 @@ build:
 rebuild:
 	docker rm $(containerName) && docker rmi $(imageName) && make build
 
-.PHONY: run runNative rebuild build
+sqlc:
+	docker run --rm -v "$(shell cd):/src" -w /src kjconroy/sqlc generate 
+
+migrateup:
+	docker run -v $(shell cd)/db/migration:/migrations --network host migrate/migrate \
+    -path=/migrations/ -database $(db_conn) up 1
+
+migratedown:
+	docker run -v $(shell cd)/db/migration:/migrations --network host migrate/migrate \
+    -path=/migrations/ -database $(db_conn) down 1
+
+migratecreate:
+	docker run -v $(shell cd)/db/migration:/migrations --network host migrate/migrate create -seq -ext sql -dir /migrations $(name)
+
+migrateupall:
+	docker run -v $(shell cd)/db/migration:/migrations --network host migrate/migrate \
+    -path=/migrations/ -database $(db_conn) up
+
+.PHONY: run runNative rebuild build delete rerun migrateup migratedown migratecreate migrateupall sqlc

@@ -1,15 +1,19 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"net"
 
 	"github.com/duo/api"
+	db "github.com/duo/db/sqlc"
 	"github.com/duo/pb"
 	"github.com/duo/util"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+
+	_ "github.com/lib/pq" // postgres driver
 )
 
 func main() {
@@ -19,11 +23,18 @@ func main() {
 		return
 	}
 
-	RunGrpcServer(config)
+	dbConn, dbErr := sql.Open(config.DBDriver, config.DBSource)
+	if dbErr != nil {
+		log.Fatalf("Error connecting to db: %s", dbErr)
+		return
+	}
+	store := db.NewStore(dbConn)
+
+	RunGrpcServer(store, config)
 }
 
-func RunGrpcServer(config util.Config) {
-	server := api.NewServer(config)
+func RunGrpcServer(store db.Store, config util.Config) {
+	server := api.NewServer(store, config)
 	gRPCServer := grpc.NewServer()
 
 	pb.RegisterMessagingServiceServer(gRPCServer, server)

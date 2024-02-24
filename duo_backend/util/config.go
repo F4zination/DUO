@@ -7,6 +7,8 @@ import (
 type Config struct {
 	Output        string `mapstructure:"OUTPUT"`
 	ServerAddress string `mapstructure:"SERVER_ADDRESS"`
+	DBDriver      string `mapstructure:"DB_DRIVER"`
+	DBSource      string `mapstructure:"DB_SOURCE"`
 }
 
 func LoadConfig(path string) (config Config, err error) {
