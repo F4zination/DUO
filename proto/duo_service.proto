@@ -3,6 +3,7 @@ syntax = "proto3";
 package pb;
 
 import "auth_messages.proto";
+import "session_messages.proto";
 import "void.proto";
 
 option go_package = "github.com/duo/pb";
@@ -12,6 +13,10 @@ service DUOService {
     rpc Register (RegisterRequest) returns (RegisterResponse) {}
     rpc RequestLoginChallenge(LoginRequest) returns (LoginChallengeRequest) {}
     rpc SubmitLoginChallenge(LoginChallengeResponse) returns (LoginResponse) {}
+
+    rpc CreateSession(CreateSessionRequest) returns (stream SessionStream) {}
+    rpc JoinSession(JoinSessionRequest) returns (stream SessionStream) {}
+    rpc DeleteSessionRequest(DeleteSessionRequest) returns (DeleteSessionResponse) {}
 
 }
 

@@ -95,6 +95,7 @@ class GrpcServerConnection extends AbstractServerConnection {
       return -1;
     }
 
+    // If the login was successful, return 0
     return 0;
   }
 }

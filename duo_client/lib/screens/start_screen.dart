@@ -1,19 +1,20 @@
+import 'package:duo_client/provider/storage_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:grpc/grpc.dart';
 import 'package:duo_client/utils/constants.dart';
 
-class StartScreen extends StatefulWidget {
+class StartScreen extends ConsumerStatefulWidget {
   const StartScreen({super.key, required this.title});
 
   final String title;
 
   @override
-  State<StartScreen> createState() => _StartScreenState();
+  ConsumerState<StartScreen> createState() => _StartScreenState();
 }
 
-class _StartScreenState extends State<StartScreen> {
+class _StartScreenState extends ConsumerState<StartScreen> {
   late final ClientChannel channel;
-  String message = 'Register or Login to continue';
 
   @override
   void initState() {
@@ -36,7 +37,11 @@ class _StartScreenState extends State<StartScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              message,
+              ref
+                  .read(storageProvider)
+                  .storage
+                  .read(key: keyToUsername)
+                  .toString(),
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 20),

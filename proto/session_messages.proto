@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "github.com/duo/pb";
+
+
+message GameState{
+
+}
+
+
+message CreateSessionRequest{
+    string user_uuid = 1;
+    int32 pin = 2;
+}
+
+message JoinSessionRequest{
+    string user_uuid = 1;
+    int32 session_id = 2;
+    int32 pin = 2;
+}
+
+message SessionStream{
+    GameState state = 1;
+}
+
+
+message DeleteSessionRequest{
+    string uuid = 1;
+}
+
+message DeleteSessionResponse{
+    bool success = 1;
+}
