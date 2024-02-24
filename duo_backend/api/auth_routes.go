@@ -55,7 +55,8 @@ func (server *Server) RequestLoginChallenge(ctx context.Context, req *pb.LoginRe
 
 	plainChallenge, encryptedChallenge, encryptErr := util.CreateLoginChallenge(dbUser.PublicKey)
 	//TODO delete
-	log.Printf("Created Challenge: %s", plainChallenge)
+	log.Printf("Created Challenge Plain: %s", plainChallenge)
+	log.Printf("Created Challenge Encrypted: %s", encryptedChallenge)
 
 	if encryptErr != nil {
 		server.OnError(encryptErr)
