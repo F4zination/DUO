@@ -36,7 +36,7 @@ func CryptoRandomString(length int) (string, error) {
 		if randErr != nil {
 			return "", randErr
 		}
-		sb.WriteByte(alphabet[n.Int64()])
+		sb.WriteByte(challengeAlphabet[n.Int64()])
 	}
 	return sb.String(), nil
 }
