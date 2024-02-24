@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
+	"encoding/base64"
 	"encoding/pem"
 	"fmt"
 )
@@ -32,4 +33,12 @@ func CreateLoginChallenge(publicKey string) (string, string, error) {
 	}
 
 	return challenge, string(encryptedText), nil
+}
+
+func EncodeBase64(b []byte) string {
+	return base64.StdEncoding.EncodeToString(b)
+}
+
+func DecodeBase64(s string) ([]byte, error) {
+	return base64.StdEncoding.DecodeString(s)
 }
