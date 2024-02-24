@@ -12,7 +12,7 @@ import (
 // / CreateLoginChallenge creates a login challenge and encrypts it with the user's public key
 // / Returns the encrypted challenge and the challenge itself (plaintext, encrypted, error)
 func CreateLoginChallenge(publicKey string) (string, string, error) {
-	challenge, challengeErr := CryptoRandomString(32)
+	challenge, challengeErr := CryptoRandomString(8)
 	if challengeErr != nil {
 		return "", "", challengeErr
 	}
