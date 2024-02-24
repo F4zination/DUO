@@ -38,7 +38,7 @@ func (server *Server) Register(ctx context.Context, req *pb.RegisterRequest) (*p
 }
 
 func (server *Server) RequestLoginChallenge(ctx context.Context, req *pb.LoginRequest) (*pb.LoginChallengeRequest, error) {
-	actualUUID, uuidErr := uuid.FromBytes([]byte(req.Uuid))
+	actualUUID, uuidErr := uuid.Parse(req.Uuid)
 	if uuidErr != nil {
 		server.OnError(uuidErr)
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid UUID")
@@ -77,7 +77,7 @@ func (server *Server) RequestLoginChallenge(ctx context.Context, req *pb.LoginRe
 }
 
 func (server *Server) SubmitLoginChallenge(ctx context.Context, req *pb.LoginChallengeResponse) (*pb.LoginResponse, error) {
-	actualUUID, uuidErr := uuid.FromBytes([]byte(req.Uuid))
+	actualUUID, uuidErr := uuid.Parse(req.Uuid)
 	if uuidErr != nil {
 		server.OnError(uuidErr)
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid UUID")
