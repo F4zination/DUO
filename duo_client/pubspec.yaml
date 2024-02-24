@@ -38,6 +38,11 @@ dependencies:
   grpc: ^3.2.4
   protobuf: ^3.1.0
   fixnum: ^1.1.0
+  flutter_riverpod: ^2.4.10
+  flutter_secure_storage: ^9.0.0
+  pointycastle: ^3.7.4
+  asn1lib: ^1.5.2
+  rsa_encrypt: ^2.0.0
 
 
 dev_dependencies:
