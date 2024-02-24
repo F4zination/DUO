@@ -11,30 +11,25 @@ import (
 
 // / CreateLoginChallenge creates a login challenge and encrypts it with the user's public key
 // / Returns the encrypted challenge and the challenge itself (plaintext, encrypted, error)
-func CreateLoginChallenge(publicKey string) (string, string, error) {
-	challenge, challengeErr := CryptoRandomString(8)
+func CreateLoginChallenge(publicPEMKey string) (string, string, error) {
+	challenge, challengeErr := CryptoRandomString(32)
 	if challengeErr != nil {
 		return "", "", challengeErr
 	}
 
-	publicKeyBlock, _ := pem.Decode([]byte(publicKey))
-	if publicKeyBlock == nil || publicKeyBlock.Type != "RSA PUBLIC KEY" {
-		return "", "", fmt.Errorf("invalid public key, maybe not an rsa key")
+	publicKeyBlock, _ := pem.Decode([]byte(publicPEMKey))
+	if publicKeyBlock == nil {
+		return "", "", fmt.Errorf("failed to decode public key")
 	}
-
-	rsaKey, parseErr := x509.ParsePKCS1PublicKey(publicKeyBlock.Bytes)
-	if parseErr != nil {
-		return "", "", parseErr
+	publicKey, publicKeyErr := x509.ParsePKCS1PublicKey(publicKeyBlock.Bytes)
+	if publicKeyErr != nil {
+		return "", "", publicKeyErr
 	}
-
-	encryptedText, encErr := rsa.EncryptPKCS1v15(rand.Reader, rsaKey, []byte(challenge))
-	if encErr != nil {
-		return "", "", encErr
+	ciphertext, err := rsa.EncryptPKCS1v15(rand.Reader, publicKey, []byte(challenge))
+	if err != nil {
+		return "", "", err
 	}
-
-	encryptedChallenge := EncodeBase64(encryptedText)
-
-	return challenge, encryptedChallenge, nil
+	return challenge, EncodeBase64(ciphertext), nil
 }
 
 func EncodeBase64(b []byte) string {

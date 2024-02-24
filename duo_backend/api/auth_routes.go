@@ -52,7 +52,6 @@ func (server *Server) RequestLoginChallenge(ctx context.Context, req *pb.LoginRe
 		}
 		return nil, status.Errorf(codes.Internal, "An error occurred while getting the user from the db")
 	}
-
 	plainChallenge, encryptedChallenge, encryptErr := util.CreateLoginChallenge(dbUser.PublicKey)
 	//TODO delete
 	log.Printf("Created Challenge Plain: %s", plainChallenge)

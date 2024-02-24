@@ -43,10 +43,10 @@ class GrpcServerConnection extends AbstractServerConnection {
         ..username = username
         ..publicKey = encodedPublicKey);
 
-      storage.write(key: 'username', value: username);
-      storage.write(key: 'userid', value: resp.uuid);
-      storage.write(key: keyToAccessToken, value: resp.authToken);
-      storage.write(key: keyToPrivateKey, value: encodedPrivateKey);
+      await storage.write(key: 'username', value: username);
+      await storage.write(key: 'userid', value: resp.uuid);
+      await storage.write(key: keyToAccessToken, value: resp.authToken);
+      await storage.write(key: keyToPrivateKey, value: encodedPrivateKey);
     } catch (e) {
       return -1;
     }
@@ -61,19 +61,20 @@ class GrpcServerConnection extends AbstractServerConnection {
     String privateKey = (await storage.read(key: keyToPrivateKey)) ?? '';
     var helper = RsaKeyHelper();
 
-    // var helper = RsaKeyHelper();
-    PrivateKey privKey = helper.parsePrivateKeyFromPem(privateKey);
+    RSAPrivateKey privKey = helper.parsePrivateKeyFromPem(privateKey);
 
     var decodedChallenge = base64.decode(lcr.challenge);
     var decodedChallengeString = String.fromCharCodes(decodedChallenge);
 
     var decryptedChallenge = decrypt(
       decodedChallengeString,
-      privKey as RSAPrivateKey,
+      privKey,
     );
 
-    print(
-        'Decrypted challenge: ${base64.encode(decryptedChallenge.codeUnits)}');
+    decryptedChallenge =
+        decryptedChallenge.substring(decryptedChallenge.length - 32);
+
+    print('Decrypted challenge: ${decryptedChallenge}');
     return 0;
   }
 }

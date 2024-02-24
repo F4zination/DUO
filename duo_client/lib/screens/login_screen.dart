@@ -31,7 +31,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   _apiProvider.init(ServerConnectionType.grpc);
                   final AbstractServerConnection _serverConnection =
                       _apiProvider.serverConnection!;
-                  String uuid = await storage.read(key: 'userid') as String;
+                  String uuid =
+                      await storage.read(key: 'userid') as String? ?? '';
                   print(uuid);
                   _serverConnection.loginUser(uuid).then((value) {
                     if (value == 0) {
