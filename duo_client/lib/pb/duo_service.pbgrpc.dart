@@ -25,12 +25,12 @@ class DUOServiceClient extends $grpc.Client {
       '/pb.DUOService/Register',
       ($0.RegisterRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.RegisterResponse.fromBuffer(value));
-  static final _$requestChallenge = $grpc.ClientMethod<$0.LoginRequest, $0.LoginChallengeRequest>(
-      '/pb.DUOService/requestChallenge',
+  static final _$requestLoginChallenge = $grpc.ClientMethod<$0.LoginRequest, $0.LoginChallengeRequest>(
+      '/pb.DUOService/RequestLoginChallenge',
       ($0.LoginRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.LoginChallengeRequest.fromBuffer(value));
-  static final _$submitChallenge = $grpc.ClientMethod<$0.LoginChallengeResponse, $0.LoginResponse>(
-      '/pb.DUOService/submitChallenge',
+  static final _$submitLoginChallenge = $grpc.ClientMethod<$0.LoginChallengeResponse, $0.LoginResponse>(
+      '/pb.DUOService/SubmitLoginChallenge',
       ($0.LoginChallengeResponse value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.LoginResponse.fromBuffer(value));
 
@@ -44,12 +44,12 @@ class DUOServiceClient extends $grpc.Client {
     return $createUnaryCall(_$register, request, options: options);
   }
 
-  $grpc.ResponseFuture<$0.LoginChallengeRequest> requestChallenge($0.LoginRequest request, {$grpc.CallOptions? options}) {
-    return $createUnaryCall(_$requestChallenge, request, options: options);
+  $grpc.ResponseFuture<$0.LoginChallengeRequest> requestLoginChallenge($0.LoginRequest request, {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$requestLoginChallenge, request, options: options);
   }
 
-  $grpc.ResponseFuture<$0.LoginResponse> submitChallenge($0.LoginChallengeResponse request, {$grpc.CallOptions? options}) {
-    return $createUnaryCall(_$submitChallenge, request, options: options);
+  $grpc.ResponseFuture<$0.LoginResponse> submitLoginChallenge($0.LoginChallengeResponse request, {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$submitLoginChallenge, request, options: options);
   }
 }
 
@@ -66,15 +66,15 @@ abstract class DUOServiceBase extends $grpc.Service {
         ($core.List<$core.int> value) => $0.RegisterRequest.fromBuffer(value),
         ($0.RegisterResponse value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.LoginRequest, $0.LoginChallengeRequest>(
-        'requestChallenge',
-        requestChallenge_Pre,
+        'RequestLoginChallenge',
+        requestLoginChallenge_Pre,
         false,
         false,
         ($core.List<$core.int> value) => $0.LoginRequest.fromBuffer(value),
         ($0.LoginChallengeRequest value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.LoginChallengeResponse, $0.LoginResponse>(
-        'submitChallenge',
-        submitChallenge_Pre,
+        'SubmitLoginChallenge',
+        submitLoginChallenge_Pre,
         false,
         false,
         ($core.List<$core.int> value) => $0.LoginChallengeResponse.fromBuffer(value),
@@ -85,15 +85,15 @@ abstract class DUOServiceBase extends $grpc.Service {
     return register(call, await request);
   }
 
-  $async.Future<$0.LoginChallengeRequest> requestChallenge_Pre($grpc.ServiceCall call, $async.Future<$0.LoginRequest> request) async {
-    return requestChallenge(call, await request);
+  $async.Future<$0.LoginChallengeRequest> requestLoginChallenge_Pre($grpc.ServiceCall call, $async.Future<$0.LoginRequest> request) async {
+    return requestLoginChallenge(call, await request);
   }
 
-  $async.Future<$0.LoginResponse> submitChallenge_Pre($grpc.ServiceCall call, $async.Future<$0.LoginChallengeResponse> request) async {
-    return submitChallenge(call, await request);
+  $async.Future<$0.LoginResponse> submitLoginChallenge_Pre($grpc.ServiceCall call, $async.Future<$0.LoginChallengeResponse> request) async {
+    return submitLoginChallenge(call, await request);
   }
 
   $async.Future<$0.RegisterResponse> register($grpc.ServiceCall call, $0.RegisterRequest request);
-  $async.Future<$0.LoginChallengeRequest> requestChallenge($grpc.ServiceCall call, $0.LoginRequest request);
-  $async.Future<$0.LoginResponse> submitChallenge($grpc.ServiceCall call, $0.LoginChallengeResponse request);
+  $async.Future<$0.LoginChallengeRequest> requestLoginChallenge($grpc.ServiceCall call, $0.LoginRequest request);
+  $async.Future<$0.LoginResponse> submitLoginChallenge($grpc.ServiceCall call, $0.LoginChallengeResponse request);
 }

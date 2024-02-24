@@ -23,8 +23,8 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DUOServiceClient interface {
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
-	RequestChallenge(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginChallengeRequest, error)
-	SubmitChallenge(ctx context.Context, in *LoginChallengeResponse, opts ...grpc.CallOption) (*LoginResponse, error)
+	RequestLoginChallenge(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginChallengeRequest, error)
+	SubmitLoginChallenge(ctx context.Context, in *LoginChallengeResponse, opts ...grpc.CallOption) (*LoginResponse, error)
 }
 
 type dUOServiceClient struct {
@@ -44,18 +44,18 @@ func (c *dUOServiceClient) Register(ctx context.Context, in *RegisterRequest, op
 	return out, nil
 }
 
-func (c *dUOServiceClient) RequestChallenge(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginChallengeRequest, error) {
+func (c *dUOServiceClient) RequestLoginChallenge(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginChallengeRequest, error) {
 	out := new(LoginChallengeRequest)
-	err := c.cc.Invoke(ctx, "/pb.DUOService/requestChallenge", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/pb.DUOService/RequestLoginChallenge", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *dUOServiceClient) SubmitChallenge(ctx context.Context, in *LoginChallengeResponse, opts ...grpc.CallOption) (*LoginResponse, error) {
+func (c *dUOServiceClient) SubmitLoginChallenge(ctx context.Context, in *LoginChallengeResponse, opts ...grpc.CallOption) (*LoginResponse, error) {
 	out := new(LoginResponse)
-	err := c.cc.Invoke(ctx, "/pb.DUOService/submitChallenge", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/pb.DUOService/SubmitLoginChallenge", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -67,8 +67,8 @@ func (c *dUOServiceClient) SubmitChallenge(ctx context.Context, in *LoginChallen
 // for forward compatibility
 type DUOServiceServer interface {
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
-	RequestChallenge(context.Context, *LoginRequest) (*LoginChallengeRequest, error)
-	SubmitChallenge(context.Context, *LoginChallengeResponse) (*LoginResponse, error)
+	RequestLoginChallenge(context.Context, *LoginRequest) (*LoginChallengeRequest, error)
+	SubmitLoginChallenge(context.Context, *LoginChallengeResponse) (*LoginResponse, error)
 	mustEmbedUnimplementedDUOServiceServer()
 }
 
@@ -79,11 +79,11 @@ type UnimplementedDUOServiceServer struct {
 func (UnimplementedDUOServiceServer) Register(context.Context, *RegisterRequest) (*RegisterResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
 }
-func (UnimplementedDUOServiceServer) RequestChallenge(context.Context, *LoginRequest) (*LoginChallengeRequest, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RequestChallenge not implemented")
+func (UnimplementedDUOServiceServer) RequestLoginChallenge(context.Context, *LoginRequest) (*LoginChallengeRequest, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RequestLoginChallenge not implemented")
 }
-func (UnimplementedDUOServiceServer) SubmitChallenge(context.Context, *LoginChallengeResponse) (*LoginResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SubmitChallenge not implemented")
+func (UnimplementedDUOServiceServer) SubmitLoginChallenge(context.Context, *LoginChallengeResponse) (*LoginResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SubmitLoginChallenge not implemented")
 }
 func (UnimplementedDUOServiceServer) mustEmbedUnimplementedDUOServiceServer() {}
 
@@ -116,38 +116,38 @@ func _DUOService_Register_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
-func _DUOService_RequestChallenge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _DUOService_RequestLoginChallenge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(LoginRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DUOServiceServer).RequestChallenge(ctx, in)
+		return srv.(DUOServiceServer).RequestLoginChallenge(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.DUOService/requestChallenge",
+		FullMethod: "/pb.DUOService/RequestLoginChallenge",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DUOServiceServer).RequestChallenge(ctx, req.(*LoginRequest))
+		return srv.(DUOServiceServer).RequestLoginChallenge(ctx, req.(*LoginRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _DUOService_SubmitChallenge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _DUOService_SubmitLoginChallenge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(LoginChallengeResponse)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DUOServiceServer).SubmitChallenge(ctx, in)
+		return srv.(DUOServiceServer).SubmitLoginChallenge(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.DUOService/submitChallenge",
+		FullMethod: "/pb.DUOService/SubmitLoginChallenge",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DUOServiceServer).SubmitChallenge(ctx, req.(*LoginChallengeResponse))
+		return srv.(DUOServiceServer).SubmitLoginChallenge(ctx, req.(*LoginChallengeResponse))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -164,12 +164,12 @@ var DUOService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _DUOService_Register_Handler,
 		},
 		{
-			MethodName: "requestChallenge",
-			Handler:    _DUOService_RequestChallenge_Handler,
+			MethodName: "RequestLoginChallenge",
+			Handler:    _DUOService_RequestLoginChallenge_Handler,
 		},
 		{
-			MethodName: "submitChallenge",
-			Handler:    _DUOService_SubmitChallenge_Handler,
+			MethodName: "SubmitLoginChallenge",
+			Handler:    _DUOService_SubmitLoginChallenge_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

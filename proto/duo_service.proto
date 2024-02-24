@@ -10,8 +10,8 @@ option go_package = "github.com/duo/pb";
 
 service DUOService {
     rpc Register (RegisterRequest) returns (RegisterResponse) {}
-    rpc requestChallenge(LoginRequest) returns (LoginChallengeRequest) {}
-    rpc submitChallenge(LoginChallengeResponse) returns (LoginResponse) {}
+    rpc RequestLoginChallenge(LoginRequest) returns (LoginChallengeRequest) {}
+    rpc SubmitLoginChallenge(LoginChallengeResponse) returns (LoginResponse) {}
 
 }
 

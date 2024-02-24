@@ -37,7 +37,7 @@ func RunGrpcServer(store db.Store, config util.Config) {
 	server := api.NewServer(store, config)
 	gRPCServer := grpc.NewServer()
 
-	pb.RegisterMessagingServiceServer(gRPCServer, server)
+	pb.RegisterDUOServiceServer(gRPCServer, server)
 	reflection.Register(gRPCServer)
 
 	listener, err := net.Listen("tcp", config.ServerAddress)
