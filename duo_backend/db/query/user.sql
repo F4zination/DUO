@@ -10,5 +10,5 @@ INSERT INTO user_login (user_uuid, challenge) VALUES ($1, $2) RETURNING *;
 -- name: GetUserLoginByUUID :one
 SELECT * FROM user_login WHERE user_uuid = $1 LIMIT 1;
 
--- name: DeleteUserLoginByUUID :execresult
-DELETE FROM user_login WHERE user_uuid = $1;
+-- name: DeleteUserLoginByUUID :one
+DELETE FROM user_login WHERE user_uuid = $1 RETURNING *;

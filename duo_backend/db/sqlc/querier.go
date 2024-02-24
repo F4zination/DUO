@@ -6,7 +6,6 @@ package db
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/google/uuid"
 )
@@ -14,7 +13,7 @@ import (
 type Querier interface {
 	CreateUser(ctx context.Context, arg CreateUserParams) (Duouser, error)
 	CreateUserLogin(ctx context.Context, arg CreateUserLoginParams) (UserLogin, error)
-	DeleteUserLoginByUUID(ctx context.Context, userUuid uuid.UUID) (sql.Result, error)
+	DeleteUserLoginByUUID(ctx context.Context, userUuid uuid.UUID) (UserLogin, error)
 	GetUserByUUID(ctx context.Context, uuid uuid.UUID) (Duouser, error)
 	GetUserLoginByUUID(ctx context.Context, userUuid uuid.UUID) (UserLogin, error)
 }

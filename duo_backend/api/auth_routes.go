@@ -72,7 +72,7 @@ func (server *Server) RequestLoginChallenge(ctx context.Context, req *pb.LoginRe
 	}
 
 	return &pb.LoginChallengeRequest{
-		Challenge: util.EncodeBase64([]byte(encryptedChallenge)),
+		Challenge: encryptedChallenge,
 	}, nil
 }
 
@@ -83,6 +83,15 @@ func (server *Server) SubmitLoginChallenge(ctx context.Context, req *pb.LoginCha
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid UUID")
 	}
 
+	dbUserLogin, getErr := server.Store.DeleteUserLoginByUUID(ctx, actualUUID)
+	if getErr != nil {
+		server.OnError(getErr)
+		if getErr == sql.ErrNoRows {
+			return nil, status.Errorf(codes.NotFound, "User login not found")
+		}
+		return nil, status.Errorf(codes.Internal, "An error occurred while getting the user login from the db")
+	}
+
 	dbUser, getErr := server.Store.GetUserByUUID(ctx, actualUUID)
 	if getErr != nil {
 		server.OnError(getErr)
@@ -90,15 +99,6 @@ func (server *Server) SubmitLoginChallenge(ctx context.Context, req *pb.LoginCha
 			return nil, status.Errorf(codes.NotFound, "User not found")
 		}
 		return nil, status.Errorf(codes.Internal, "An error occurred while getting the user from the db")
-	}
-
-	dbUserLogin, getErr := server.Store.GetUserLoginByUUID(ctx, actualUUID)
-	if getErr != nil {
-		server.OnError(getErr)
-		if getErr == sql.ErrNoRows {
-			return nil, status.Errorf(codes.NotFound, "User login not found")
-		}
-		return nil, status.Errorf(codes.Internal, "An error occurred while getting the user login from the db")
 	}
 
 	if dbUserLogin.Challenge != req.DecryptedChallenge {

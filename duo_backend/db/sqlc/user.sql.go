@@ -7,7 +7,6 @@ package db
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/google/uuid"
 )
@@ -44,12 +43,15 @@ func (q *Queries) CreateUserLogin(ctx context.Context, arg CreateUserLoginParams
 	return i, err
 }
 
-const deleteUserLoginByUUID = `-- name: DeleteUserLoginByUUID :execresult
-DELETE FROM user_login WHERE user_uuid = $1
+const deleteUserLoginByUUID = `-- name: DeleteUserLoginByUUID :one
+DELETE FROM user_login WHERE user_uuid = $1 RETURNING user_uuid, challenge, login_time
 `
 
-func (q *Queries) DeleteUserLoginByUUID(ctx context.Context, userUuid uuid.UUID) (sql.Result, error) {
-	return q.db.ExecContext(ctx, deleteUserLoginByUUID, userUuid)
+func (q *Queries) DeleteUserLoginByUUID(ctx context.Context, userUuid uuid.UUID) (UserLogin, error) {
+	row := q.db.QueryRowContext(ctx, deleteUserLoginByUUID, userUuid)
+	var i UserLogin
+	err := row.Scan(&i.UserUuid, &i.Challenge, &i.LoginTime)
+	return i, err
 }
 
 const getUserByUUID = `-- name: GetUserByUUID :one
