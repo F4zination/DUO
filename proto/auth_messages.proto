@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package pb;
+
+option go_package = "github.com/duo/pb";
+
+message RegisterRequest {
+  string username = 1;
+  string public_key = 2;
+}
+
+message RegisterResponse {
+    string uuid = 1;
+    string auth_token = 2;
+}
+
+message LoginRequest {
+  string uuid = 1;
+}
+
+message LoginChallengeRequest {
+  string challenge = 1;
+}
+
+message LoginChallengeResponse {
+  string uuid = 1;
+  string decryptedChallenge = 2;
+}
+
+message LoginResponse {
+  string token = 1;
+  google.protobuf.Timestamp expires_at = 2;
+
+}

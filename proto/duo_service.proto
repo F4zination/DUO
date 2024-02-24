@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package pb;
+
+import "auth_messages.proto";
+import "void.proto";
+
+option go_package = "github.com/duo/pb";
+
+
+service DUOService {
+    rpc Register (RegisterRequest) returns (RegisterResponse) {}
+    rpc requestChallenge(LoginRequest) returns (LoginChallengeRequest) {}
+    rpc submitChallenge(LoginChallengeResponse) returns (LoginResponse) {}
+
+}
+

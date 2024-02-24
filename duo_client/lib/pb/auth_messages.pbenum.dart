@@ -1,6 +1,6 @@
 //
 //  Generated code. Do not modify.
-//  source: empty.proto
+//  source: auth_messages.proto
 //
 // @dart = 2.12
 
