@@ -33,12 +33,6 @@ class GrpcServerConnection extends AbstractServerConnection {
     final (publicPEMKey, privatePEMKey) =
         await EncryptionHandler.createPemKeyPair();
 
-    // Encode the public and private keys to PEM format
-    var encodedPublicKey =
-        helper.encodePublicKeyToPemPKCS1(keyPair.publicKey as RSAPublicKey);
-    var encodedPrivateKey =
-        helper.encodePrivateKeyToPemPKCS1(keyPair.privateKey as RSAPrivateKey);
-
     // Try to register the user with the server and store the private key and user id
     try {
       RegisterResponse resp = await client.register(RegisterRequest()

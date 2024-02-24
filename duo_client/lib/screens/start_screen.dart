@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:grpc/grpc.dart';
-import 'package:duo_client/utils/connection/conectivity.dart' as connectivity;
+import 'package:duo_client/utils/constants.dart';
 
 class StartScreen extends StatefulWidget {
   const StartScreen({super.key, required this.title});
@@ -19,8 +19,8 @@ class _StartScreenState extends State<StartScreen> {
   void initState() {
     super.initState();
     channel = ClientChannel(
-      connectivity.host,
-      port: connectivity.port,
+      Constants.host,
+      port: Constants.port,
       options: const ChannelOptions(credentials: ChannelCredentials.insecure()),
     );
   }
