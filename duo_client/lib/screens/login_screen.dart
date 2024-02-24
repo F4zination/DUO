@@ -1,8 +1,8 @@
 import 'package:duo_client/provider/api_provider.dart';
+import 'package:duo_client/provider/storage_provider.dart';
 import 'package:duo_client/utils/connection/abstract_connection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -12,9 +12,6 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  // TODO: Change to Provider
-  final storage = const FlutterSecureStorage();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,14 +24,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           children: [
             ElevatedButton(
                 onPressed: () async {
-                  final ApiProvider _apiProvider = ref.read(apiProvider);
-                  _apiProvider.init(ServerConnectionType.grpc);
-                  final AbstractServerConnection _serverConnection =
-                      _apiProvider.serverConnection!;
-                  String uuid =
-                      await storage.read(key: 'userid') as String? ?? '';
-                  print(uuid);
-                  _serverConnection.loginUser(uuid).then((value) {
+                  final StorageProvider storage = ref.read(storageProvider);
+                  final ApiProvider api = ref.read(apiProvider);
+                  api.init(ServerConnectionType.grpc);
+                  final AbstractServerConnection serverConnection =
+                      api.serverConnection!;
+                  String uuid = await storage.read(key: 'userid') ?? '';
+                  serverConnection.loginUser(uuid).then((value) {
                     if (value == 0) {
                       Navigator.pushReplacementNamed(context, '/');
                     } else {

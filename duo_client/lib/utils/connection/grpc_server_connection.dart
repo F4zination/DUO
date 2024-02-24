@@ -1,21 +1,18 @@
 import 'dart:convert';
 import 'package:duo_client/pb/auth_messages.pb.dart';
+import 'package:duo_client/provider/storage_provider.dart';
 import 'package:duo_client/utils/connection/abstract_connection.dart';
-import 'package:flutter/material.dart';
 import 'package:grpc/grpc.dart';
 import 'package:duo_client/utils/connection/conectivity.dart' as connectivity;
 import 'package:duo_client/pb/duo_service.pbgrpc.dart';
 import 'package:pointycastle/export.dart';
-
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:logging/logging.dart';
 import 'package:rsa_encrypt/rsa_encrypt.dart';
 
 class GrpcServerConnection extends AbstractServerConnection {
   late final ClientChannel channel;
   late final DUOServiceClient client;
   final storage = const FlutterSecureStorage();
-  final Logger log = Logger('GrpcServerConnection');
 
   @override
   void init() {
@@ -34,47 +31,74 @@ class GrpcServerConnection extends AbstractServerConnection {
     var helper = RsaKeyHelper();
     final keyPair = await helper.computeRSAKeyPair(helper.getSecureRandom());
 
+    // Encode the public and private keys to PEM format
     var encodedPublicKey =
         helper.encodePublicKeyToPemPKCS1(keyPair.publicKey as RSAPublicKey);
     var encodedPrivateKey =
         helper.encodePrivateKeyToPemPKCS1(keyPair.privateKey as RSAPrivateKey);
+
+    // Try to register the user with the server and store the private key and user id
     try {
       RegisterResponse resp = await client.register(RegisterRequest()
         ..username = username
         ..publicKey = encodedPublicKey);
 
-      await storage.write(key: 'username', value: username);
-      await storage.write(key: 'userid', value: resp.uuid);
+      await storage.write(key: keyToUsername, value: username);
+      await storage.write(key: keyToUserId, value: resp.uuid);
       await storage.write(key: keyToAccessToken, value: resp.authToken);
       await storage.write(key: keyToPrivateKey, value: encodedPrivateKey);
     } catch (e) {
+      // If the registration fails, return -1
       return -1;
     }
     return 0;
   }
 
+  /// Logs in a user with the server
   @override
   Future<int> loginUser(String uuid) async {
-    LoginChallengeRequest lcr =
-        await client.requestLoginChallenge(LoginRequest()..uuid = uuid);
+    String decryptedChallenge = '';
 
-    String privateKey = (await storage.read(key: keyToPrivateKey)) ?? '';
-    var helper = RsaKeyHelper();
+    ////////////////////////////////////////////
+    // Request a login challenge from the server
+    ////////////////////////////////////////////
+    try {
+      LoginChallengeRequest lcr =
+          await client.requestLoginChallenge(LoginRequest()..uuid = uuid);
 
-    RSAPrivateKey privKey = helper.parsePrivateKeyFromPem(privateKey);
+      String privateKey = (await storage.read(key: keyToPrivateKey)) ?? '';
+      var helper = RsaKeyHelper();
 
-    var decodedChallenge = base64.decode(lcr.challenge);
-    var decodedChallengeString = String.fromCharCodes(decodedChallenge);
+      RSAPrivateKey privKey = helper.parsePrivateKeyFromPem(privateKey);
 
-    var decryptedChallenge = decrypt(
-      decodedChallengeString,
-      privKey,
-    );
+      var decodedChallenge = base64.decode(lcr.challenge);
+      var decodedChallengeString = String.fromCharCodes(decodedChallenge);
 
-    decryptedChallenge =
-        decryptedChallenge.substring(decryptedChallenge.length - 32);
+      decryptedChallenge = decrypt(
+        decodedChallengeString,
+        privKey,
+      );
 
-    print('Decrypted challenge: ${decryptedChallenge}');
+      decryptedChallenge =
+          decryptedChallenge.substring(decryptedChallenge.length - 32);
+    } catch (e) {
+      return -1;
+    }
+    ////////////////////////////////////////////
+    //  Submit the decrypted challenge to the server
+    ////////////////////////////////////////////
+    try {
+      LoginResponse lr =
+          await client.submitLoginChallenge(LoginChallengeResponse()
+            ..uuid = uuid
+            ..decryptedChallenge = decryptedChallenge);
+
+      await storage.write(key: keyToAccessToken, value: lr.token);
+      await storage.write(key: keyToExpireDate, value: lr.expiresAt.toString());
+    } catch (e) {
+      return -1;
+    }
+
     return 0;
   }
 }
