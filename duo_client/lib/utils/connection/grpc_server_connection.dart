@@ -2,8 +2,9 @@ import 'dart:convert';
 import 'package:duo_client/pb/auth_messages.pb.dart';
 import 'package:duo_client/provider/storage_provider.dart';
 import 'package:duo_client/utils/connection/abstract_connection.dart';
+import 'package:duo_client/utils/constants.dart';
+import 'package:duo_client/utils/encryption/encryption_handler.dart';
 import 'package:grpc/grpc.dart';
-import 'package:duo_client/utils/connection/conectivity.dart' as connectivity;
 import 'package:duo_client/pb/duo_service.pbgrpc.dart';
 import 'package:pointycastle/export.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -17,8 +18,9 @@ class GrpcServerConnection extends AbstractServerConnection {
   @override
   void init() {
     channel = ClientChannel(
-      connectivity.host,
-      port: connectivity.port,
+      Constants.host,
+      port: Constants.port,
+      //TODO make secure
       options: const ChannelOptions(credentials: ChannelCredentials.insecure()),
     );
     client = DUOServiceClient(channel);
@@ -28,8 +30,8 @@ class GrpcServerConnection extends AbstractServerConnection {
   @override
   Future<int> registerUser(String username) async {
     // Generate RSA key pair
-    var helper = RsaKeyHelper();
-    final keyPair = await helper.computeRSAKeyPair(helper.getSecureRandom());
+    final (publicPEMKey, privatePEMKey) =
+        await EncryptionHandler.createPemKeyPair();
 
     // Encode the public and private keys to PEM format
     var encodedPublicKey =
@@ -41,12 +43,12 @@ class GrpcServerConnection extends AbstractServerConnection {
     try {
       RegisterResponse resp = await client.register(RegisterRequest()
         ..username = username
-        ..publicKey = encodedPublicKey);
+        ..publicKey = publicPEMKey);
 
       await storage.write(key: keyToUsername, value: username);
       await storage.write(key: keyToUserId, value: resp.uuid);
       await storage.write(key: keyToAccessToken, value: resp.authToken);
-      await storage.write(key: keyToPrivateKey, value: encodedPrivateKey);
+      await storage.write(key: keyToPrivateKey, value: privatePEMKey);
     } catch (e) {
       // If the registration fails, return -1
       return -1;
