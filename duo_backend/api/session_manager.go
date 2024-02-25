@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"time"
 
 	db "github.com/duo/db/sqlc"
 	"github.com/duo/pb"
@@ -36,6 +37,25 @@ func NewSessionManager() *SessionManager {
 	}
 }
 
+func (sm *SessionManager) SendTestMessagesToAll() {
+	go func() {
+		i := 0
+		for {
+			for sessionId, _ := range sm.SessionStreams {
+				sm.SendMessage(sessionId, &pb.SessionStream{
+					SessionId: int32(sessionId),
+					GameState: &pb.GameState{},
+					SessionState: &pb.SessionState{
+						CurrentPlayers: fmt.Sprint(i),
+					},
+				})
+			}
+			i++
+			time.Sleep(1 * time.Second)
+		}
+	}()
+}
+
 func (sm *SessionManager) CreateSession(userUUID uuid.UUID, pin string, store db.Store) (*db.GameSession, error) {
 	//TODO move to route
 	// _, getErr := store.GetSessionByOwnerUUID(context.Background(), stream.UserId)
@@ -58,6 +78,23 @@ func (sm *SessionManager) CreateSession(userUUID uuid.UUID, pin string, store db
 	sm.Mu.Unlock()
 
 	return &dbSession, nil
+}
+
+func (sm *SessionManager) GetPlayerIdsInSession(sessionId int) ([]uuid.UUID, error) {
+	sm.Mu.Lock()
+	defer sm.Mu.Unlock()
+
+	//Session must exist
+	if sm.SessionStreams[sessionId] == nil {
+		return []uuid.UUID{}, fmt.Errorf("session does not exist")
+	}
+
+	var userIds []uuid.UUID
+	for _, s := range sm.SessionStreams[sessionId] {
+		userIds = append(userIds, s.UserId)
+	}
+
+	return userIds, nil
 }
 
 func (sm *SessionManager) GetSession(sessionId int) ([]UserStream, error) {
