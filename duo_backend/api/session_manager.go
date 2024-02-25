@@ -65,12 +65,6 @@ func (sm *SessionManager) SendTestMessagesToAll() {
 }
 
 func (sm *SessionManager) CreateSession(userUUID uuid.UUID, pin string, maxPlayers int32) (*db.GameSession, error) {
-	//TODO move to route
-	// _, getErr := store.GetSessionByOwnerUUID(context.Background(), stream.UserId)
-	// if getErr != sql.ErrNoRows {
-	// 	return fmt.Errorf("user already owns a session")
-	// }
-
 	dbSession, createErr := sm.store.CreateSession(context.Background(), db.CreateSessionParams{
 		OwnerID:    userUUID,
 		Pin:        pin,
@@ -150,7 +144,8 @@ func (sm *SessionManager) DeleteSession(sessionId int) error {
 	defer sm.Mu.Unlock()
 
 	for _, s := range sm.SessionStreams[sessionId] {
-		_ = s.Stream.Context().Done() //TODO check if necessary
+		//TODO Close client connection correctly
+		s.Stream.Context().Done()
 	}
 	delete(sm.SessionStreams, sessionId)
 

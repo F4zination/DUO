@@ -16,6 +16,11 @@ func (server *Server) CreateSession(ctx context.Context, req *pb.CreateSessionRe
 		return nil, status.Errorf(codes.Unauthenticated, "invalid token")
 	}
 
+	_, getErr := server.Store.GetSessionByOwnerUUID(context.Background(), payload.UserID)
+	if getErr != sql.ErrNoRows {
+		return nil, status.Errorf(codes.AlreadyExists, "user already owns a session")
+	}
+
 	session, createErr := server.SessionHandler.CreateSession(payload.UserID, req.Pin, req.MaxPlayers)
 	if createErr != nil {
 		log.Printf("error creating session: %v", createErr)
