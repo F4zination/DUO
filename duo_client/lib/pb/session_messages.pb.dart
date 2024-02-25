@@ -48,10 +48,14 @@ class GameState extends $pb.GeneratedMessage {
 class SessionState extends $pb.GeneratedMessage {
   factory SessionState({
     $core.String? currentPlayers,
+    $core.int? maxPlayers,
   }) {
     final $result = create();
     if (currentPlayers != null) {
       $result.currentPlayers = currentPlayers;
+    }
+    if (maxPlayers != null) {
+      $result.maxPlayers = maxPlayers;
     }
     return $result;
   }
@@ -61,6 +65,7 @@ class SessionState extends $pb.GeneratedMessage {
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'SessionState', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'currentPlayers')
+    ..a<$core.int>(2, _omitFieldNames ? '' : 'maxPlayers', $pb.PbFieldType.O3)
     ..hasRequiredFields = false
   ;
 
@@ -93,12 +98,22 @@ class SessionState extends $pb.GeneratedMessage {
   $core.bool hasCurrentPlayers() => $_has(0);
   @$pb.TagNumber(1)
   void clearCurrentPlayers() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.int get maxPlayers => $_getIZ(1);
+  @$pb.TagNumber(2)
+  set maxPlayers($core.int v) { $_setSignedInt32(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasMaxPlayers() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearMaxPlayers() => clearField(2);
 }
 
 class CreateSessionRequest extends $pb.GeneratedMessage {
   factory CreateSessionRequest({
     $core.String? token,
     $core.String? pin,
+    $core.int? maxPlayers,
   }) {
     final $result = create();
     if (token != null) {
@@ -106,6 +121,9 @@ class CreateSessionRequest extends $pb.GeneratedMessage {
     }
     if (pin != null) {
       $result.pin = pin;
+    }
+    if (maxPlayers != null) {
+      $result.maxPlayers = maxPlayers;
     }
     return $result;
   }
@@ -116,6 +134,7 @@ class CreateSessionRequest extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'CreateSessionRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'token')
     ..aOS(2, _omitFieldNames ? '' : 'pin')
+    ..a<$core.int>(3, _omitFieldNames ? '' : 'maxPlayers', $pb.PbFieldType.O3)
     ..hasRequiredFields = false
   ;
 
@@ -157,6 +176,15 @@ class CreateSessionRequest extends $pb.GeneratedMessage {
   $core.bool hasPin() => $_has(1);
   @$pb.TagNumber(2)
   void clearPin() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.int get maxPlayers => $_getIZ(2);
+  @$pb.TagNumber(3)
+  set maxPlayers($core.int v) { $_setSignedInt32(2, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasMaxPlayers() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearMaxPlayers() => clearField(3);
 }
 
 class CreateSessionResponse extends $pb.GeneratedMessage {
@@ -445,170 +473,6 @@ class DisconnectSessionRequest extends $pb.GeneratedMessage {
   $core.bool hasSessionId() => $_has(1);
   @$pb.TagNumber(2)
   void clearSessionId() => clearField(2);
-}
-
-class DisconnectSessionResponse extends $pb.GeneratedMessage {
-  factory DisconnectSessionResponse({
-    $core.bool? success,
-  }) {
-    final $result = create();
-    if (success != null) {
-      $result.success = success;
-    }
-    return $result;
-  }
-  DisconnectSessionResponse._() : super();
-  factory DisconnectSessionResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory DisconnectSessionResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DisconnectSessionResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
-    ..aOB(1, _omitFieldNames ? '' : 'success')
-    ..hasRequiredFields = false
-  ;
-
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
-  DisconnectSessionResponse clone() => DisconnectSessionResponse()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  DisconnectSessionResponse copyWith(void Function(DisconnectSessionResponse) updates) => super.copyWith((message) => updates(message as DisconnectSessionResponse)) as DisconnectSessionResponse;
-
-  $pb.BuilderInfo get info_ => _i;
-
-  @$core.pragma('dart2js:noInline')
-  static DisconnectSessionResponse create() => DisconnectSessionResponse._();
-  DisconnectSessionResponse createEmptyInstance() => create();
-  static $pb.PbList<DisconnectSessionResponse> createRepeated() => $pb.PbList<DisconnectSessionResponse>();
-  @$core.pragma('dart2js:noInline')
-  static DisconnectSessionResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DisconnectSessionResponse>(create);
-  static DisconnectSessionResponse? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  $core.bool get success => $_getBF(0);
-  @$pb.TagNumber(1)
-  set success($core.bool v) { $_setBool(0, v); }
-  @$pb.TagNumber(1)
-  $core.bool hasSuccess() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearSuccess() => clearField(1);
-}
-
-class DeleteSessionRequest extends $pb.GeneratedMessage {
-  factory DeleteSessionRequest({
-    $core.String? token,
-    $core.int? sessionId,
-  }) {
-    final $result = create();
-    if (token != null) {
-      $result.token = token;
-    }
-    if (sessionId != null) {
-      $result.sessionId = sessionId;
-    }
-    return $result;
-  }
-  DeleteSessionRequest._() : super();
-  factory DeleteSessionRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory DeleteSessionRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DeleteSessionRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'token')
-    ..a<$core.int>(2, _omitFieldNames ? '' : 'sessionId', $pb.PbFieldType.O3)
-    ..hasRequiredFields = false
-  ;
-
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
-  DeleteSessionRequest clone() => DeleteSessionRequest()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  DeleteSessionRequest copyWith(void Function(DeleteSessionRequest) updates) => super.copyWith((message) => updates(message as DeleteSessionRequest)) as DeleteSessionRequest;
-
-  $pb.BuilderInfo get info_ => _i;
-
-  @$core.pragma('dart2js:noInline')
-  static DeleteSessionRequest create() => DeleteSessionRequest._();
-  DeleteSessionRequest createEmptyInstance() => create();
-  static $pb.PbList<DeleteSessionRequest> createRepeated() => $pb.PbList<DeleteSessionRequest>();
-  @$core.pragma('dart2js:noInline')
-  static DeleteSessionRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DeleteSessionRequest>(create);
-  static DeleteSessionRequest? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  $core.String get token => $_getSZ(0);
-  @$pb.TagNumber(1)
-  set token($core.String v) { $_setString(0, v); }
-  @$pb.TagNumber(1)
-  $core.bool hasToken() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearToken() => clearField(1);
-
-  @$pb.TagNumber(2)
-  $core.int get sessionId => $_getIZ(1);
-  @$pb.TagNumber(2)
-  set sessionId($core.int v) { $_setSignedInt32(1, v); }
-  @$pb.TagNumber(2)
-  $core.bool hasSessionId() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearSessionId() => clearField(2);
-}
-
-class DeleteSessionResponse extends $pb.GeneratedMessage {
-  factory DeleteSessionResponse({
-    $core.bool? success,
-  }) {
-    final $result = create();
-    if (success != null) {
-      $result.success = success;
-    }
-    return $result;
-  }
-  DeleteSessionResponse._() : super();
-  factory DeleteSessionResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory DeleteSessionResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DeleteSessionResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
-    ..aOB(1, _omitFieldNames ? '' : 'success')
-    ..hasRequiredFields = false
-  ;
-
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
-  DeleteSessionResponse clone() => DeleteSessionResponse()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  DeleteSessionResponse copyWith(void Function(DeleteSessionResponse) updates) => super.copyWith((message) => updates(message as DeleteSessionResponse)) as DeleteSessionResponse;
-
-  $pb.BuilderInfo get info_ => _i;
-
-  @$core.pragma('dart2js:noInline')
-  static DeleteSessionResponse create() => DeleteSessionResponse._();
-  DeleteSessionResponse createEmptyInstance() => create();
-  static $pb.PbList<DeleteSessionResponse> createRepeated() => $pb.PbList<DeleteSessionResponse>();
-  @$core.pragma('dart2js:noInline')
-  static DeleteSessionResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DeleteSessionResponse>(create);
-  static DeleteSessionResponse? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  $core.bool get success => $_getBF(0);
-  @$pb.TagNumber(1)
-  set success($core.bool v) { $_setBool(0, v); }
-  @$pb.TagNumber(1)
-  $core.bool hasSuccess() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearSuccess() => clearField(1);
 }
 
 

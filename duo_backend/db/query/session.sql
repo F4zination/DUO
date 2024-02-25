@@ -1,5 +1,5 @@
 -- name: CreateSession :one
-INSERT INTO game_session (pin, owner_id) VALUES ($1, $2) RETURNING *;
+INSERT INTO game_session (pin, owner_id, max_players) VALUES ($1, $2, $3) RETURNING *;
 
 -- name: GetSessionByID :one
 SELECT * FROM game_session WHERE id = $1;

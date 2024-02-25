@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"database/sql"
 	"log"
 
 	"github.com/duo/pb"
@@ -15,7 +16,7 @@ func (server *Server) CreateSession(ctx context.Context, req *pb.CreateSessionRe
 		return nil, status.Errorf(codes.Unauthenticated, "invalid token")
 	}
 
-	session, createErr := server.SessionHandler.CreateSession(payload.UserID, req.Pin, server.Store)
+	session, createErr := server.SessionHandler.CreateSession(payload.UserID, req.Pin, req.MaxPlayers)
 	if createErr != nil {
 		log.Printf("error creating session: %v", createErr)
 		return nil, status.Errorf(codes.Internal, "error creating session")
@@ -33,9 +34,32 @@ func (server *Server) JoinSession(req *pb.JoinSessionRequest, stream pb.DUOServi
 		return status.Errorf(codes.Unauthenticated, "invalid token")
 	}
 
+	dbSession, getErr := server.Store.GetSessionByID(context.Background(), req.SessionId)
+	if getErr != nil {
+		if getErr == sql.ErrNoRows {
+			return status.Errorf(codes.NotFound, "session not found")
+		}
+		return status.Errorf(codes.Internal, "error getting session")
+	}
+
+	if dbSession.Pin != req.Pin {
+		return status.Errorf(codes.PermissionDenied, "invalid pin")
+	}
+
 	userStream := NewUserStream(stream, payload.UserID, payload.Username)
 
 	server.SessionHandler.AddStreamToSession(int(req.SessionId), *userStream)
 
 	return nil
+}
+
+func (server *Server) DisconnectSession(ctx context.Context, req *pb.DisconnectSessionRequest) (*pb.Void, error) {
+	payload, tokenErr := server.Maker.VerifyToken(req.Token)
+	if tokenErr != nil {
+		return nil, status.Errorf(codes.Unauthenticated, "invalid token")
+	}
+
+	server.SessionHandler.RemoveStreamFromSession(int(req.SessionId), payload.UserID)
+
+	return &pb.Void{}, nil
 }

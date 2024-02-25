@@ -17,9 +17,10 @@ type Duouser struct {
 }
 
 type GameSession struct {
-	ID      int32     `json:"id"`
-	Pin     string    `json:"pin"`
-	OwnerID uuid.UUID `json:"owner_id"`
+	ID         int32     `json:"id"`
+	Pin        string    `json:"pin"`
+	OwnerID    uuid.UUID `json:"owner_id"`
+	MaxPlayers int32     `json:"max_players"`
 }
 
 type UserLogin struct {

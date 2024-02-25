@@ -27,13 +27,14 @@ const SessionState$json = {
   '1': 'SessionState',
   '2': [
     {'1': 'current_players', '3': 1, '4': 1, '5': 9, '10': 'currentPlayers'},
+    {'1': 'max_players', '3': 2, '4': 1, '5': 5, '10': 'maxPlayers'},
   ],
 };
 
 /// Descriptor for `SessionState`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List sessionStateDescriptor = $convert.base64Decode(
-    'CgxTZXNzaW9uU3RhdGUSJwoPY3VycmVudF9wbGF5ZXJzGAEgASgJUg5jdXJyZW50UGxheWVycw'
-    '==');
+    'CgxTZXNzaW9uU3RhdGUSJwoPY3VycmVudF9wbGF5ZXJzGAEgASgJUg5jdXJyZW50UGxheWVycx'
+    'IfCgttYXhfcGxheWVycxgCIAEoBVIKbWF4UGxheWVycw==');
 
 @$core.Deprecated('Use createSessionRequestDescriptor instead')
 const CreateSessionRequest$json = {
@@ -41,13 +42,14 @@ const CreateSessionRequest$json = {
   '2': [
     {'1': 'token', '3': 1, '4': 1, '5': 9, '10': 'token'},
     {'1': 'pin', '3': 2, '4': 1, '5': 9, '10': 'pin'},
+    {'1': 'max_players', '3': 3, '4': 1, '5': 5, '10': 'maxPlayers'},
   ],
 };
 
 /// Descriptor for `CreateSessionRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List createSessionRequestDescriptor = $convert.base64Decode(
     'ChRDcmVhdGVTZXNzaW9uUmVxdWVzdBIUCgV0b2tlbhgBIAEoCVIFdG9rZW4SEAoDcGluGAIgAS'
-    'gJUgNwaW4=');
+    'gJUgNwaW4SHwoLbWF4X3BsYXllcnMYAyABKAVSCm1heFBsYXllcnM=');
 
 @$core.Deprecated('Use createSessionResponseDescriptor instead')
 const CreateSessionResponse$json = {
@@ -107,42 +109,4 @@ const DisconnectSessionRequest$json = {
 final $typed_data.Uint8List disconnectSessionRequestDescriptor = $convert.base64Decode(
     'ChhEaXNjb25uZWN0U2Vzc2lvblJlcXVlc3QSFAoFdG9rZW4YASABKAlSBXRva2VuEh0KCnNlc3'
     'Npb25faWQYAiABKAVSCXNlc3Npb25JZA==');
-
-@$core.Deprecated('Use disconnectSessionResponseDescriptor instead')
-const DisconnectSessionResponse$json = {
-  '1': 'DisconnectSessionResponse',
-  '2': [
-    {'1': 'success', '3': 1, '4': 1, '5': 8, '10': 'success'},
-  ],
-};
-
-/// Descriptor for `DisconnectSessionResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List disconnectSessionResponseDescriptor = $convert.base64Decode(
-    'ChlEaXNjb25uZWN0U2Vzc2lvblJlc3BvbnNlEhgKB3N1Y2Nlc3MYASABKAhSB3N1Y2Nlc3M=');
-
-@$core.Deprecated('Use deleteSessionRequestDescriptor instead')
-const DeleteSessionRequest$json = {
-  '1': 'DeleteSessionRequest',
-  '2': [
-    {'1': 'token', '3': 1, '4': 1, '5': 9, '10': 'token'},
-    {'1': 'session_id', '3': 2, '4': 1, '5': 5, '10': 'sessionId'},
-  ],
-};
-
-/// Descriptor for `DeleteSessionRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List deleteSessionRequestDescriptor = $convert.base64Decode(
-    'ChREZWxldGVTZXNzaW9uUmVxdWVzdBIUCgV0b2tlbhgBIAEoCVIFdG9rZW4SHQoKc2Vzc2lvbl'
-    '9pZBgCIAEoBVIJc2Vzc2lvbklk');
-
-@$core.Deprecated('Use deleteSessionResponseDescriptor instead')
-const DeleteSessionResponse$json = {
-  '1': 'DeleteSessionResponse',
-  '2': [
-    {'1': 'success', '3': 1, '4': 1, '5': 8, '10': 'success'},
-  ],
-};
-
-/// Descriptor for `DeleteSessionResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List deleteSessionResponseDescriptor = $convert.base64Decode(
-    'ChVEZWxldGVTZXNzaW9uUmVzcG9uc2USGAoHc3VjY2VzcxgBIAEoCFIHc3VjY2Vzcw==');
 

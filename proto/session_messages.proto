@@ -11,12 +11,14 @@ message GameState{
 
 message SessionState{
     string current_players = 1;
+    int32 max_players = 2;
 }
 
 
 message CreateSessionRequest{
     string token = 1;
     string pin = 2;
+    int32 max_players = 3;
 }
 
 message CreateSessionResponse{
@@ -39,18 +41,4 @@ message SessionStream{
 message DisconnectSessionRequest{
     string token = 1;
     int32 session_id = 2;
-}
-
-message DisconnectSessionResponse{
-    bool success = 1;
-}
-
-
-message DeleteSessionRequest{
-    string token = 1;
-    int32 session_id = 2;
-}
-
-message DeleteSessionResponse{
-    bool success = 1;
 }

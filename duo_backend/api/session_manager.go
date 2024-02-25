@@ -3,9 +3,9 @@ package api
 import (
 	"context"
 	"fmt"
+	"log"
 	"sync"
 	"time"
-	"log"
 
 	db "github.com/duo/db/sqlc"
 	"github.com/duo/pb"
@@ -28,12 +28,14 @@ func NewUserStream(stream pb.DUOService_JoinSessionServer, userId uuid.UUID, use
 
 type SessionManager struct {
 	SessionStreams map[int][]UserStream
+	store          db.Store
 	Mu             sync.Mutex
 }
 
-func NewSessionManager() *SessionManager {
+func NewSessionManager(store db.Store) *SessionManager {
 	return &SessionManager{
 		SessionStreams: make(map[int][]UserStream),
+		store:          store,
 		Mu:             sync.Mutex{},
 	}
 }
@@ -42,7 +44,6 @@ func (sm *SessionManager) SendTestMessagesToAll() {
 	//Send messages to all clients in all sessions with a 1 second interval
 	go func() {
 		for {
-			//sm.Mu.Lock()
 			log.Printf("sending test message to sessions: %v", sm.SessionStreams)
 			for sessionId, _ := range sm.SessionStreams {
 				sm.SendMessage(sessionId, &pb.SessionStream{
@@ -53,22 +54,22 @@ func (sm *SessionManager) SendTestMessagesToAll() {
 					},
 				})
 			}
-			//sm.Mu.Unlock()
 			time.Sleep(1 * time.Second)
 		}
 	}()
 }
 
-func (sm *SessionManager) CreateSession(userUUID uuid.UUID, pin string, store db.Store) (*db.GameSession, error) {
+func (sm *SessionManager) CreateSession(userUUID uuid.UUID, pin string, maxPlayers int32) (*db.GameSession, error) {
 	//TODO move to route
 	// _, getErr := store.GetSessionByOwnerUUID(context.Background(), stream.UserId)
 	// if getErr != sql.ErrNoRows {
 	// 	return fmt.Errorf("user already owns a session")
 	// }
 
-	dbSession, createErr := store.CreateSession(context.Background(), db.CreateSessionParams{
-		OwnerID: userUUID,
-		Pin:     pin,
+	dbSession, createErr := sm.store.CreateSession(context.Background(), db.CreateSessionParams{
+		OwnerID:    userUUID,
+		Pin:        pin,
+		MaxPlayers: maxPlayers,
 	})
 	if createErr != nil {
 		return nil, createErr
@@ -124,8 +125,8 @@ func (sm *SessionManager) SendMessage(sessionId int, message *pb.SessionStream) 
 	return errs
 }
 
-func (sm *SessionManager) DeleteSession(sessionId int, store db.Store) error {
-	_, delErr := store.DeleteSessionByID(context.Background(), int32(sessionId))
+func (sm *SessionManager) DeleteSession(sessionId int) error {
+	_, delErr := sm.store.DeleteSessionByID(context.Background(), int32(sessionId))
 	if delErr != nil {
 		return delErr
 	}
@@ -146,19 +147,19 @@ func (sm *SessionManager) GetSessionStreams(sessionId int) ([]UserStream, error)
 }
 
 func (sm *SessionManager) AddStreamToSession(sessionId int, stream UserStream) error {
-	
+
 	//Stream must exist
 	if sm.SessionStreams[sessionId] == nil {
 		return fmt.Errorf("session does not exist")
 	}
-	
+
 	//Stream must be unique
 	for _, s := range sm.SessionStreams[sessionId] {
 		if s.UserId == stream.UserId {
 			return fmt.Errorf("stream already exists in session")
 		}
 	}
-	
+
 	sm.Mu.Lock()
 	sm.SessionStreams[sessionId] = append(sm.SessionStreams[sessionId], stream)
 	sm.Mu.Unlock()
@@ -174,13 +175,23 @@ func (sm *SessionManager) AddStreamToSession(sessionId int, stream UserStream) e
 }
 
 func (sm *SessionManager) RemoveStreamFromSession(sessionId int, userId uuid.UUID) error {
-	
-	
+
 	//Stream must exist
 	if sm.SessionStreams[sessionId] == nil {
 		return fmt.Errorf("session does not exist")
 	}
-	
+
+	dbSession, getErr := sm.store.GetSessionByID(context.Background(), int32(sessionId))
+	if getErr != nil {
+		return getErr
+	}
+
+	if userId == dbSession.OwnerID {
+		log.Printf("Owner %v disconnected and session %d deleted", userId, sessionId)
+		sm.DeleteSession(sessionId)
+		return nil
+	}
+
 	newStreams := []UserStream{}
 	for _, s := range sm.SessionStreams[sessionId] {
 		if s.UserId != userId {

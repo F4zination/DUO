@@ -67,11 +67,31 @@ class _SessionTestScreeState extends ConsumerState<SessionTestScreen> {
                 child: const Text('Create Session (PIN: 1234)')),
             ElevatedButton(
                 onPressed: () async {
+                  await showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: const Text('Enter Session ID'),
+                          content: TextField(
+                            onChanged: (value) {
+                              sessionId = value;
+                            },
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: const Text('OK'),
+                            ),
+                          ],
+                        );
+                      });
                   // add code
                   var token = await _storageProvider.storage
                       .read(key: keyToAccessToken);
-                  _apiProvider.serverConnection!
-                      .joinSession(token!, int.parse(sessionId), '1234');
+                  _apiProvider.serverConnection!.joinSession(
+                      token!, int.tryParse(sessionId) ?? 0, '1234');
                 },
                 child: const Text('Join Session (ID: 1234 | PIN: 1234)')),
             ElevatedButton(

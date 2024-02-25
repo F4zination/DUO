@@ -28,7 +28,7 @@ func NewServer(store db.Store, config util.Config) *Server {
 		Store:          store,
 		Config:         config,
 		Maker:          maker,
-		SessionHandler: *NewSessionManager(),
+		SessionHandler: *NewSessionManager(store),
 	}
 }
 
