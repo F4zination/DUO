@@ -27,6 +27,7 @@ func NewPayload(userId uuid.UUID, username string, duration time.Duration) (*Pay
 	payload := &Payload{
 		ID:        tokenId,
 		Username:  username,
+		UserID:    userId,
 		IssuedAt:  time.Now(),
 		ExpiredAt: time.Now().Add(duration),
 	}

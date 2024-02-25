@@ -17,8 +17,9 @@ class GrpcServerConnection extends AbstractServerConnection {
   late StorageProvider _storageProvider;
 
   @override
-  void init(Function notifyListeners, StorageProvider prov) {
+  void init(StorageProvider prov) {
     _storageProvider = prov;
+
     channel = ClientChannel(
       Constants.host,
       port: Constants.port,
@@ -26,7 +27,6 @@ class GrpcServerConnection extends AbstractServerConnection {
       options: const ChannelOptions(credentials: ChannelCredentials.insecure()),
     );
     client = DUOServiceClient(channel);
-    this.notifyListeners = notifyListeners;
   }
 
   /// Registers a user with the server
@@ -51,7 +51,7 @@ class GrpcServerConnection extends AbstractServerConnection {
       // If the registration fails, return -1
       return -1;
     }
-    notifyListeners();
+
     return 0;
   }
 
@@ -103,7 +103,7 @@ class GrpcServerConnection extends AbstractServerConnection {
     }
 
     // If the login was successful, return 0
-    notifyListeners();
+
     return 0;
   }
 
@@ -117,10 +117,11 @@ class GrpcServerConnection extends AbstractServerConnection {
 
       if (response.sessionId != 0) {
         print('Session ID: ${response.sessionId}');
-        notifyListeners();
+
         return response.sessionId;
       }
     } catch (e) {
+      print('Error: $e');
       return -1;
     }
     return 0;
@@ -136,7 +137,6 @@ class GrpcServerConnection extends AbstractServerConnection {
             ..pin = pin);
 
       await for (SessionStream ss in stream) {
-        notifyListeners();
         print('Received: ${ss.sessionId}');
       }
     } catch (e) {
@@ -154,7 +154,6 @@ class GrpcServerConnection extends AbstractServerConnection {
             ..sessionId = sessionId);
 
       if (res.success) {
-        notifyListeners();
         return 0;
       } else {
         return -1;

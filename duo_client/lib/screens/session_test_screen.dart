@@ -17,6 +17,9 @@ class _SessionTestScreeState extends ConsumerState<SessionTestScreen> {
   @override
   Widget build(BuildContext context) {
     final ApiProvider _apiProvider = ref.read(apiProvider);
+    if (_apiProvider.serverConnection == null) {
+      _apiProvider.init(ServerConnectionType.grpc);
+    }
     final StorageProvider _storageProvider = ref.read(storageProvider);
 
     return Scaffold(
@@ -48,10 +51,11 @@ class _SessionTestScreeState extends ConsumerState<SessionTestScreen> {
                   _apiProvider.serverConnection!
                       .createSession(token!, '1234')
                       .then((value) async {
+                    print('value = $value');
                     // join Session
                     if (value == 0) return;
                     int _sessionID = await _apiProvider.serverConnection!
-                        .joinSession(token, 1234, '1234');
+                        .joinSession(token, value, '1234');
                     if (_sessionID == 0) {
                       setState(() {
                         sessionId = _sessionID.toString();
@@ -67,7 +71,7 @@ class _SessionTestScreeState extends ConsumerState<SessionTestScreen> {
                   var token = await _storageProvider.storage
                       .read(key: keyToAccessToken);
                   _apiProvider.serverConnection!
-                      .joinSession(token!, 1234, '1234');
+                      .joinSession(token!, int.parse(sessionId), '1234');
                 },
                 child: const Text('Join Session (ID: 1234 | PIN: 1234)')),
             ElevatedButton(

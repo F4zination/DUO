@@ -1,8 +1,7 @@
 import 'package:duo_client/provider/storage_provider.dart';
 
 abstract class AbstractServerConnection {
-  StorageProvider? _storageProvider;
-  void init(Function notifyListeners, StorageProvider storageProvider);
+  void init(StorageProvider storageProvider);
   Future<int> registerUser(String username);
   Future<int> loginUser(String uuid);
   Future<int> createSession(String token, String pin);

@@ -18,12 +18,12 @@ class ApiProvider extends ChangeNotifier {
     switch (type) {
       case ServerConnectionType.grpc:
         serverConnection = GrpcServerConnection();
-        serverConnection!.init(notifyListeners, _storageProvider!);
+        serverConnection!.init(_storageProvider!);
         break;
     }
   }
 }
 
 final apiProvider = ChangeNotifierProvider<ApiProvider>((ref) {
-  return ApiProvider(ref.watch(storageProvider));
+  return ApiProvider(ref.read(storageProvider));
 });

@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"log"
 
 	"github.com/duo/pb"
 	"google.golang.org/grpc/codes"
@@ -16,6 +17,7 @@ func (server *Server) CreateSession(ctx context.Context, req *pb.CreateSessionRe
 
 	session, createErr := server.SessionHandler.CreateSession(payload.UserID, req.Pin, server.Store)
 	if createErr != nil {
+		log.Printf("error creating session: %v", createErr)
 		return nil, status.Errorf(codes.Internal, "error creating session")
 	}
 
