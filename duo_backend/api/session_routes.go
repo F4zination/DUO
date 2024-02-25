@@ -46,6 +46,15 @@ func (server *Server) JoinSession(req *pb.JoinSessionRequest, stream pb.DUOServi
 		return status.Errorf(codes.PermissionDenied, "invalid pin")
 	}
 
+	users, usersErr := server.SessionHandler.GetUsersInSession(int(req.SessionId))
+	if usersErr != nil {
+		return status.Errorf(codes.Internal, "error getting users in session")
+	}
+
+	if int32(len(users)) >= dbSession.MaxPlayers {
+		return status.Errorf(codes.PermissionDenied, "session is full")
+	}
+
 	userStream := NewUserStream(stream, payload.UserID, payload.Username)
 
 	server.SessionHandler.AddStreamToSession(int(req.SessionId), *userStream)
