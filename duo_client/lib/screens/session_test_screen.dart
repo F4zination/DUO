@@ -46,12 +46,12 @@ class _SessionTestScreeState extends ConsumerState<SessionTestScreen> {
 
                   // create Session
                   _apiProvider.serverConnection!
-                      .createSession(token!, 1234)
+                      .createSession(token!, '1234')
                       .then((value) async {
                     // join Session
                     if (value == 0) return;
                     int _sessionID = await _apiProvider.serverConnection!
-                        .joinSession(token, 1234, 1234);
+                        .joinSession(token, 1234, '1234');
                     if (_sessionID == 0) {
                       setState(() {
                         sessionId = _sessionID.toString();
@@ -67,7 +67,7 @@ class _SessionTestScreeState extends ConsumerState<SessionTestScreen> {
                   var token = await _storageProvider.storage
                       .read(key: keyToAccessToken);
                   _apiProvider.serverConnection!
-                      .joinSession(token!, 1234, 1234);
+                      .joinSession(token!, 1234, '1234');
                 },
                 child: const Text('Join Session (ID: 1234 | PIN: 1234)')),
             ElevatedButton(

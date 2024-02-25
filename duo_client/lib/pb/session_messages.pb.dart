@@ -98,7 +98,7 @@ class SessionState extends $pb.GeneratedMessage {
 class CreateSessionRequest extends $pb.GeneratedMessage {
   factory CreateSessionRequest({
     $core.String? token,
-    $core.int? pin,
+    $core.String? pin,
   }) {
     final $result = create();
     if (token != null) {
@@ -115,7 +115,7 @@ class CreateSessionRequest extends $pb.GeneratedMessage {
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'CreateSessionRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'token')
-    ..a<$core.int>(2, _omitFieldNames ? '' : 'pin', $pb.PbFieldType.O3)
+    ..aOS(2, _omitFieldNames ? '' : 'pin')
     ..hasRequiredFields = false
   ;
 
@@ -150,9 +150,9 @@ class CreateSessionRequest extends $pb.GeneratedMessage {
   void clearToken() => clearField(1);
 
   @$pb.TagNumber(2)
-  $core.int get pin => $_getIZ(1);
+  $core.String get pin => $_getSZ(1);
   @$pb.TagNumber(2)
-  set pin($core.int v) { $_setSignedInt32(1, v); }
+  set pin($core.String v) { $_setString(1, v); }
   @$pb.TagNumber(2)
   $core.bool hasPin() => $_has(1);
   @$pb.TagNumber(2)
@@ -162,7 +162,7 @@ class CreateSessionRequest extends $pb.GeneratedMessage {
 class CreateSessionResponse extends $pb.GeneratedMessage {
   factory CreateSessionResponse({
     $core.int? sessionId,
-    $core.int? pin,
+    $core.String? pin,
   }) {
     final $result = create();
     if (sessionId != null) {
@@ -179,7 +179,7 @@ class CreateSessionResponse extends $pb.GeneratedMessage {
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'CreateSessionResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
     ..a<$core.int>(1, _omitFieldNames ? '' : 'sessionId', $pb.PbFieldType.O3)
-    ..a<$core.int>(2, _omitFieldNames ? '' : 'pin', $pb.PbFieldType.O3)
+    ..aOS(2, _omitFieldNames ? '' : 'pin')
     ..hasRequiredFields = false
   ;
 
@@ -214,9 +214,9 @@ class CreateSessionResponse extends $pb.GeneratedMessage {
   void clearSessionId() => clearField(1);
 
   @$pb.TagNumber(2)
-  $core.int get pin => $_getIZ(1);
+  $core.String get pin => $_getSZ(1);
   @$pb.TagNumber(2)
-  set pin($core.int v) { $_setSignedInt32(1, v); }
+  set pin($core.String v) { $_setString(1, v); }
   @$pb.TagNumber(2)
   $core.bool hasPin() => $_has(1);
   @$pb.TagNumber(2)
@@ -227,7 +227,7 @@ class JoinSessionRequest extends $pb.GeneratedMessage {
   factory JoinSessionRequest({
     $core.String? token,
     $core.int? sessionId,
-    $core.int? pin,
+    $core.String? pin,
   }) {
     final $result = create();
     if (token != null) {
@@ -248,7 +248,7 @@ class JoinSessionRequest extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'JoinSessionRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'token')
     ..a<$core.int>(2, _omitFieldNames ? '' : 'sessionId', $pb.PbFieldType.O3)
-    ..a<$core.int>(3, _omitFieldNames ? '' : 'pin', $pb.PbFieldType.O3)
+    ..aOS(3, _omitFieldNames ? '' : 'pin')
     ..hasRequiredFields = false
   ;
 
@@ -292,9 +292,9 @@ class JoinSessionRequest extends $pb.GeneratedMessage {
   void clearSessionId() => clearField(2);
 
   @$pb.TagNumber(3)
-  $core.int get pin => $_getIZ(2);
+  $core.String get pin => $_getSZ(2);
   @$pb.TagNumber(3)
-  set pin($core.int v) { $_setSignedInt32(2, v); }
+  set pin($core.String v) { $_setString(2, v); }
   @$pb.TagNumber(3)
   $core.bool hasPin() => $_has(2);
   @$pb.TagNumber(3)

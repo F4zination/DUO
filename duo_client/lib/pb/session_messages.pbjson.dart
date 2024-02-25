@@ -40,28 +40,28 @@ const CreateSessionRequest$json = {
   '1': 'CreateSessionRequest',
   '2': [
     {'1': 'token', '3': 1, '4': 1, '5': 9, '10': 'token'},
-    {'1': 'pin', '3': 2, '4': 1, '5': 5, '10': 'pin'},
+    {'1': 'pin', '3': 2, '4': 1, '5': 9, '10': 'pin'},
   ],
 };
 
 /// Descriptor for `CreateSessionRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List createSessionRequestDescriptor = $convert.base64Decode(
     'ChRDcmVhdGVTZXNzaW9uUmVxdWVzdBIUCgV0b2tlbhgBIAEoCVIFdG9rZW4SEAoDcGluGAIgAS'
-    'gFUgNwaW4=');
+    'gJUgNwaW4=');
 
 @$core.Deprecated('Use createSessionResponseDescriptor instead')
 const CreateSessionResponse$json = {
   '1': 'CreateSessionResponse',
   '2': [
     {'1': 'session_id', '3': 1, '4': 1, '5': 5, '10': 'sessionId'},
-    {'1': 'pin', '3': 2, '4': 1, '5': 5, '10': 'pin'},
+    {'1': 'pin', '3': 2, '4': 1, '5': 9, '10': 'pin'},
   ],
 };
 
 /// Descriptor for `CreateSessionResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List createSessionResponseDescriptor = $convert.base64Decode(
     'ChVDcmVhdGVTZXNzaW9uUmVzcG9uc2USHQoKc2Vzc2lvbl9pZBgBIAEoBVIJc2Vzc2lvbklkEh'
-    'AKA3BpbhgCIAEoBVIDcGlu');
+    'AKA3BpbhgCIAEoCVIDcGlu');
 
 @$core.Deprecated('Use joinSessionRequestDescriptor instead')
 const JoinSessionRequest$json = {
@@ -69,14 +69,14 @@ const JoinSessionRequest$json = {
   '2': [
     {'1': 'token', '3': 1, '4': 1, '5': 9, '10': 'token'},
     {'1': 'session_id', '3': 2, '4': 1, '5': 5, '10': 'sessionId'},
-    {'1': 'pin', '3': 3, '4': 1, '5': 5, '10': 'pin'},
+    {'1': 'pin', '3': 3, '4': 1, '5': 9, '10': 'pin'},
   ],
 };
 
 /// Descriptor for `JoinSessionRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List joinSessionRequestDescriptor = $convert.base64Decode(
     'ChJKb2luU2Vzc2lvblJlcXVlc3QSFAoFdG9rZW4YASABKAlSBXRva2VuEh0KCnNlc3Npb25faW'
-    'QYAiABKAVSCXNlc3Npb25JZBIQCgNwaW4YAyABKAVSA3Bpbg==');
+    'QYAiABKAVSCXNlc3Npb25JZBIQCgNwaW4YAyABKAlSA3Bpbg==');
 
 @$core.Deprecated('Use sessionStreamDescriptor instead')
 const SessionStream$json = {

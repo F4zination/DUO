@@ -108,7 +108,7 @@ class GrpcServerConnection extends AbstractServerConnection {
   }
 
   @override
-  Future<int> createSession(String token, int pin) async {
+  Future<int> createSession(String token, String pin) async {
     try {
       CreateSessionResponse response =
           await client.createSession(CreateSessionRequest()
@@ -127,7 +127,7 @@ class GrpcServerConnection extends AbstractServerConnection {
   }
 
   @override
-  Future<int> joinSession(String token, int sessionId, int pin) async {
+  Future<int> joinSession(String token, int sessionId, String pin) async {
     try {
       ResponseStream<SessionStream> stream =
           await client.joinSession(JoinSessionRequest()
