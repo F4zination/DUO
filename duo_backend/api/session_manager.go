@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sync"
 	"time"
+	"log"
 
 	db "github.com/duo/db/sqlc"
 	"github.com/duo/pb"
@@ -38,19 +39,21 @@ func NewSessionManager() *SessionManager {
 }
 
 func (sm *SessionManager) SendTestMessagesToAll() {
+	//Send messages to all clients in all sessions with a 1 second interval
 	go func() {
-		i := 0
 		for {
+			//sm.Mu.Lock()
+			log.Printf("sending test message to sessions: %v", sm.SessionStreams)
 			for sessionId, _ := range sm.SessionStreams {
 				sm.SendMessage(sessionId, &pb.SessionStream{
 					SessionId: int32(sessionId),
 					GameState: &pb.GameState{},
 					SessionState: &pb.SessionState{
-						CurrentPlayers: fmt.Sprint(i),
+						CurrentPlayers: fmt.Sprint(0),
 					},
 				})
 			}
-			i++
+			//sm.Mu.Unlock()
 			time.Sleep(1 * time.Second)
 		}
 	}()
@@ -102,9 +105,6 @@ func (sm *SessionManager) GetSession(sessionId int) ([]UserStream, error) {
 }
 
 func (sm *SessionManager) SendMessage(sessionId int, message *pb.SessionStream) []error {
-	sm.Mu.Lock()
-	defer sm.Mu.Unlock()
-
 	//Session must exist
 	if sm.SessionStreams[sessionId] == nil {
 		return []error{fmt.Errorf("session does not exist")}
@@ -113,9 +113,11 @@ func (sm *SessionManager) SendMessage(sessionId int, message *pb.SessionStream) 
 	var errs []error
 
 	for _, s := range sm.SessionStreams[sessionId] {
+		log.Printf("sending message to session %d", sessionId)
 		err := s.Stream.Send(message)
 		if err != nil {
 			errs = append(errs, err)
+			log.Printf("error sending message to session %d: %v", sessionId, err)
 		}
 	}
 
@@ -144,42 +146,52 @@ func (sm *SessionManager) GetSessionStreams(sessionId int) ([]UserStream, error)
 }
 
 func (sm *SessionManager) AddStreamToSession(sessionId int, stream UserStream) error {
-	sm.Mu.Lock()
-	defer sm.Mu.Unlock()
-
+	
 	//Stream must exist
 	if sm.SessionStreams[sessionId] == nil {
 		return fmt.Errorf("session does not exist")
 	}
-
+	
 	//Stream must be unique
 	for _, s := range sm.SessionStreams[sessionId] {
 		if s.UserId == stream.UserId {
 			return fmt.Errorf("stream already exists in session")
 		}
 	}
-
+	
+	sm.Mu.Lock()
 	sm.SessionStreams[sessionId] = append(sm.SessionStreams[sessionId], stream)
+	sm.Mu.Unlock()
 
+	log.Printf("Added user stream %v to session %d", stream.UserId, sessionId)
+
+	//Wait for client to disconnect
+	<-stream.Stream.Context().Done()
+
+	log.Printf("Client %v disconnected", stream.UserId)
+	sm.RemoveStreamFromSession(sessionId, stream.UserId)
 	return nil
 }
 
 func (sm *SessionManager) RemoveStreamFromSession(sessionId int, userId uuid.UUID) error {
-	sm.Mu.Lock()
-	defer sm.Mu.Unlock()
-
+	
+	
 	//Stream must exist
 	if sm.SessionStreams[sessionId] == nil {
 		return fmt.Errorf("session does not exist")
 	}
-
+	
 	newStreams := []UserStream{}
 	for _, s := range sm.SessionStreams[sessionId] {
 		if s.UserId != userId {
 			newStreams = append(newStreams, s)
 		}
 	}
-	sm.SessionStreams[sessionId] = newStreams
 
+	sm.Mu.Lock()
+	sm.SessionStreams[sessionId] = newStreams
+	sm.Mu.Unlock()
+
+	log.Printf("Removed user stream %v from session %d", userId, sessionId)
 	return nil
 }
