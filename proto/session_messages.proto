@@ -4,16 +4,20 @@ package pb;
 
 option go_package = "github.com/duo/pb";
 
+message User {
+    string uuid = 1;
+    string username = 2;
+    bool is_admin = 3;
+}
 
 message GameState{
 
 }
 
 message SessionState{
-    string current_players = 1;
+    repeated User users = 1;
     int32 max_players = 2;
 }
-
 
 message CreateSessionRequest{
     string token = 1;
@@ -41,4 +45,8 @@ message SessionStream{
 message DisconnectSessionRequest{
     string token = 1;
     int32 session_id = 2;
+}
+
+message DisconnectSessionResponse{
+    bool success = 1;
 }

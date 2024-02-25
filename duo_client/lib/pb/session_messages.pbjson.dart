@@ -13,6 +13,21 @@ import 'dart:convert' as $convert;
 import 'dart:core' as $core;
 import 'dart:typed_data' as $typed_data;
 
+@$core.Deprecated('Use userDescriptor instead')
+const User$json = {
+  '1': 'User',
+  '2': [
+    {'1': 'uuid', '3': 1, '4': 1, '5': 9, '10': 'uuid'},
+    {'1': 'username', '3': 2, '4': 1, '5': 9, '10': 'username'},
+    {'1': 'is_admin', '3': 3, '4': 1, '5': 8, '10': 'isAdmin'},
+  ],
+};
+
+/// Descriptor for `User`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List userDescriptor = $convert.base64Decode(
+    'CgRVc2VyEhIKBHV1aWQYASABKAlSBHV1aWQSGgoIdXNlcm5hbWUYAiABKAlSCHVzZXJuYW1lEh'
+    'kKCGlzX2FkbWluGAMgASgIUgdpc0FkbWlu');
+
 @$core.Deprecated('Use gameStateDescriptor instead')
 const GameState$json = {
   '1': 'GameState',
@@ -26,15 +41,15 @@ final $typed_data.Uint8List gameStateDescriptor = $convert.base64Decode(
 const SessionState$json = {
   '1': 'SessionState',
   '2': [
-    {'1': 'current_players', '3': 1, '4': 1, '5': 9, '10': 'currentPlayers'},
+    {'1': 'users', '3': 1, '4': 3, '5': 11, '6': '.pb.User', '10': 'users'},
     {'1': 'max_players', '3': 2, '4': 1, '5': 5, '10': 'maxPlayers'},
   ],
 };
 
 /// Descriptor for `SessionState`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List sessionStateDescriptor = $convert.base64Decode(
-    'CgxTZXNzaW9uU3RhdGUSJwoPY3VycmVudF9wbGF5ZXJzGAEgASgJUg5jdXJyZW50UGxheWVycx'
-    'IfCgttYXhfcGxheWVycxgCIAEoBVIKbWF4UGxheWVycw==');
+    'CgxTZXNzaW9uU3RhdGUSHgoFdXNlcnMYASADKAsyCC5wYi5Vc2VyUgV1c2VycxIfCgttYXhfcG'
+    'xheWVycxgCIAEoBVIKbWF4UGxheWVycw==');
 
 @$core.Deprecated('Use createSessionRequestDescriptor instead')
 const CreateSessionRequest$json = {
@@ -109,4 +124,16 @@ const DisconnectSessionRequest$json = {
 final $typed_data.Uint8List disconnectSessionRequestDescriptor = $convert.base64Decode(
     'ChhEaXNjb25uZWN0U2Vzc2lvblJlcXVlc3QSFAoFdG9rZW4YASABKAlSBXRva2VuEh0KCnNlc3'
     'Npb25faWQYAiABKAVSCXNlc3Npb25JZA==');
+
+@$core.Deprecated('Use disconnectSessionResponseDescriptor instead')
+const DisconnectSessionResponse$json = {
+  '1': 'DisconnectSessionResponse',
+  '2': [
+    {'1': 'success', '3': 1, '4': 1, '5': 8, '10': 'success'},
+  ],
+};
+
+/// Descriptor for `DisconnectSessionResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List disconnectSessionResponseDescriptor = $convert.base64Decode(
+    'ChlEaXNjb25uZWN0U2Vzc2lvblJlc3BvbnNlEhgKB3N1Y2Nlc3MYASABKAhSB3N1Y2Nlc3M=');
 

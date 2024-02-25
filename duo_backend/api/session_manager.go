@@ -46,11 +46,16 @@ func (sm *SessionManager) SendTestMessagesToAll() {
 		for {
 			log.Printf("sending test message to sessions: %v", sm.SessionStreams)
 			for sessionId, _ := range sm.SessionStreams {
+				users, usersErr := sm.GetUsersInSession(sessionId)
+				if usersErr != nil {
+					log.Printf("error getting users in session %d: %v", sessionId, usersErr)
+					continue
+				}
 				sm.SendMessage(sessionId, &pb.SessionStream{
 					SessionId: int32(sessionId),
 					GameState: &pb.GameState{},
 					SessionState: &pb.SessionState{
-						CurrentPlayers: fmt.Sprint(0),
+						Users: users,
 					},
 				})
 			}
@@ -84,21 +89,31 @@ func (sm *SessionManager) CreateSession(userUUID uuid.UUID, pin string, maxPlaye
 	return &dbSession, nil
 }
 
-func (sm *SessionManager) GetPlayerIdsInSession(sessionId int) ([]uuid.UUID, error) {
+func (sm *SessionManager) GetUsersInSession(sessionId int) ([]*pb.User, error) {
+
+	dbSession, getErr := sm.store.GetSessionByID(context.Background(), int32(sessionId))
+	if getErr != nil {
+		return []*pb.User{}, getErr
+	}
+
 	sm.Mu.Lock()
 	defer sm.Mu.Unlock()
-
 	//Session must exist
 	if sm.SessionStreams[sessionId] == nil {
-		return []uuid.UUID{}, fmt.Errorf("session does not exist")
+		return []*pb.User{}, fmt.Errorf("session does not exist")
 	}
 
-	var userIds []uuid.UUID
+	var users []*pb.User
 	for _, s := range sm.SessionStreams[sessionId] {
-		userIds = append(userIds, s.UserId)
+		users = append(users, &pb.User{
+			Uuid:     s.UserId.String(),
+			Username: s.Username,
+			IsAdmin:  dbSession.OwnerID == s.UserId,
+		})
+
 	}
 
-	return userIds, nil
+	return users, nil
 }
 
 func (sm *SessionManager) GetSession(sessionId int) ([]UserStream, error) {
@@ -175,7 +190,6 @@ func (sm *SessionManager) AddStreamToSession(sessionId int, stream UserStream) e
 }
 
 func (sm *SessionManager) RemoveStreamFromSession(sessionId int, userId uuid.UUID) error {
-
 	//Stream must exist
 	if sm.SessionStreams[sessionId] == nil {
 		return fmt.Errorf("session does not exist")

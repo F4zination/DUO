@@ -27,7 +27,7 @@ type DUOServiceClient interface {
 	SubmitLoginChallenge(ctx context.Context, in *LoginChallengeResponse, opts ...grpc.CallOption) (*LoginResponse, error)
 	CreateSession(ctx context.Context, in *CreateSessionRequest, opts ...grpc.CallOption) (*CreateSessionResponse, error)
 	JoinSession(ctx context.Context, in *JoinSessionRequest, opts ...grpc.CallOption) (DUOService_JoinSessionClient, error)
-	DisconnectSession(ctx context.Context, in *DisconnectSessionRequest, opts ...grpc.CallOption) (*Void, error)
+	DisconnectSession(ctx context.Context, in *DisconnectSessionRequest, opts ...grpc.CallOption) (*DisconnectSessionResponse, error)
 }
 
 type dUOServiceClient struct {
@@ -106,8 +106,8 @@ func (x *dUOServiceJoinSessionClient) Recv() (*SessionStream, error) {
 	return m, nil
 }
 
-func (c *dUOServiceClient) DisconnectSession(ctx context.Context, in *DisconnectSessionRequest, opts ...grpc.CallOption) (*Void, error) {
-	out := new(Void)
+func (c *dUOServiceClient) DisconnectSession(ctx context.Context, in *DisconnectSessionRequest, opts ...grpc.CallOption) (*DisconnectSessionResponse, error) {
+	out := new(DisconnectSessionResponse)
 	err := c.cc.Invoke(ctx, "/pb.DUOService/DisconnectSession", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -124,7 +124,7 @@ type DUOServiceServer interface {
 	SubmitLoginChallenge(context.Context, *LoginChallengeResponse) (*LoginResponse, error)
 	CreateSession(context.Context, *CreateSessionRequest) (*CreateSessionResponse, error)
 	JoinSession(*JoinSessionRequest, DUOService_JoinSessionServer) error
-	DisconnectSession(context.Context, *DisconnectSessionRequest) (*Void, error)
+	DisconnectSession(context.Context, *DisconnectSessionRequest) (*DisconnectSessionResponse, error)
 	mustEmbedUnimplementedDUOServiceServer()
 }
 
@@ -147,7 +147,7 @@ func (UnimplementedDUOServiceServer) CreateSession(context.Context, *CreateSessi
 func (UnimplementedDUOServiceServer) JoinSession(*JoinSessionRequest, DUOService_JoinSessionServer) error {
 	return status.Errorf(codes.Unimplemented, "method JoinSession not implemented")
 }
-func (UnimplementedDUOServiceServer) DisconnectSession(context.Context, *DisconnectSessionRequest) (*Void, error) {
+func (UnimplementedDUOServiceServer) DisconnectSession(context.Context, *DisconnectSessionRequest) (*DisconnectSessionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DisconnectSession not implemented")
 }
 func (UnimplementedDUOServiceServer) mustEmbedUnimplementedDUOServiceServer() {}

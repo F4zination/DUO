@@ -53,7 +53,7 @@ func (server *Server) JoinSession(req *pb.JoinSessionRequest, stream pb.DUOServi
 	return nil
 }
 
-func (server *Server) DisconnectSession(ctx context.Context, req *pb.DisconnectSessionRequest) (*pb.Void, error) {
+func (server *Server) DisconnectSession(ctx context.Context, req *pb.DisconnectSessionRequest) (*pb.DisconnectSessionResponse, error) {
 	payload, tokenErr := server.Maker.VerifyToken(req.Token)
 	if tokenErr != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "invalid token")
@@ -61,5 +61,5 @@ func (server *Server) DisconnectSession(ctx context.Context, req *pb.DisconnectS
 
 	server.SessionHandler.RemoveStreamFromSession(int(req.SessionId), payload.UserID)
 
-	return &pb.Void{}, nil
+	return &pb.DisconnectSessionResponse{Success: true}, nil
 }

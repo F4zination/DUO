@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:duo_client/pb/auth_messages.pb.dart';
 import 'package:duo_client/pb/session_messages.pb.dart';
+import 'package:duo_client/pb/void.pb.dart';
 import 'package:duo_client/provider/storage_provider.dart';
 import 'package:duo_client/utils/connection/abstract_connection.dart';
 import 'package:duo_client/utils/constants.dart';
@@ -137,7 +138,7 @@ class GrpcServerConnection extends AbstractServerConnection {
             ..pin = pin);
 
       await for (SessionStream ss in stream) {
-        print('Received: ${ss.sessionId}');
+        print('Received: ${ss.sessionState.users.length}');
       }
     } catch (e) {
       return -1;
@@ -150,24 +151,6 @@ class GrpcServerConnection extends AbstractServerConnection {
     try {
       DisconnectSessionResponse res =
           await client.disconnectSession(DisconnectSessionRequest()
-            ..token = token
-            ..sessionId = sessionId);
-
-      if (res.success) {
-        return 0;
-      } else {
-        return -1;
-      }
-    } catch (e) {
-      return -1;
-    }
-  }
-
-  @override
-  Future<int> deleteSession(String token, int sessionId) async {
-    try {
-      DeleteSessionResponse res =
-          await client.deleteSession(DeleteSessionRequest()
             ..token = token
             ..sessionId = sessionId);
 

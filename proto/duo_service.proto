@@ -4,7 +4,7 @@ package pb;
 
 import "auth_messages.proto";
 import "session_messages.proto";
-import "void.proto";
+// import "void.proto";
 
 option go_package = "github.com/duo/pb";
 
@@ -16,6 +16,6 @@ service DUOService {
 
     rpc CreateSession(CreateSessionRequest) returns (CreateSessionResponse) {}
     rpc JoinSession(JoinSessionRequest) returns (stream SessionStream) {}
-    rpc DisconnectSession(DisconnectSessionRequest) returns (void) {}  
+    rpc DisconnectSession(DisconnectSessionRequest) returns (DisconnectSessionResponse) {}  
 }
 

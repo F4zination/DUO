@@ -7,5 +7,4 @@ abstract class AbstractServerConnection {
   Future<int> createSession(String token, String pin);
   Future<int> joinSession(String token, int sessionId, String pin);
   Future<int> disconnectSession(String token, int sessionId);
-  Future<int> deleteSession(String token, int sessionId);
 }
