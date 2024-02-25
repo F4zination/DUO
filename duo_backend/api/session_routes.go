@@ -24,3 +24,16 @@ func (server *Server) CreateSession(ctx context.Context, req *pb.CreateSessionRe
 		Pin:       session.Pin,
 	}, nil
 }
+
+func (server *Server) JoinSession(req *pb.JoinSessionRequest, stream pb.DUOService_JoinSessionServer) error {
+	payload, tokenErr := server.Maker.VerifyToken(req.Token)
+	if tokenErr != nil {
+		return status.Errorf(codes.Unauthenticated, "invalid token")
+	}
+
+	userStream := NewUserStream(stream, payload.UserID, payload.Username)
+
+	server.SessionHandler.AddStreamToSession(int(req.SessionId), *userStream)
+
+	return nil
+}
