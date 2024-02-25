@@ -2,6 +2,10 @@ containerName=duo_server
 imageName=duo_backend
 db_conn=postgres://duo_user:Testimesti123@0.0.0.0:5432/duo?sslmode=disable
 
+all:
+	docker-compose down
+	docker-compose up --build
+	
 runNative:
 	go run main.go
 
