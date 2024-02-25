@@ -16,18 +16,18 @@ message SessionState{
 
 message CreateSessionRequest{
     string token = 1;
-    int32 pin = 2;
+    string pin = 2;
 }
 
 message CreateSessionResponse{
     int32 session_id = 1;
-    int32 pin = 2;
+    string pin = 2;
 }
 
 message JoinSessionRequest{
     string token = 1;
     int32 session_id = 2;
-    int32 pin = 3;
+    string pin = 3;
 }
 
 message SessionStream{
