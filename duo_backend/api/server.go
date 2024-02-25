@@ -11,9 +11,10 @@ import (
 
 type Server struct {
 	pb.UnimplementedDUOServiceServer
-	Config util.Config
-	Store  db.Store
-	Maker  token.Maker
+	Config         util.Config
+	Store          db.Store
+	Maker          token.Maker
+	SessionHandler SessionManager
 }
 
 func NewServer(store db.Store, config util.Config) *Server {
@@ -24,9 +25,10 @@ func NewServer(store db.Store, config util.Config) *Server {
 	}
 
 	return &Server{
-		Store:  store,
-		Config: config,
-		Maker:  maker,
+		Store:          store,
+		Config:         config,
+		Maker:          maker,
+		SessionHandler: *NewSessionManager(),
 	}
 }
 

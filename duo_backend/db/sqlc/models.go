@@ -16,6 +16,12 @@ type Duouser struct {
 	PublicKey string    `json:"public_key"`
 }
 
+type GameSession struct {
+	ID      int32     `json:"id"`
+	Pin     string    `json:"pin"`
+	OwnerID uuid.UUID `json:"owner_id"`
+}
+
 type UserLogin struct {
 	UserUuid  uuid.UUID `json:"user_uuid"`
 	Challenge string    `json:"challenge"`

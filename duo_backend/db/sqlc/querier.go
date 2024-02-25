@@ -11,9 +11,13 @@ import (
 )
 
 type Querier interface {
+	CreateSession(ctx context.Context, arg CreateSessionParams) (GameSession, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (Duouser, error)
 	CreateUserLogin(ctx context.Context, arg CreateUserLoginParams) (UserLogin, error)
+	DeleteSessionByID(ctx context.Context, id int32) (GameSession, error)
 	DeleteUserLoginByUUID(ctx context.Context, userUuid uuid.UUID) (UserLogin, error)
+	GetSessionByID(ctx context.Context, id int32) (GameSession, error)
+	GetSessionByOwnerUUID(ctx context.Context, ownerID uuid.UUID) (GameSession, error)
 	GetUserByUUID(ctx context.Context, uuid uuid.UUID) (Duouser, error)
 	GetUserLoginByUUID(ctx context.Context, userUuid uuid.UUID) (UserLogin, error)
 }
