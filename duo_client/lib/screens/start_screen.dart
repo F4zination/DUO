@@ -47,7 +47,7 @@ class _StartScreenState extends ConsumerState<StartScreen> {
             const SizedBox(height: 20),
             ElevatedButton(
                 onPressed: () async {
-                  Navigator.pushNamed(context, '/session_test');
+                  Navigator.pushNamed(context, '/testSession');
                 },
                 child: const Text('Go to Session Test')),
             ElevatedButton(

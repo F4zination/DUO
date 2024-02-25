@@ -5,4 +5,4 @@ CREATE TABLE IF NOT EXISTS game_session (
 );
 
 CREATE INDEX owner_id_idx ON game_session (owner_id);
-ALTER TABLE game_session ADD CONSTRAINT fk_owner_id FOREIGN KEY (owner_id) REFERENCES duouser(id);
+ALTER TABLE game_session ADD CONSTRAINT fk_owner_id FOREIGN KEY (owner_id) REFERENCES duouser(uuid);

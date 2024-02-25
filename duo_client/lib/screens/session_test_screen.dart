@@ -12,7 +12,7 @@ class SessionTestScreen extends ConsumerStatefulWidget {
 
 class _SessionTestScreeState extends ConsumerState<SessionTestScreen> {
   String sessionId = '';
-  List<String> sessionUsers = [];
+  String successfull = 'false';
 
   @override
   Widget build(BuildContext context) {
@@ -31,16 +31,34 @@ class _SessionTestScreeState extends ConsumerState<SessionTestScreen> {
               child: Column(
                 children: [
                   Text('Session ID: $sessionId'),
-                  Text('Session Users: $sessionUsers')
+                  Text('Successful: $successfull')
                 ],
               ),
+            ),
+            const SizedBox(
+              height: 20,
             ),
             ElevatedButton(
                 onPressed: () async {
                   // add code
                   var token = await _storageProvider.storage
                       .read(key: keyToAccessToken);
-                  _apiProvider.serverConnection!.createSession(token!, 1234);
+
+                  // create Session
+                  _apiProvider.serverConnection!
+                      .createSession(token!, 1234)
+                      .then((value) async {
+                    // join Session
+                    if (value == 0) return;
+                    int _sessionID = await _apiProvider.serverConnection!
+                        .joinSession(token, 1234, 1234);
+                    if (_sessionID == 0) {
+                      setState(() {
+                        sessionId = _sessionID.toString();
+                        successfull = 'true';
+                      });
+                    }
+                  });
                 },
                 child: const Text('Create Session (PIN: 1234)')),
             ElevatedButton(

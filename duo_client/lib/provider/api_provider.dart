@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:duo_client/provider/storage_provider.dart';
 import 'package:duo_client/utils/connection/abstract_connection.dart';
 import 'package:duo_client/utils/connection/grpc_server_connection.dart';
@@ -21,7 +19,6 @@ class ApiProvider extends ChangeNotifier {
       case ServerConnectionType.grpc:
         serverConnection = GrpcServerConnection();
         serverConnection!.init(notifyListeners, _storageProvider!);
-        notifyListeners();
         break;
     }
   }
