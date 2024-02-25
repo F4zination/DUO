@@ -36,7 +36,7 @@ func NewSessionManager() *SessionManager {
 	}
 }
 
-func (sm *SessionManager) CreateSession(stream UserStream, pin string, store db.Store) error {
+func (sm *SessionManager) CreateSession(userUUID uuid.UUID, pin string, store db.Store) (*db.GameSession, error) {
 	//TODO move to route
 	// _, getErr := store.GetSessionByOwnerUUID(context.Background(), stream.UserId)
 	// if getErr != sql.ErrNoRows {
@@ -44,21 +44,20 @@ func (sm *SessionManager) CreateSession(stream UserStream, pin string, store db.
 	// }
 
 	dbSession, createErr := store.CreateSession(context.Background(), db.CreateSessionParams{
-		OwnerID: stream.UserId,
+		OwnerID: userUUID,
 		Pin:     pin,
 	})
-
 	if createErr != nil {
-		return createErr
+		return nil, createErr
 	}
 
 	sm.Mu.Lock()
 
-	sm.SessionStreams[int(dbSession.ID)] = append(sm.SessionStreams[int(dbSession.ID)], stream)
+	sm.SessionStreams[int(dbSession.ID)] = []UserStream{}
 
 	sm.Mu.Unlock()
 
-	return nil
+	return &dbSession, nil
 }
 
 func (sm *SessionManager) GetSession(sessionId int) ([]UserStream, error) {
