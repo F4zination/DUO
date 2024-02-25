@@ -47,15 +47,11 @@ class GameState extends $pb.GeneratedMessage {
 
 class SessionState extends $pb.GeneratedMessage {
   factory SessionState({
-    $core.String? joinedUserUuids,
-    $core.String? disconnectedUserUuids,
+    $core.String? currentPlayers,
   }) {
     final $result = create();
-    if (joinedUserUuids != null) {
-      $result.joinedUserUuids = joinedUserUuids;
-    }
-    if (disconnectedUserUuids != null) {
-      $result.disconnectedUserUuids = disconnectedUserUuids;
+    if (currentPlayers != null) {
+      $result.currentPlayers = currentPlayers;
     }
     return $result;
   }
@@ -64,8 +60,7 @@ class SessionState extends $pb.GeneratedMessage {
   factory SessionState.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'SessionState', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'joinedUserUuids')
-    ..aOS(2, _omitFieldNames ? '' : 'disconnectedUserUuids')
+    ..aOS(1, _omitFieldNames ? '' : 'currentPlayers')
     ..hasRequiredFields = false
   ;
 
@@ -91,22 +86,13 @@ class SessionState extends $pb.GeneratedMessage {
   static SessionState? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.String get joinedUserUuids => $_getSZ(0);
+  $core.String get currentPlayers => $_getSZ(0);
   @$pb.TagNumber(1)
-  set joinedUserUuids($core.String v) { $_setString(0, v); }
+  set currentPlayers($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
-  $core.bool hasJoinedUserUuids() => $_has(0);
+  $core.bool hasCurrentPlayers() => $_has(0);
   @$pb.TagNumber(1)
-  void clearJoinedUserUuids() => clearField(1);
-
-  @$pb.TagNumber(2)
-  $core.String get disconnectedUserUuids => $_getSZ(1);
-  @$pb.TagNumber(2)
-  set disconnectedUserUuids($core.String v) { $_setString(1, v); }
-  @$pb.TagNumber(2)
-  $core.bool hasDisconnectedUserUuids() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearDisconnectedUserUuids() => clearField(2);
+  void clearCurrentPlayers() => clearField(1);
 }
 
 class CreateSessionRequest extends $pb.GeneratedMessage {
@@ -162,6 +148,70 @@ class CreateSessionRequest extends $pb.GeneratedMessage {
   $core.bool hasToken() => $_has(0);
   @$pb.TagNumber(1)
   void clearToken() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.int get pin => $_getIZ(1);
+  @$pb.TagNumber(2)
+  set pin($core.int v) { $_setSignedInt32(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasPin() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearPin() => clearField(2);
+}
+
+class CreateSessionResponse extends $pb.GeneratedMessage {
+  factory CreateSessionResponse({
+    $core.int? sessionId,
+    $core.int? pin,
+  }) {
+    final $result = create();
+    if (sessionId != null) {
+      $result.sessionId = sessionId;
+    }
+    if (pin != null) {
+      $result.pin = pin;
+    }
+    return $result;
+  }
+  CreateSessionResponse._() : super();
+  factory CreateSessionResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory CreateSessionResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'CreateSessionResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
+    ..a<$core.int>(1, _omitFieldNames ? '' : 'sessionId', $pb.PbFieldType.O3)
+    ..a<$core.int>(2, _omitFieldNames ? '' : 'pin', $pb.PbFieldType.O3)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  CreateSessionResponse clone() => CreateSessionResponse()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  CreateSessionResponse copyWith(void Function(CreateSessionResponse) updates) => super.copyWith((message) => updates(message as CreateSessionResponse)) as CreateSessionResponse;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static CreateSessionResponse create() => CreateSessionResponse._();
+  CreateSessionResponse createEmptyInstance() => create();
+  static $pb.PbList<CreateSessionResponse> createRepeated() => $pb.PbList<CreateSessionResponse>();
+  @$core.pragma('dart2js:noInline')
+  static CreateSessionResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<CreateSessionResponse>(create);
+  static CreateSessionResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.int get sessionId => $_getIZ(0);
+  @$pb.TagNumber(1)
+  set sessionId($core.int v) { $_setSignedInt32(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasSessionId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearSessionId() => clearField(1);
 
   @$pb.TagNumber(2)
   $core.int get pin => $_getIZ(1);

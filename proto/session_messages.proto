@@ -10,13 +10,17 @@ message GameState{
 }
 
 message SessionState{
-    string joined_user_uuids = 1;
-    string disconnected_user_uuids = 2;
+    string current_players = 1;
 }
 
 
 message CreateSessionRequest{
     string token = 1;
+    int32 pin = 2;
+}
+
+message CreateSessionResponse{
+    int32 session_id = 1;
     int32 pin = 2;
 }
 

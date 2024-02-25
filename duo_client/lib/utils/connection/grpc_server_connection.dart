@@ -8,16 +8,17 @@ import 'package:duo_client/utils/encryption/encryption_handler.dart';
 import 'package:grpc/grpc.dart';
 import 'package:duo_client/pb/duo_service.pbgrpc.dart';
 import 'package:pointycastle/export.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:rsa_encrypt/rsa_encrypt.dart';
 
 class GrpcServerConnection extends AbstractServerConnection {
   late final ClientChannel channel;
   late final DUOServiceClient client;
-  final storage = const FlutterSecureStorage();
+  late final Function notifyListeners;
+  late StorageProvider _storageProvider;
 
   @override
-  void init() {
+  void init(Function notifyListeners, StorageProvider prov) {
+    _storageProvider = prov;
     channel = ClientChannel(
       Constants.host,
       port: Constants.port,
@@ -25,6 +26,7 @@ class GrpcServerConnection extends AbstractServerConnection {
       options: const ChannelOptions(credentials: ChannelCredentials.insecure()),
     );
     client = DUOServiceClient(channel);
+    this.notifyListeners = notifyListeners;
   }
 
   /// Registers a user with the server
@@ -40,14 +42,16 @@ class GrpcServerConnection extends AbstractServerConnection {
         ..username = username
         ..publicKey = publicPEMKey);
 
-      await storage.write(key: keyToUsername, value: username);
-      await storage.write(key: keyToUserId, value: resp.uuid);
-      await storage.write(key: keyToAccessToken, value: resp.authToken);
-      await storage.write(key: keyToPrivateKey, value: privatePEMKey);
+      await _storageProvider.write(key: keyToUsername, value: username);
+      await _storageProvider.write(key: keyToUserId, value: resp.uuid);
+      await _storageProvider.write(
+          key: keyToAccessToken, value: resp.authToken);
+      await _storageProvider.write(key: keyToPrivateKey, value: privatePEMKey);
     } catch (e) {
       // If the registration fails, return -1
       return -1;
     }
+    notifyListeners();
     return 0;
   }
 
@@ -63,7 +67,8 @@ class GrpcServerConnection extends AbstractServerConnection {
       LoginChallengeRequest lcr =
           await client.requestLoginChallenge(LoginRequest()..uuid = uuid);
 
-      String privateKey = (await storage.read(key: keyToPrivateKey)) ?? '';
+      String privateKey =
+          (await _storageProvider.read(key: keyToPrivateKey)) ?? '';
       var helper = RsaKeyHelper();
 
       RSAPrivateKey privKey = helper.parsePrivateKeyFromPem(privateKey);
@@ -90,26 +95,30 @@ class GrpcServerConnection extends AbstractServerConnection {
             ..uuid = uuid
             ..decryptedChallenge = decryptedChallenge);
 
-      await storage.write(key: keyToAccessToken, value: lr.token);
-      await storage.write(key: keyToExpireDate, value: lr.expiresAt.toString());
+      await _storageProvider.write(key: keyToAccessToken, value: lr.token);
+      await _storageProvider.write(
+          key: keyToExpireDate, value: lr.expiresAt.toString());
     } catch (e) {
       return -1;
     }
 
     // If the login was successful, return 0
+    notifyListeners();
     return 0;
   }
 
   @override
   Future<int> createSession(String token, int pin) async {
     try {
-      ResponseStream<SessionStream> stream =
+      CreateSessionResponse response =
           await client.createSession(CreateSessionRequest()
             ..token = token
             ..pin = pin);
 
-      await for (SessionStream ss in stream) {
-        print('Received: ${ss.sessionId}');
+      if (response.sessionId != 0) {
+        print('Session ID: ${response.sessionId}');
+        notifyListeners();
+        return response.sessionId;
       }
     } catch (e) {
       return -1;
@@ -127,6 +136,7 @@ class GrpcServerConnection extends AbstractServerConnection {
             ..pin = pin);
 
       await for (SessionStream ss in stream) {
+        notifyListeners();
         print('Received: ${ss.sessionId}');
       }
     } catch (e) {
@@ -144,6 +154,7 @@ class GrpcServerConnection extends AbstractServerConnection {
             ..sessionId = sessionId);
 
       if (res.success) {
+        notifyListeners();
         return 0;
       } else {
         return -1;

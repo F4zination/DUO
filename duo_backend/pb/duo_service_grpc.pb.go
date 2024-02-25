@@ -25,7 +25,7 @@ type DUOServiceClient interface {
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	RequestLoginChallenge(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginChallengeRequest, error)
 	SubmitLoginChallenge(ctx context.Context, in *LoginChallengeResponse, opts ...grpc.CallOption) (*LoginResponse, error)
-	CreateSession(ctx context.Context, in *CreateSessionRequest, opts ...grpc.CallOption) (DUOService_CreateSessionClient, error)
+	CreateSession(ctx context.Context, in *CreateSessionRequest, opts ...grpc.CallOption) (*CreateSessionResponse, error)
 	JoinSession(ctx context.Context, in *JoinSessionRequest, opts ...grpc.CallOption) (DUOService_JoinSessionClient, error)
 	DisconnectSession(ctx context.Context, in *DisconnectSessionRequest, opts ...grpc.CallOption) (*DisconnectSessionResponse, error)
 	DeleteSession(ctx context.Context, in *DeleteSessionRequest, opts ...grpc.CallOption) (*DeleteSessionResponse, error)
@@ -66,40 +66,17 @@ func (c *dUOServiceClient) SubmitLoginChallenge(ctx context.Context, in *LoginCh
 	return out, nil
 }
 
-func (c *dUOServiceClient) CreateSession(ctx context.Context, in *CreateSessionRequest, opts ...grpc.CallOption) (DUOService_CreateSessionClient, error) {
-	stream, err := c.cc.NewStream(ctx, &DUOService_ServiceDesc.Streams[0], "/pb.DUOService/CreateSession", opts...)
+func (c *dUOServiceClient) CreateSession(ctx context.Context, in *CreateSessionRequest, opts ...grpc.CallOption) (*CreateSessionResponse, error) {
+	out := new(CreateSessionResponse)
+	err := c.cc.Invoke(ctx, "/pb.DUOService/CreateSession", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &dUOServiceCreateSessionClient{stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
-}
-
-type DUOService_CreateSessionClient interface {
-	Recv() (*SessionStream, error)
-	grpc.ClientStream
-}
-
-type dUOServiceCreateSessionClient struct {
-	grpc.ClientStream
-}
-
-func (x *dUOServiceCreateSessionClient) Recv() (*SessionStream, error) {
-	m := new(SessionStream)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
+	return out, nil
 }
 
 func (c *dUOServiceClient) JoinSession(ctx context.Context, in *JoinSessionRequest, opts ...grpc.CallOption) (DUOService_JoinSessionClient, error) {
-	stream, err := c.cc.NewStream(ctx, &DUOService_ServiceDesc.Streams[1], "/pb.DUOService/JoinSession", opts...)
+	stream, err := c.cc.NewStream(ctx, &DUOService_ServiceDesc.Streams[0], "/pb.DUOService/JoinSession", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -155,7 +132,7 @@ type DUOServiceServer interface {
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	RequestLoginChallenge(context.Context, *LoginRequest) (*LoginChallengeRequest, error)
 	SubmitLoginChallenge(context.Context, *LoginChallengeResponse) (*LoginResponse, error)
-	CreateSession(*CreateSessionRequest, DUOService_CreateSessionServer) error
+	CreateSession(context.Context, *CreateSessionRequest) (*CreateSessionResponse, error)
 	JoinSession(*JoinSessionRequest, DUOService_JoinSessionServer) error
 	DisconnectSession(context.Context, *DisconnectSessionRequest) (*DisconnectSessionResponse, error)
 	DeleteSession(context.Context, *DeleteSessionRequest) (*DeleteSessionResponse, error)
@@ -175,8 +152,8 @@ func (UnimplementedDUOServiceServer) RequestLoginChallenge(context.Context, *Log
 func (UnimplementedDUOServiceServer) SubmitLoginChallenge(context.Context, *LoginChallengeResponse) (*LoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SubmitLoginChallenge not implemented")
 }
-func (UnimplementedDUOServiceServer) CreateSession(*CreateSessionRequest, DUOService_CreateSessionServer) error {
-	return status.Errorf(codes.Unimplemented, "method CreateSession not implemented")
+func (UnimplementedDUOServiceServer) CreateSession(context.Context, *CreateSessionRequest) (*CreateSessionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateSession not implemented")
 }
 func (UnimplementedDUOServiceServer) JoinSession(*JoinSessionRequest, DUOService_JoinSessionServer) error {
 	return status.Errorf(codes.Unimplemented, "method JoinSession not implemented")
@@ -254,25 +231,22 @@ func _DUOService_SubmitLoginChallenge_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _DUOService_CreateSession_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(CreateSessionRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
+func _DUOService_CreateSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateSessionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
 	}
-	return srv.(DUOServiceServer).CreateSession(m, &dUOServiceCreateSessionServer{stream})
-}
-
-type DUOService_CreateSessionServer interface {
-	Send(*SessionStream) error
-	grpc.ServerStream
-}
-
-type dUOServiceCreateSessionServer struct {
-	grpc.ServerStream
-}
-
-func (x *dUOServiceCreateSessionServer) Send(m *SessionStream) error {
-	return x.ServerStream.SendMsg(m)
+	if interceptor == nil {
+		return srv.(DUOServiceServer).CreateSession(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.DUOService/CreateSession",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DUOServiceServer).CreateSession(ctx, req.(*CreateSessionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _DUOService_JoinSession_Handler(srv interface{}, stream grpc.ServerStream) error {
@@ -352,6 +326,10 @@ var DUOService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _DUOService_SubmitLoginChallenge_Handler,
 		},
 		{
+			MethodName: "CreateSession",
+			Handler:    _DUOService_CreateSession_Handler,
+		},
+		{
 			MethodName: "DisconnectSession",
 			Handler:    _DUOService_DisconnectSession_Handler,
 		},
@@ -361,11 +339,6 @@ var DUOService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams: []grpc.StreamDesc{
-		{
-			StreamName:    "CreateSession",
-			Handler:       _DUOService_CreateSession_Handler,
-			ServerStreams: true,
-		},
 		{
 			StreamName:    "JoinSession",
 			Handler:       _DUOService_JoinSession_Handler,

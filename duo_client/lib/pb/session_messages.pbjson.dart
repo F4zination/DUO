@@ -26,16 +26,14 @@ final $typed_data.Uint8List gameStateDescriptor = $convert.base64Decode(
 const SessionState$json = {
   '1': 'SessionState',
   '2': [
-    {'1': 'joined_user_uuids', '3': 1, '4': 1, '5': 9, '10': 'joinedUserUuids'},
-    {'1': 'disconnected_user_uuids', '3': 2, '4': 1, '5': 9, '10': 'disconnectedUserUuids'},
+    {'1': 'current_players', '3': 1, '4': 1, '5': 9, '10': 'currentPlayers'},
   ],
 };
 
 /// Descriptor for `SessionState`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List sessionStateDescriptor = $convert.base64Decode(
-    'CgxTZXNzaW9uU3RhdGUSKgoRam9pbmVkX3VzZXJfdXVpZHMYASABKAlSD2pvaW5lZFVzZXJVdW'
-    'lkcxI2ChdkaXNjb25uZWN0ZWRfdXNlcl91dWlkcxgCIAEoCVIVZGlzY29ubmVjdGVkVXNlclV1'
-    'aWRz');
+    'CgxTZXNzaW9uU3RhdGUSJwoPY3VycmVudF9wbGF5ZXJzGAEgASgJUg5jdXJyZW50UGxheWVycw'
+    '==');
 
 @$core.Deprecated('Use createSessionRequestDescriptor instead')
 const CreateSessionRequest$json = {
@@ -50,6 +48,20 @@ const CreateSessionRequest$json = {
 final $typed_data.Uint8List createSessionRequestDescriptor = $convert.base64Decode(
     'ChRDcmVhdGVTZXNzaW9uUmVxdWVzdBIUCgV0b2tlbhgBIAEoCVIFdG9rZW4SEAoDcGluGAIgAS'
     'gFUgNwaW4=');
+
+@$core.Deprecated('Use createSessionResponseDescriptor instead')
+const CreateSessionResponse$json = {
+  '1': 'CreateSessionResponse',
+  '2': [
+    {'1': 'session_id', '3': 1, '4': 1, '5': 5, '10': 'sessionId'},
+    {'1': 'pin', '3': 2, '4': 1, '5': 5, '10': 'pin'},
+  ],
+};
+
+/// Descriptor for `CreateSessionResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List createSessionResponseDescriptor = $convert.base64Decode(
+    'ChVDcmVhdGVTZXNzaW9uUmVzcG9uc2USHQoKc2Vzc2lvbl9pZBgBIAEoBVIJc2Vzc2lvbklkEh'
+    'AKA3BpbhgCIAEoBVIDcGlu');
 
 @$core.Deprecated('Use joinSessionRequestDescriptor instead')
 const JoinSessionRequest$json = {

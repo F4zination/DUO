@@ -38,10 +38,20 @@ class _SessionTestScreeState extends ConsumerState<SessionTestScreen> {
             ElevatedButton(
                 onPressed: () async {
                   // add code
-                  var token = await _storageProvider.storage.read(key: 'token');
+                  var token = await _storageProvider.storage
+                      .read(key: keyToAccessToken);
                   _apiProvider.serverConnection!.createSession(token!, 1234);
                 },
                 child: const Text('Create Session (PIN: 1234)')),
+            ElevatedButton(
+                onPressed: () async {
+                  // add code
+                  var token = await _storageProvider.storage
+                      .read(key: keyToAccessToken);
+                  _apiProvider.serverConnection!
+                      .joinSession(token!, 1234, 1234);
+                },
+                child: const Text('Join Session (ID: 1234 | PIN: 1234)')),
             ElevatedButton(
               onPressed: () {
                 // Add code to send Hello World! to the server
