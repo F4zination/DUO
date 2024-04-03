@@ -13,12 +13,14 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
   AbstractServerConnection? _serverConnection;
   final StorageProvider _storageProvider;
 
-  ApiProvider(this._storageProvider);
+  ApiProvider(this._storageProvider) {
+    init(_storageProvider.lastSelectedConnectionType);
+  }
 
   void init(ServerConnectionType type) {
+    _storageProvider.setLastSelectedConnectionType(type);
     switch (type) {
       case ServerConnectionType.grpc:
-        debugPrint('init grpc');
         _serverConnection =
             GrpcServerConnection(_storageProvider, notifyListeners);
         break;
@@ -56,5 +58,6 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
 }
 
 final apiProvider = ChangeNotifierProvider<ApiProvider>((ref) {
+  //TODO make dynamic
   return ApiProvider(ref.watch(storageProvider));
 });

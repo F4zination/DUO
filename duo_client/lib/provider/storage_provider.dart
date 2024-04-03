@@ -1,3 +1,4 @@
+import 'package:duo_client/provider/api_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -12,6 +13,7 @@ class StorageProvider extends ChangeNotifier {
 
   final _storage = const FlutterSecureStorage();
 
+  ServerConnectionType _lastSelectedConnectionType = ServerConnectionType.grpc;
   String _userId = "";
   String _username = "";
   String _accessToken = "";
@@ -58,6 +60,14 @@ class StorageProvider extends ChangeNotifier {
   Future<void> setPrivateKey(String privateKey) async {
     _privateKey = privateKey;
     await _write(key: _keyToPrivateKey, value: privateKey);
+  }
+
+  void setLastSelectedConnectionType(ServerConnectionType type) {
+    _lastSelectedConnectionType = type;
+  }
+
+  ServerConnectionType get lastSelectedConnectionType {
+    return _lastSelectedConnectionType;
   }
 
   bool get isFirstTime {
