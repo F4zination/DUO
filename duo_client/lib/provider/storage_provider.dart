@@ -2,22 +2,94 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-const keyToPrivateKey = 'privateKey';
-const keyToPublicKey = 'publicKey';
-const keyToAccessToken = 'accessToken';
-const keyToUserId = 'userid';
-const keyToUsername = 'username';
-const keyToExpireDate = 'expireDate';
-
 class StorageProvider extends ChangeNotifier {
-  final storage = const FlutterSecureStorage();
+  static const _keyToPrivateKey = 'privateKey';
+  static const _keyToAccessToken = 'accessToken';
+  static const _keyToUserId = 'userid';
+  static const _keyToUsername = 'username';
+  static const _keyToExpireDate = 'expireDate';
+  static const _keyToIsFirstTime = 'isFirstTime';
 
-  Future<String?> read({required String key}) async {
-    return await storage.read(key: key);
+  final _storage = const FlutterSecureStorage();
+
+  String _userId = "";
+  String _username = "";
+  String _accessToken = "";
+  DateTime? _expireDate;
+  String _privateKey = "";
+  bool _isFirstTime = true;
+
+  StorageProvider();
+
+  Future<void> init() async {
+    _userId = await _read(key: _keyToUserId) ?? "";
+    _username = await _read(key: _keyToUsername) ?? "";
+    _accessToken = await _read(key: _keyToAccessToken) ?? "";
+    _expireDate = DateTime.tryParse(await _read(key: _keyToExpireDate) ?? "");
+    _privateKey = await _read(key: _keyToPrivateKey) ?? "";
+    _isFirstTime = ((await _read(key: _keyToIsFirstTime)) ?? "true") == "true";
   }
 
-  Future<void> write({required String key, required String value}) async {
-    await storage.write(key: key, value: value);
+  Future<void> setIsFirstTime(bool isFirstTime) async {
+    _isFirstTime = isFirstTime;
+    await _write(key: _keyToIsFirstTime, value: isFirstTime.toString());
+  }
+
+  Future<void> setUserId(String userId) async {
+    _userId = userId;
+    await _write(key: _keyToUserId, value: userId);
+  }
+
+  Future<void> setUsername(String username) async {
+    _username = username;
+    await _write(key: _keyToUsername, value: username);
+  }
+
+  Future<void> setAccessToken(String accessToken) async {
+    _accessToken = accessToken;
+    await _write(key: _keyToAccessToken, value: accessToken);
+  }
+
+  Future<void> setExpireDate(DateTime expireDate) async {
+    _expireDate = expireDate;
+    await _write(key: _keyToExpireDate, value: expireDate.toString());
+  }
+
+  Future<void> setPrivateKey(String privateKey) async {
+    _privateKey = privateKey;
+    await _write(key: _keyToPrivateKey, value: privateKey);
+  }
+
+  bool get isFirstTime {
+    return _isFirstTime;
+  }
+
+  String get userId {
+    return _userId;
+  }
+
+  String get username {
+    return _username;
+  }
+
+  String get accessToken {
+    return _accessToken;
+  }
+
+  DateTime? get expireDate {
+    return _expireDate;
+  }
+
+  String get privateKey {
+    return _privateKey;
+  }
+
+  Future<String?> _read({required String key}) async {
+    return await _storage.read(key: key);
+  }
+
+  Future<void> _write({required String key, required String value}) async {
+    await _storage.write(key: key, value: value);
     notifyListeners();
   }
 }

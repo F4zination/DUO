@@ -1,26 +1,24 @@
 import 'dart:convert';
-import 'package:duo_client/pb/auth_messages.pb.dart';
-import 'package:duo_client/pb/session_messages.pb.dart';
-import 'package:duo_client/pb/void.pb.dart';
 import 'package:duo_client/provider/storage_provider.dart';
-import 'package:duo_client/utils/connection/abstract_connection.dart';
-import 'package:duo_client/utils/constants.dart';
-import 'package:duo_client/utils/encryption/encryption_handler.dart';
+
+import '../../pb/auth_messages.pb.dart';
+import '../../pb/session_messages.pb.dart';
+import 'abstract_connection.dart';
+import '../constants.dart';
+import '../encryption/encryption_handler.dart';
+import 'package:flutter/material.dart';
 import 'package:grpc/grpc.dart';
-import 'package:duo_client/pb/duo_service.pbgrpc.dart';
+import '../../pb/duo_service.pbgrpc.dart';
 import 'package:pointycastle/export.dart';
 import 'package:rsa_encrypt/rsa_encrypt.dart';
 
 class GrpcServerConnection extends AbstractServerConnection {
   late final ClientChannel channel;
   late final DUOServiceClient client;
-  late final Function notifyListeners;
-  late StorageProvider _storageProvider;
+  late final VoidCallback _notifyListeners;
+  final StorageProvider _storage;
 
-  @override
-  void init(StorageProvider prov) {
-    _storageProvider = prov;
-
+  GrpcServerConnection(this._storage, this._notifyListeners) : super() {
     channel = ClientChannel(
       Constants.host,
       port: Constants.port,
@@ -43,11 +41,10 @@ class GrpcServerConnection extends AbstractServerConnection {
         ..username = username
         ..publicKey = publicPEMKey);
 
-      await _storageProvider.write(key: keyToUsername, value: username);
-      await _storageProvider.write(key: keyToUserId, value: resp.uuid);
-      await _storageProvider.write(
-          key: keyToAccessToken, value: resp.authToken);
-      await _storageProvider.write(key: keyToPrivateKey, value: privatePEMKey);
+      await _storage.setUsername(username);
+      await _storage.setUserId(resp.uuid);
+      await _storage.setAccessToken(resp.authToken);
+      await _storage.setPrivateKey(privatePEMKey);
     } catch (e) {
       // If the registration fails, return -1
       return -1;
@@ -68,8 +65,7 @@ class GrpcServerConnection extends AbstractServerConnection {
       LoginChallengeRequest lcr =
           await client.requestLoginChallenge(LoginRequest()..uuid = uuid);
 
-      String privateKey =
-          (await _storageProvider.read(key: keyToPrivateKey)) ?? '';
+      String privateKey = _storage.privateKey;
       var helper = RsaKeyHelper();
 
       RSAPrivateKey privKey = helper.parsePrivateKeyFromPem(privateKey);
@@ -96,9 +92,8 @@ class GrpcServerConnection extends AbstractServerConnection {
             ..uuid = uuid
             ..decryptedChallenge = decryptedChallenge);
 
-      await _storageProvider.write(key: keyToAccessToken, value: lr.token);
-      await _storageProvider.write(
-          key: keyToExpireDate, value: lr.expiresAt.toString());
+      await _storage.setExpireDate(lr.expiresAt.toDateTime());
+      await _storage.setAccessToken(lr.token);
     } catch (e) {
       return -1;
     }
@@ -132,7 +127,7 @@ class GrpcServerConnection extends AbstractServerConnection {
   Future<int> joinSession(String token, int sessionId, String pin) async {
     try {
       ResponseStream<SessionStream> stream =
-          await client.joinSession(JoinSessionRequest()
+          client.joinSession(JoinSessionRequest()
             ..token = token
             ..sessionId = sessionId
             ..pin = pin);
