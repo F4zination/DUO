@@ -14,7 +14,7 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
   final StorageProvider _storageProvider;
 
   ApiProvider(this._storageProvider) {
-    init(_storageProvider.lastSelectedConnectionType);
+    init(_storageProvider.lastSelectedConnectionType); //Defaults to grpc
   }
 
   void init(ServerConnectionType type) {
@@ -29,6 +29,13 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
         break;
     }
     notifyListeners();
+  }
+
+  Future<String> getToken() async {
+    if (_storageProvider.expireDate?.isBefore(DateTime.now()) ?? false) {
+      await _serverConnection!.loginUser(_storageProvider.userId);
+    }
+    return _storageProvider.accessToken;
   }
 
   @override
@@ -58,6 +65,5 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
 }
 
 final apiProvider = ChangeNotifierProvider<ApiProvider>((ref) {
-  //TODO make dynamic
   return ApiProvider(ref.watch(storageProvider));
 });
