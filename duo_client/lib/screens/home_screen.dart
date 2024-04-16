@@ -1,79 +1,100 @@
-import 'package:duo_client/provider/api_provider.dart';
-import 'package:duo_client/provider/storage_provider.dart';
 import 'package:duo_client/screens/dashboard_screen.dart';
-import 'package:duo_client/screens/profile_screen.dart';
-import 'package:duo_client/screens/splash_screen.dart';
-import 'package:duo_client/widgets/first_time_dialog.dart';
+import 'package:duo_client/screens/leaderboard_screen.dart';
+import 'package:duo_client/utils/constants.dart';
+import 'package:duo_client/widgets/duo_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
-class HomeScreen extends ConsumerStatefulWidget {
-  static const route = '/home';
+class HomeScreen extends StatefulWidget {
+  static const route = "/home";
   const HomeScreen({super.key});
 
   @override
-  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
-  bool _isLoading = false;
-
+class _HomeScreenState extends State<HomeScreen> {
+  int _currentIndex = 0;
   final List<Widget> _screens = [
     const DashboardScreen(),
-    const ProfileScreen(),
+    const LeaderboardScreen(),
+    const DashboardScreen(),
+    const DashboardScreen(),
   ];
-
-  int _currentIndex = 0;
-
-  @override
-  void initState() {
-    //Put  initialization code here
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await ref.read(storageProvider).init();
-      ref.read(apiProvider).init(ServerConnectionType.grpc);
-      //TODO delete
-      ref.read(storageProvider).setIsFirstTime(true);
-      setState(() {
-        _isLoading = false;
-      });
-      if (ref.read(storageProvider).isFirstTime) {
-        if (!mounted) return;
-        showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (context) => FirstTimeDialog(onNameSet: (name) async {
-                  await ref.read(apiProvider).registerUser(name);
-                  ref.read(storageProvider).setIsFirstTime(false);
-                }));
-      }
-    });
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
-    return _isLoading
-        ? const SplashScreen()
-        : Scaffold(
-            body: _screens[_currentIndex],
-            bottomNavigationBar: BottomNavigationBar(
-              currentIndex: _currentIndex,
-              onTap: (index) {
-                setState(() {
-                  _currentIndex = index;
-                });
-              },
-              items: const [
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.home),
-                  label: 'Home',
+    return Stack(
+      children: [
+        _screens[_currentIndex],
+        Positioned(
+          bottom: 0,
+          child: DuoBottomNavigationBar(
+            onPlay: () {
+              debugPrint('Play button pressed');
+            },
+            onSelected: (index) => setState(() {
+              debugPrint('Selected index: $index');
+              _currentIndex = index;
+            }),
+            currentIndex: _currentIndex,
+            items: const [
+              DuoBottomNavigationItem(
+                label: 'Home',
+                icon: 'res/icons/house.svg',
+              ),
+              DuoBottomNavigationItem(
+                label: 'Board',
+                icon: 'res/icons/chart.svg',
+              ),
+              DuoBottomNavigationItem(
+                label: 'Profile',
+                icon: 'res/icons/user.svg',
+              ),
+              DuoBottomNavigationItem(
+                label: 'Settings',
+                icon: 'res/icons/settings.svg',
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class EmptySegmentText extends StatelessWidget {
+  final String text;
+  const EmptySegmentText({
+    required this.text,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 100,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SvgPicture.asset('res/icons/snooze.svg',
+              colorFilter: ColorFilter.mode(
+                Theme.of(context).colorScheme.onBackground.withOpacity(0.54),
+                BlendMode.srcIn,
+              )),
+          const SizedBox(width: Constants.defaultPadding),
+          Text(
+            text,
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onBackground
+                      .withOpacity(0.54),
                 ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.person),
-                  label: 'Profile',
-                ),
-              ],
-            ),
-          );
+          ),
+        ],
+      ),
+    );
   }
 }

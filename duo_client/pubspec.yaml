@@ -43,6 +43,8 @@ dependencies:
   pointycastle: ^3.7.4
   asn1lib: ^1.5.2
   rsa_encrypt: ^2.0.0
+  google_fonts: ^6.2.1
+  flutter_svg: ^2.0.10+1
 
 
 dev_dependencies:
@@ -71,8 +73,9 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
+  assets:
+    - res/images/
+    - res/icons/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
