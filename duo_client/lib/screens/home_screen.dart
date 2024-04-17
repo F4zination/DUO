@@ -2,6 +2,7 @@ import 'package:duo_client/screens/dashboard_screen.dart';
 import 'package:duo_client/screens/leaderboard_screen.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:duo_client/widgets/duo_bottom_nav_bar.dart';
+import 'package:duo_client/widgets/game_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -32,6 +33,10 @@ class _HomeScreenState extends State<HomeScreen> {
           child: DuoBottomNavigationBar(
             onPlay: () {
               debugPrint('Play button pressed');
+              showDialog(
+                context: context,
+                builder: (context) => const GameDialog(),
+              );
             },
             onSelected: (index) => setState(() {
               debugPrint('Selected index: $index');
