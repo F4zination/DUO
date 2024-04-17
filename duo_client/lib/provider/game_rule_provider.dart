@@ -1,12 +1,12 @@
-import 'package:duo_client/models/game_rule.dart';
+import 'package:duo_client/pb/game_rule.pb.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class GameRuleProvider extends ChangeNotifier {
   final List<GameRule> _gameRules = [
-    GameRule(id: '1', name: 'Classic'),
-    GameRule(id: '2', name: 'Duo'),
-    GameRule(id: '3', name: 'Squad'),
+    GameRule(uuid: '1', name: 'Classic'),
+    GameRule(uuid: '2', name: 'Duo'),
+    GameRule(uuid: '3', name: 'Squad'),
   ];
 
   List<GameRule> get gameRules => _gameRules;

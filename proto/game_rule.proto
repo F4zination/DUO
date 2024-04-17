@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package gameRule;
+
+option go_package = "github.com/duo/gameRule";
+
+message GameRule {
+    string uuid = 1;
+    string name = 2;
+}

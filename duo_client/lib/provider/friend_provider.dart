@@ -1,9 +1,9 @@
-import 'package:duo_client/models/friend.dart';
+import 'package:duo_client/pb/friend.pb.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class FriendProvider extends ChangeNotifier {
-  final List<Friend> _friends = const [
+  final List<Friend> _friends = [
     Friend(
       uuid: '1',
       name: 'Joe Mama',

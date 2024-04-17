@@ -1,4 +1,4 @@
-import 'package:duo_client/models/friend.dart';
+import 'package:duo_client/pb/friend.pb.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:duo_client/utils/helpers.dart';
 import 'package:duo_client/widgets/duo_container.dart';
@@ -59,6 +59,7 @@ class FriendListTile extends StatelessWidget {
                             FriendState.inGame => 'in game',
                             FriendState.inLobby => 'in lobby',
                             FriendState.online => 'Online',
+                            _ => 'Unknown',
                           },
                           style: Theme.of(context)
                               .textTheme
@@ -72,6 +73,10 @@ class FriendListTile extends StatelessWidget {
                                   FriendState.inGame => Constants.warningColor,
                                   FriendState.inLobby => Constants.warningColor,
                                   FriendState.online => Constants.successColor,
+                                  _ => Theme.of(context)
+                                      .colorScheme
+                                      .onBackground
+                                      .withOpacity(0.30),
                                 },
                               ),
                         ),

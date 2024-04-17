@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package friend;
+
+option go_package = "github.com/duo/friend";
+
+enum FriendState {
+    offline = 0;
+    inGame = 1;
+    inLobby = 2;
+    online = 3;
+}
+
+message Friend {
+    string uuid = 1;
+    string name = 2;
+    int32 score = 3;
+    FriendState state = 4;
+}

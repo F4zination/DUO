@@ -1,4 +1,4 @@
-import 'package:duo_client/models/game_statistic.dart';
+import 'package:duo_client/pb/game_statistic.pb.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:duo_client/widgets/duo_container.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +14,10 @@ class RecentGameItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final int ownPlace = gameStatistic.playerBoard
+        .firstWhere((element) => element.name == 'Player1')
+        .rank; //TODO: Replace with real user
+
     return Padding(
       padding: const EdgeInsets.only(right: Constants.defaultPadding),
       child: DuoContainer(
@@ -31,18 +35,18 @@ class RecentGameItem extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 30,
-                    backgroundColor: switch (gameStatistic.ownPlace) {
+                    backgroundColor: switch (ownPlace) {
                       1 => Constants.goldColor,
                       2 => Constants.silverColor,
                       3 => Constants.bronzeColor,
                       _ => Theme.of(context).primaryColor,
                     },
                     child: Text(
-                      switch (gameStatistic.ownPlace) {
+                      switch (ownPlace) {
                         1 => '🥇',
                         2 => '🥈',
                         3 => '🥉',
-                        _ => '${gameStatistic.ownPlace}'
+                        _ => '${ownPlace}'
                       },
                       style: TextStyle(
                         fontSize: 24,
@@ -72,7 +76,7 @@ class RecentGameItem extends StatelessWidget {
                         ),
                         const SizedBox(height: Constants.defaultPadding / 4),
                         Text(
-                          '${gameStatistic.playersBoard.length + 1} Players',
+                          '${gameStatistic.playerBoard.length} Players',
                           style:
                               Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     color: Theme.of(context)

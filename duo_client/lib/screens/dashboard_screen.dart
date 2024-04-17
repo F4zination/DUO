@@ -135,7 +135,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Flexible(
                 child: Consumer(builder: (context, ref, child) {
                   var friendList = [...ref.watch(friendProvider).friends]
-                    ..sort((a, b) => b.state.index.compareTo(a.state.index));
+                    ..sort((a, b) => b.state.value.compareTo(a.state.value));
                   return friendList.isEmpty
                       ? const EmptySegmentText(text: 'No friends yet')
                       : ListView.builder(

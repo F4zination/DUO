@@ -1,4 +1,4 @@
-import 'package:duo_client/models/friend.dart';
+import 'package:duo_client/pb/friend.pb.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:duo_client/utils/helpers.dart';
 import 'package:duo_client/widgets/duo_container.dart';
@@ -48,7 +48,9 @@ class LeaderboardListTile extends StatelessWidget {
                       1 => Helpers.getTopThreeCircleAvatar(context, boardPlace),
                       2 => Helpers.getTopThreeCircleAvatar(context, boardPlace),
                       3 => Helpers.getTopThreeCircleAvatar(context, boardPlace),
-                      _ => Helpers.getCircleAvatar(text: friend.name),
+                      _ => Helpers.getCircleAvatar(
+                          text: friend.name,
+                          displayedText: boardPlace.toString()),
                     }),
                 const SizedBox(width: Constants.defaultPadding),
                 Expanded(
@@ -74,6 +76,7 @@ class LeaderboardListTile extends StatelessWidget {
                             FriendState.inGame => 'in game',
                             FriendState.inLobby => 'in lobby',
                             FriendState.online => 'Online',
+                            _ => 'Unknown',
                           },
                           style: Theme.of(context)
                               .textTheme
@@ -87,6 +90,10 @@ class LeaderboardListTile extends StatelessWidget {
                                   FriendState.inGame => Constants.warningColor,
                                   FriendState.inLobby => Constants.warningColor,
                                   FriendState.online => Constants.successColor,
+                                  _ => Theme.of(context)
+                                      .colorScheme
+                                      .onBackground
+                                      .withOpacity(0.30),
                                 },
                               ),
                         ),

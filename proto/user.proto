@@ -1,0 +1,11 @@
+syntax = "proto3";  
+
+package user;
+
+option go_package = "github.com/duo/user";
+
+message User {
+    string uuid = 1;
+    string name = 2;
+    string score = 3;
+}
