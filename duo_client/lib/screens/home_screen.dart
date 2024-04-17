@@ -1,5 +1,6 @@
 import 'package:duo_client/screens/dashboard_screen.dart';
 import 'package:duo_client/screens/leaderboard_screen.dart';
+import 'package:duo_client/screens/profile_screen.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:duo_client/widgets/duo_bottom_nav_bar.dart';
 import 'package:duo_client/widgets/game_dialog.dart';
@@ -19,7 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _screens = [
     const DashboardScreen(),
     const LeaderboardScreen(),
-    const DashboardScreen(),
+    const ProfileScreen(),
     const DashboardScreen(),
   ];
 
