@@ -1,3 +1,4 @@
+import 'package:duo_client/screens/lobby_screen.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:duo_client/widgets/duo_container.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +14,7 @@ class GameDialog extends StatelessWidget {
       insetPadding: const EdgeInsets.all(20),
       child: SizedBox(
           width: 400,
-          height: 250,
+          height: 270,
           child: Column(
             children: [
               const SizedBox(
@@ -23,75 +24,81 @@ class GameDialog extends StatelessWidget {
                   style: TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
-                      color: Constants.primaryColor)),
-              const SizedBox(height: 30),
+                      color: Colors.white70)),
+              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: DuoContainer(
-                      width: 150,
-                      backgroundColor: Constants.primaryColor,
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          borderRadius:
-                              BorderRadius.circular(Constants.defaultRadius),
-                          onTap: () {
-                            debugPrint('Host Game has been pressed');
-                          },
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SvgPicture.asset('res/icons/wifi_house.svg',
-                                  width: 100),
-                              const SizedBox(height: 10),
-                              const Text('Host Game',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20)),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
+                  DuoSelectTile(
+                    title: 'Host Game',
+                    onPressed: () {
+                      print('Host Game');
+                      Navigator.of(context)
+                          .pushReplacementNamed(LobbyScreen.route);
+                    },
+                    backgroundColor: Constants.primaryColor,
+                    icon: 'res/icons/wifi_house.svg',
                   ),
                   const SizedBox(width: 20),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: DuoContainer(
-                      width: 150,
-                      backgroundColor: Constants.primaryColorAccent,
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          borderRadius:
-                              BorderRadius.circular(Constants.defaultRadius),
-                          onTap: () {
-                            debugPrint('Join Game has been pressed');
-                          },
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SvgPicture.asset(
-                                  'res/icons/gaming_controller.svg',
-                                  width: 100),
-                              const SizedBox(height: 10),
-                              const Text('Join Game',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20)),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
+                  DuoSelectTile(
+                    title: 'Join Game',
+                    onPressed: () {},
+                    backgroundColor: Constants.primaryColor,
+                    icon: 'res/icons/gaming_controller.svg',
                   ),
                 ],
               ),
             ],
           )),
+    );
+  }
+}
+
+class DuoSelectTile extends StatelessWidget {
+  const DuoSelectTile({
+    super.key,
+    required this.title,
+    required this.onPressed,
+    required this.backgroundColor,
+    required this.icon,
+  });
+
+  final String icon;
+  final String title;
+  final Function onPressed;
+  final Color backgroundColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(Constants.defaultPadding),
+      child: DuoContainer(
+        width: 150,
+        backgroundColor: backgroundColor,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(Constants.defaultRadius),
+            onTap: () => onPressed(),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SvgPicture.asset(icon,
+                    width: 100,
+                    colorFilter: const ColorFilter.mode(
+                        Colors.white60, BlendMode.srcIn)),
+                const SizedBox(height: 10),
+                Text(title,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: Colors.white70)),
+                const SizedBox(height: 10),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

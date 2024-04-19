@@ -1,4 +1,5 @@
 import 'package:duo_client/screens/home_screen.dart';
+import 'package:duo_client/screens/lobby_screen.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -41,6 +42,7 @@ class DuoApp extends StatelessWidget {
       initialRoute: HomeScreen.route,
       routes: {
         HomeScreen.route: (context) => const HomeScreen(),
+        LobbyScreen.route: (context) => const LobbyScreen(),
       },
     );
   }

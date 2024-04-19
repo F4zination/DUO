@@ -45,6 +45,8 @@ dependencies:
   rsa_encrypt: ^2.0.0
   google_fonts: ^6.2.1
   flutter_svg: ^2.0.10+1
+  animated_background: ^2.0.0
+  flutter_spinkit: ^5.2.1
 
 
 dev_dependencies:

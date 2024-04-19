@@ -8,8 +8,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 class FriendListTile extends StatelessWidget {
   final Friend friend;
   final VoidCallback? onTap;
+  final bool? showIcons;
   const FriendListTile({
     required this.friend,
+    this.showIcons,
     this.onTap,
     super.key,
   });
@@ -82,30 +84,32 @@ class FriendListTile extends StatelessWidget {
                         ),
                       ]),
                 ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      tooltip: 'Invite to game',
-                      icon: SvgPicture.asset(
-                        'res/icons/mail.svg',
-                        colorFilter: const ColorFilter.mode(
-                            Colors.white54, BlendMode.srcIn),
-                      ),
-                      onPressed: () {},
-                    ),
-                    const SizedBox(width: Constants.defaultPadding / 2),
-                    IconButton(
-                      tooltip: 'Remove friend',
-                      icon: SvgPicture.asset(
-                        'res/icons/user_minus.svg',
-                        colorFilter: const ColorFilter.mode(
-                            Colors.white54, BlendMode.srcIn),
-                      ),
-                      onPressed: () {},
-                    ),
-                  ],
-                ),
+                showIcons ?? true
+                    ? Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            tooltip: 'Invite to game',
+                            icon: SvgPicture.asset(
+                              'res/icons/mail.svg',
+                              colorFilter: const ColorFilter.mode(
+                                  Colors.white54, BlendMode.srcIn),
+                            ),
+                            onPressed: () {},
+                          ),
+                          const SizedBox(width: Constants.defaultPadding / 2),
+                          IconButton(
+                            tooltip: 'Remove friend',
+                            icon: SvgPicture.asset(
+                              'res/icons/user_minus.svg',
+                              colorFilter: const ColorFilter.mode(
+                                  Colors.white54, BlendMode.srcIn),
+                            ),
+                            onPressed: () {},
+                          ),
+                        ],
+                      )
+                    : const SizedBox.shrink(),
               ],
             ),
           ),
