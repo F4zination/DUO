@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:animated_background/animated_background.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:duo_client/widgets/add_tile.dart';
@@ -15,6 +17,8 @@ class LobbyScreen extends StatefulWidget {
 
 class _LobbyScreenState extends State<LobbyScreen>
     with TickerProviderStateMixin {
+  final int inviteCode = Random().nextInt(999999);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,7 +31,7 @@ class _LobbyScreenState extends State<LobbyScreen>
           child: Center(
               child: Text(
             'Lobby',
-            style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
           )),
         ),
       ),
@@ -48,7 +52,7 @@ class _LobbyScreenState extends State<LobbyScreen>
             child: Column(
               children: [
                 const Text(
-                  'Players',
+                  'DUO PLAYERS',
                   style: TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
@@ -68,37 +72,49 @@ class _LobbyScreenState extends State<LobbyScreen>
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: AddTile(
-                          Dialog: InviteDialog(),
+                          Dialog: InviteDialog(
+                            invideCode: inviteCode,
+                          ),
                         ),
                       ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: AddTile(
-                          Dialog: InviteDialog(),
+                          Dialog: InviteDialog(
+                            invideCode: inviteCode,
+                          ),
                         ),
                       ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: AddTile(
-                          Dialog: InviteDialog(),
+                          Dialog: InviteDialog(
+                            invideCode: inviteCode,
+                          ),
                         ),
                       ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: AddTile(
-                          Dialog: InviteDialog(),
+                          Dialog: InviteDialog(
+                            invideCode: inviteCode,
+                          ),
                         ),
                       ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: AddTile(
-                          Dialog: InviteDialog(),
+                          Dialog: InviteDialog(
+                            invideCode: inviteCode,
+                          ),
                         ),
                       ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: AddTile(
-                          Dialog: InviteDialog(),
+                          Dialog: InviteDialog(
+                            invideCode: inviteCode,
+                          ),
                         ),
                       ),
                     ],

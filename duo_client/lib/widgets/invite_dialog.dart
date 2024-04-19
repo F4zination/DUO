@@ -1,12 +1,14 @@
 import 'package:duo_client/pb/friend.pb.dart';
+import 'package:duo_client/provider/friend_provider.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:duo_client/widgets/friend_list_tile.dart';
 import 'package:flutter/material.dart';
 
 class InviteDialog extends StatelessWidget {
-  InviteDialog({super.key});
+  InviteDialog({super.key, required this.invideCode});
 
   late final Friend friendInvited;
+  final int invideCode;
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +17,7 @@ class InviteDialog extends StatelessWidget {
       insetPadding: const EdgeInsets.all(20),
       child: SizedBox(
           width: 400,
-          height: 370,
+          height: 450,
           child: Column(
             children: [
               const SizedBox(
@@ -29,45 +31,35 @@ class InviteDialog extends StatelessWidget {
               const SizedBox(height: 20),
               Expanded(
                   child: ListView(
+                children: FriendProvider().friends.map((friend) {
+                  return FriendListTile(
+                    showIcons: false,
+                    friend: friend,
+                    onTap: () {
+                      friendInvited = friend;
+                      Navigator.of(context).pop(friendInvited);
+                    },
+                  );
+                }).toList(),
+              )),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  FriendListTile(
-                    showIcons: false,
-                    friend: Friend()
-                      ..name = 'Adrianus'
-                      ..state = FriendState.online,
-                    onTap: () {
-                      print('Invite Zinsi');
+                  Text('Join via Code:  ${invideCode.toString()}',
+                      style:
+                          const TextStyle(color: Colors.white, fontSize: 16)),
+                  const SizedBox(width: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
                     },
-                  ),
-                  FriendListTile(
-                    showIcons: false,
-                    friend: Friend()
-                      ..name = 'Zinsi'
-                      ..state = FriendState.inGame,
-                    onTap: () {
-                      print('Invite Zinsi');
-                    },
-                  ),
-                  FriendListTile(
-                    showIcons: false,
-                    friend: Friend()
-                      ..name = 'Gabriel'
-                      ..state = FriendState.offline,
-                    onTap: () {
-                      print('Invite Zinsi');
-                    },
-                  ),
-                  FriendListTile(
-                    showIcons: false,
-                    friend: Friend()
-                      ..name = 'Lenni'
-                      ..state = FriendState.online,
-                    onTap: () {
-                      print('Invite Zinsi');
-                    },
+                    child: const Text('Cancel',
+                        style: TextStyle(color: Colors.white)),
                   ),
                 ],
-              ))
+              ),
+              const SizedBox(height: 20),
             ],
           )),
     );

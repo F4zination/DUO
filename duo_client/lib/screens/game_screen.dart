@@ -22,7 +22,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     ]);
   }
 
-  List<Player> other_players = const [
+  List<Player> otherPlayers = [
     Player(playerName: 'Player 1', amountCards: 7, isCurrentPlayer: false),
     Player(playerName: 'Player 2', amountCards: 7, isCurrentPlayer: false),
     Player(playerName: 'Player 3', amountCards: 7, isCurrentPlayer: true),
@@ -51,7 +51,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                   EllipseWidgetDistributor(
                     radiusX: width / 2.8,
                     radiusY: height / 2.5,
-                    children: other_players,
+                    children: otherPlayers,
                   ),
                   Positioned(
                     left: width / 2.8 - 80,

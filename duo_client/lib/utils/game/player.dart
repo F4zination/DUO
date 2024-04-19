@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
 
 class Player extends StatelessWidget {
-  const Player(
+  Player(
       {super.key,
       required this.playerName,
       required this.amountCards,
       required this.isCurrentPlayer});
 
-  final String playerName;
-  final int amountCards;
-  final bool isCurrentPlayer;
+  Player.empty(
+      {super.key,
+      this.playerName = 'Unknown',
+      this.amountCards = 0,
+      this.isCurrentPlayer = false});
+
+  String playerName;
+  int amountCards;
+  bool isCurrentPlayer;
 
   @override
   Widget build(BuildContext context) {
