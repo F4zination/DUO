@@ -100,9 +100,9 @@ func (sm *SessionManager) GetUsersInSession(sessionId int) ([]*pb.User, error) {
 	var users []*pb.User
 	for _, s := range sm.SessionStreams[sessionId] {
 		users = append(users, &pb.User{
-			Uuid:     s.UserId.String(),
-			Username: s.Username,
-			IsAdmin:  dbSession.OwnerID == s.UserId,
+			Uuid:    s.UserId.String(),
+			Name:    s.Username,
+			IsAdmin: dbSession.OwnerID == s.UserId,
 		})
 
 	}
