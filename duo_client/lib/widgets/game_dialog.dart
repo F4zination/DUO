@@ -1,6 +1,7 @@
 import 'package:duo_client/screens/lobby_screen.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:duo_client/widgets/duo_container.dart';
+import 'package:duo_client/widgets/join_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -42,7 +43,12 @@ class GameDialog extends StatelessWidget {
                   const SizedBox(width: 20),
                   DuoSelectTile(
                     title: 'Join Game',
-                    onPressed: () {},
+                    onPressed: () {
+                      print('Join Game');
+                      showDialog(
+                          context: context,
+                          builder: (context) => const JoinDialog());
+                    },
                     backgroundColor: Constants.primaryColor,
                     icon: 'res/icons/gaming_controller.svg',
                   ),
