@@ -23,9 +23,11 @@ class _AddTileState extends State<AddTile> {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
     return DuoContainer(
-      width: 120,
-      height: 80,
+      width: width / 3.5,
+      height: height / 4.5,
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -75,7 +77,7 @@ class _AddTileState extends State<AddTile> {
                     children: [
                       Icon(
                         Icons.add,
-                        size: 40,
+                        size: 35,
                         color: Theme.of(context).colorScheme.onPrimary,
                       ),
                       const SizedBox(height: 10),

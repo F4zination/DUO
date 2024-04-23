@@ -26,17 +26,23 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
   late final StorageProvider _storageProvider;
 
   void createLobby() async {
-    _apiProvider = ref.watch(apiProvider);
-    _storageProvider = ref.watch(storageProvider);
-    _apiProvider
-        .createSession(_storageProvider.accessToken, inviteCode.toString())
-        .then(
-      (value) {
-        setState(() {
-          creatingLobby = false;
-        });
-      },
-    );
+    try {
+      _apiProvider = ref.watch(apiProvider);
+      _storageProvider = ref.watch(storageProvider);
+      _apiProvider.init(ServerConnectionType.grpc);
+      _apiProvider
+          .createSession(_storageProvider.accessToken, inviteCode.toString())
+          .then(
+        (value) {
+          print('Lobby Created with return value: $value');
+          setState(() {
+            creatingLobby = false;
+          });
+        },
+      );
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override
@@ -168,8 +174,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         Padding(
-                          padding:
-                              const EdgeInsets.all(Constants.defaultPadding),
+                          padding: const EdgeInsets.all(6),
                           child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                   backgroundColor: Constants.errorColor),
@@ -177,15 +182,14 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                                 Navigator.of(context).pop();
                               },
                               child: const Padding(
-                                padding: EdgeInsets.all(8.0),
+                                padding: EdgeInsets.all(3),
                                 child: Text('Leave Lobby',
                                     style: TextStyle(
                                         fontSize: 20, color: Colors.white70)),
                               )),
                         ),
                         Padding(
-                          padding:
-                              const EdgeInsets.all(Constants.defaultPadding),
+                          padding: const EdgeInsets.all(6),
                           child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                   backgroundColor: Constants.successColor),
@@ -193,7 +197,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                                 Navigator.of(context).pop();
                               },
                               child: const Padding(
-                                padding: EdgeInsets.all(8.0),
+                                padding: EdgeInsets.all(3.0),
                                 child: Text('Start Game',
                                     style: TextStyle(
                                         fontSize: 20, color: Colors.white70)),
