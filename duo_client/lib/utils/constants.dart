@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 class Constants {
   static const int port = 8080;
-  //static const String host = '10.0.6.202';
-  static const String host = 'localhost';
+  static const String host = '10.0.6.202';
+  //static const String host = 'localhost';
   static const int decryptedChallengeLength = 32;
 
   static const defaultPadding = 16.0;

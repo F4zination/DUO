@@ -23,6 +23,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
   bool creatingLobby = true;
   final int inviteCode = Random().nextInt(999999);
   late final ApiProvider _apiProvider;
+  int sessionID = -1;
   late final StorageProvider _storageProvider;
 
   void createLobby() async {
@@ -34,7 +35,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
           .createSession(_storageProvider.accessToken, inviteCode.toString())
           .then(
         (value) {
-          print('Lobby Created with return value: $value');
+          sessionID = value;
           setState(() {
             creatingLobby = false;
           });
@@ -178,8 +179,17 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                           child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                   backgroundColor: Constants.errorColor),
-                              onPressed: () {
-                                Navigator.of(context).pop();
+                              onPressed: () async {
+                                int status = await ref
+                                    .read(apiProvider)
+                                    .disconnectSession(
+                                        ref.read(storageProvider).accessToken,
+                                        sessionID);
+                                if (status == 0) {
+                                  Navigator.of(context).pop();
+                                } else {
+                                  print('Error leaving lobby');
+                                }
                               },
                               child: const Padding(
                                 padding: EdgeInsets.all(3),

@@ -18,10 +18,10 @@ class SplashScreen<T> extends StatefulWidget {
 class _SplasScreenState<T> extends State<SplashScreen> {
   @override
   void initState() {
+    super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       T value = await widget.onLoading();
       widget.onLoadingComplete(value);
-      super.initState();
     });
   }
 
