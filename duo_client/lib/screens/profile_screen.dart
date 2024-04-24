@@ -1,18 +1,22 @@
+import 'package:duo_client/provider/storage_provider.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:duo_client/utils/helpers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
+    String username = ref.watch(storageProvider).username;
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -59,10 +63,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               height: Constants.defaultPadding,
               width: double.infinity,
             ),
-            Helpers.getCircleAvatar(text: 'Joe Mama', radius: 70, fontSize: 32),
+            Helpers.getCircleAvatar(text: username, radius: 70, fontSize: 32),
             const SizedBox(height: Constants.defaultPadding),
             Text(
-              'Joe Mama',
+              username,
               style: Theme.of(context)
                   .textTheme
                   .headlineMedium
