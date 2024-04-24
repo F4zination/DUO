@@ -1,13 +1,13 @@
 import 'dart:async';
 
+import 'package:duo_client/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:qr_scanner_overlay/qr_scanner_overlay.dart';
 
 class QrCodeScanner extends StatefulWidget {
   static const route = '/qr-code-scanner';
-  final void Function(int id) onDetectedValid;
-  const QrCodeScanner({required this.onDetectedValid, super.key});
+  const QrCodeScanner({super.key});
 
   @override
   State<QrCodeScanner> createState() => _QrCodeScannerState();
@@ -19,12 +19,6 @@ class _QrCodeScannerState extends State<QrCodeScanner>
       detectionTimeoutMs: 500, detectionSpeed: DetectionSpeed.noDuplicates);
   Color borderColor = Colors.white;
   bool _isLoading = false;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
 
   @override
   void dispose() {
@@ -60,8 +54,7 @@ class _QrCodeScannerState extends State<QrCodeScanner>
                   Navigator.of(context).pop();
                 }
               },
-              icon: const Icon(Icons.close,
-                  color: Colors.white), //TODO change to close icon
+              icon: const Icon(Icons.close, color: Colors.white),
             ),
           ),
         ],
@@ -71,7 +64,7 @@ class _QrCodeScannerState extends State<QrCodeScanner>
 
   Future<void> setInvalidColor() async {
     setState(() {
-      borderColor = Colors.red.withOpacity(0.4);
+      borderColor = Constants.errorColor.withOpacity(0.4);
     });
     await Future.delayed(const Duration(milliseconds: 500));
     if (!mounted) return;
@@ -82,7 +75,7 @@ class _QrCodeScannerState extends State<QrCodeScanner>
 
   Future<void> setValidColor() async {
     setState(() {
-      borderColor = Colors.green.withOpacity(0.4);
+      borderColor = Constants.successColor.withOpacity(0.4);
     });
     await Future.delayed(const Duration(milliseconds: 500));
     if (!mounted) return;
@@ -110,7 +103,7 @@ class _QrCodeScannerState extends State<QrCodeScanner>
   }
 
   (bool isValid, int id) _validateQrData(String data) {
-    //has the form of id:$id;pin:$pin
+    //has the form of id:$id
     final int id = int.tryParse(data.split(':')[1]) ?? -1;
 
     if (id < 0) {
@@ -126,9 +119,8 @@ class _QrCodeScannerState extends State<QrCodeScanner>
     if (isQrValid) {
       await setValidColor();
       if (!mounted) return;
-      widget.onDetectedValid(id);
       if (Navigator.of(context).canPop()) {
-        Navigator.of(context).pop();
+        Navigator.of(context).pop(id);
       }
     } else {
       if (borderColor == Colors.white) await setInvalidColor();

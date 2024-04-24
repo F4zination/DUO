@@ -2,6 +2,7 @@ import 'package:duo_client/provider/api_provider.dart';
 import 'package:duo_client/provider/storage_provider.dart';
 import 'package:duo_client/screens/home_screen.dart';
 import 'package:duo_client/screens/lobby_screen.dart';
+import 'package:duo_client/screens/qr_scanner_screen.dart';
 import 'package:duo_client/screens/splash_screen.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:duo_client/widgets/get_user_dialog.dart';
@@ -71,6 +72,7 @@ class _DuoAppState extends ConsumerState<DuoApp> {
                 }
               },
             ),
+        QrCodeScanner.route: (context) => const QrCodeScanner(),
         HomeScreen.route: (context) => const HomeScreen(),
         LobbyScreen.route: (context) => const LobbyScreen(),
       },
