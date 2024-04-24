@@ -104,14 +104,14 @@ class GrpcServerConnection extends AbstractServerConnection {
   }
 
   @override
-  Future<int> createLobby(String token) async {
+  Future<int> createLobby(String token, int maxPlayers) async {
     try {
-      ResponseStream<LobbyStatus> response =
-          await client.createLobby(CreateLobbyRequest()..token = token);
+      ResponseStream<LobbyStatus> response = client.createLobby(
+          CreateLobbyRequest(maxPlayers: maxPlayers, token: token));
 
       await for (LobbyStatus ls in response) {
         // Todo Update LobbyProvider with new state
-        //print('Received: ${ls.lobbyId}');
+        print('Received: ${ls.lobbyId}');
         lobbyStatus = ls;
         _notifyListeners();
       }

@@ -1,12 +1,22 @@
+import 'package:duo_client/provider/api_provider.dart';
+import 'package:duo_client/provider/storage_provider.dart';
 import 'package:duo_client/screens/lobby_screen.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:duo_client/widgets/duo_container.dart';
 import 'package:duo_client/widgets/join_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class GameDialog extends StatelessWidget {
+class GameDialog extends ConsumerStatefulWidget {
   const GameDialog({super.key});
+
+  @override
+  ConsumerState<GameDialog> createState() => _GameDialogState();
+}
+
+class _GameDialogState extends ConsumerState<GameDialog> {
+  bool isLoading = false;
 
   @override
   Widget build(context) {
@@ -33,7 +43,8 @@ class GameDialog extends StatelessWidget {
                   DuoSelectTile(
                     title: 'Host Game',
                     onPressed: () {
-                      print('Host Game');
+                      ref.read(apiProvider).createLobby(
+                          ref.read(storageProvider).accessToken, 8);
                       Navigator.of(context)
                           .pushReplacementNamed(LobbyScreen.route);
                     },

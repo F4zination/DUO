@@ -6,7 +6,7 @@ abstract class AbstractServerConnection {
   AbstractServerConnection();
   Future<int> registerUser(String username);
   Future<int> loginUser(String uuid);
-  Future<int> createLobby(String token);
+  Future<int> createLobby(String token, int maxPlayers);
   Future<int> joinLobby(String token, int sessionId);
   Future<int> disconnectLobby(String token, int sessionId);
 }

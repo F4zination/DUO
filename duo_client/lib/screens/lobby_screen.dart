@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:animated_background/animated_background.dart';
 import 'package:duo_client/provider/api_provider.dart';
 import 'package:duo_client/provider/storage_provider.dart';
@@ -9,6 +11,7 @@ import 'package:duo_client/widgets/user_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:grpc/grpc.dart';
 
 class LobbyScreen extends ConsumerStatefulWidget {
   const LobbyScreen({super.key});
@@ -21,41 +24,14 @@ class LobbyScreen extends ConsumerStatefulWidget {
 
 class _LobbyScreenState extends ConsumerState<LobbyScreen>
     with TickerProviderStateMixin {
-  bool creatingLobby = true;
-  late final ApiProvider _apiProvider;
+  bool creatingLobby = false;
   int lobbyID = -1;
   String displaylobbyID = '';
-  late final StorageProvider _storageProvider;
-
-  void createLobby() async {
-    try {
-      _apiProvider = ref.watch(apiProvider);
-      _storageProvider = ref.watch(storageProvider);
-      _apiProvider.init(ServerConnectionType.grpc);
-      _apiProvider.createLobby(_storageProvider.accessToken).then(
-        (value) {
-          lobbyID = value;
-          displaylobbyID = Helpers.fillPrefixWithZeros(lobbyID);
-          setState(() {
-            creatingLobby = false;
-          });
-        },
-      );
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      createLobby();
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
+    displaylobbyID = Helpers.fillPrefixWithZeros(
+        ref.watch(apiProvider).lobbyStatus?.lobbyId ?? 0);
     return Scaffold(
       backgroundColor: Constants.bgColor,
       appBar: AppBar(
@@ -120,16 +96,27 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                           childAspectRatio: 1.5,
                         ),
                         children: [
-                          ..._apiProvider.lobbyStatus!.users.map((user) {
-                            return UserTile(user: user);
+                          ...(ref.watch(apiProvider).lobbyStatus?.users ?? [])
+                              .map((user) {
+                            return Padding(
+                              padding: const EdgeInsets.all(
+                                  Constants.defaultPadding / 2),
+                              child: UserTile(user: user),
+                            );
                           }),
                           ...List.generate(
-                              _apiProvider.lobbyStatus!.maxPlayers -
-                                  _apiProvider.lobbyStatus!.users.length,
-                              (index) {
-                            return AddTile(
-                              Dialog: InviteDialog(
-                                invideCode: displaylobbyID,
+                              (ref.watch(apiProvider).lobbyStatus?.maxPlayers ??
+                                      8) -
+                                  (ref.watch(apiProvider).lobbyStatus?.users ??
+                                          [])
+                                      .length, (index) {
+                            return Padding(
+                              padding: const EdgeInsets.all(
+                                  Constants.defaultPadding / 2),
+                              child: AddTile(
+                                Dialog: InviteDialog(
+                                  invideCode: displaylobbyID,
+                                ),
                               ),
                             );
                           })

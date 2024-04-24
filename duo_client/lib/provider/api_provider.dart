@@ -44,8 +44,8 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
   }
 
   @override
-  Future<int> createLobby(String token) {
-    return _serverConnection!.createLobby(token);
+  Future<int> createLobby(String token, int maxPlayers) {
+    return _serverConnection!.createLobby(token, maxPlayers);
   }
 
   @override
