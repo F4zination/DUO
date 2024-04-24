@@ -10,6 +10,8 @@ class Constants {
   static const defaultRadius = 20.0;
   static const defaultElevation = 2.0;
 
+  static const lengthJoinCode = 6;
+
   static const primaryColor = Color.fromARGB(255, 118, 81, 219);
   static const primaryColorAccent = Color(0xFF6F5AF5);
   static const bgColor = Color.fromARGB(255, 35, 38, 63);

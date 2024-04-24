@@ -30,6 +30,16 @@ class Helpers {
     );
   }
 
+  static String fillPrefixWithZeros(int number) {
+    String numberString = number.toString();
+    for (int i = 0;
+        i < Constants.lengthJoinCode - number.toString().length;
+        i++) {
+      numberString = '0$numberString';
+    }
+    return numberString;
+  }
+
   static Widget getTopThreeCircleAvatar(BuildContext context, int index) {
     assert(index > 0 && index < 4, 'Index must be between 1 and 3');
     return CircleAvatar(
