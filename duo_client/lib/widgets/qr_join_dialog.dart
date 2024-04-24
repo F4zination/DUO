@@ -28,11 +28,14 @@ class QrJoinDialog extends StatelessWidget {
               size: 200,
             ),
             const SizedBox(height: 10),
-            TextButton(
+            ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('OK'),
+              child: const Text(
+                'OK',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ],
         ),
