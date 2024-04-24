@@ -113,21 +113,12 @@ class _JoinDialogState extends ConsumerState<JoinDialog> {
                           });
                           return;
                         }
-                        int stauts = await ref.read(apiProvider).joinLobby(
+                        ref.read(apiProvider).joinLobby(
                             ref.read(storageProvider).accessToken,
                             int.parse(_controller.text));
-                        if (stauts == 0) {
-                          print(
-                              'Joining session with invite code ${_controller.text}');
-                          Navigator.of(context)
-                              .pushReplacementNamed(LobbyScreen.route);
-                        } else {
-                          print('Error joining session value $stauts');
-                          setState(() {
-                            wrongInviteCode = true;
-                            hintText = 'Invalid invite code';
-                          });
-                        }
+
+                        Navigator.of(context)
+                            .pushReplacementNamed(LobbyScreen.route);
                       },
                       icon: SvgPicture.asset(
                         'res/icons/play_button.svg',
