@@ -86,6 +86,7 @@ class _JoinDialogState extends ConsumerState<JoinDialog> {
                               if (id != null) {
                                 _controller.text =
                                     Helpers.fillPrefixWithZeros(id);
+                                joinGame();
                               }
                             },
                             icon: const Icon(
@@ -104,22 +105,7 @@ class _JoinDialogState extends ConsumerState<JoinDialog> {
                           style: TextStyle(color: Colors.white),
                         )),
                     IconButton(
-                      onPressed: () async {
-                        if (_controller.text.isEmpty ||
-                            _controller.text.length < 6) {
-                          setState(() {
-                            wrongInviteCode = true;
-                            hintText = 'Invite code needs to be 6 digits long';
-                          });
-                          return;
-                        }
-                        ref.read(apiProvider).joinLobby(
-                            ref.read(storageProvider).accessToken,
-                            int.parse(_controller.text));
-
-                        Navigator.of(context)
-                            .pushReplacementNamed(LobbyScreen.route);
-                      },
+                      onPressed: joinGame,
                       icon: SvgPicture.asset(
                         'res/icons/play_button.svg',
                         height: 50,
@@ -135,5 +121,19 @@ class _JoinDialogState extends ConsumerState<JoinDialog> {
             ),
           ),
         ));
+  }
+
+  void joinGame() {
+    if (_controller.text.isEmpty || _controller.text.length < 6) {
+      setState(() {
+        wrongInviteCode = true;
+        hintText = 'Invite code needs to be 6 digits long';
+      });
+      return;
+    }
+    ref.read(apiProvider).joinLobby(
+        ref.read(storageProvider).accessToken, int.parse(_controller.text));
+    Navigator.of(context).pop();
+    Navigator.of(context).pushReplacementNamed(LobbyScreen.route);
   }
 }
