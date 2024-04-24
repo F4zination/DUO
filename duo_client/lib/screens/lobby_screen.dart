@@ -3,6 +3,7 @@ import 'package:animated_background/animated_background.dart';
 import 'package:duo_client/provider/api_provider.dart';
 import 'package:duo_client/provider/storage_provider.dart';
 import 'package:duo_client/utils/constants.dart';
+import 'package:duo_client/utils/helpers.dart';
 import 'package:duo_client/widgets/add_tile.dart';
 import 'package:duo_client/widgets/invite_dialog.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +22,6 @@ class LobbyScreen extends ConsumerStatefulWidget {
 class _LobbyScreenState extends ConsumerState<LobbyScreen>
     with TickerProviderStateMixin {
   bool creatingLobby = true;
-  final int inviteCode = Random().nextInt(999999);
   late final ApiProvider _apiProvider;
   int sessionID = -1;
   String displaySessionID = '';
@@ -33,18 +33,11 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
       _storageProvider = ref.watch(storageProvider);
       _apiProvider.init(ServerConnectionType.grpc);
       _apiProvider
-          .createSession(_storageProvider.accessToken, inviteCode.toString())
+          .createSession(_storageProvider.accessToken, sessionID.toString())
           .then(
         (value) {
           sessionID = value;
-          if (value.toString().length < 6) {
-            for (int i = 0; i < 6 - value.toString().length; i++) {
-              displaySessionID += '0';
-            }
-            displaySessionID += value.toString();
-          } else {
-            displaySessionID = value.toString();
-          }
+          displaySessionID = Helpers.fillPrefixWithZeros(sessionID);
           setState(() {
             creatingLobby = false;
           });
