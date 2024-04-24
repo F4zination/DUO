@@ -29,7 +29,6 @@ message CreateSessionResponse{
 message JoinSessionRequest{
     string token = 1;
     int32 session_id = 2;
-    string pin = 3;
 }
 
 message SessionStream{

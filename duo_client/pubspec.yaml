@@ -48,9 +48,13 @@ dependencies:
   animated_background: ^2.0.0
   flutter_spinkit: ^5.2.1
   qr_flutter: ^4.1.0
+<<<<<<< HEAD
   share_plus: ^9.0.0
   qr_scanner_overlay: ^0.0.2
   mobile_scanner: 3.2.0
+=======
+  share_plus: 7.0.2
+>>>>>>> 3c42a046046a6c2f618bd060decbd47a67ee3acc
 
 
 dev_dependencies:

@@ -10,7 +10,7 @@ class InviteDialog extends StatelessWidget {
   InviteDialog({super.key, required this.invideCode});
 
   late final Friend friendInvited;
-  final int invideCode;
+  final String invideCode;
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +51,7 @@ class InviteDialog extends StatelessWidget {
                 child: Row(
                   children: [
                     Text(
-                      'Join via Code:  ${invideCode.toString()}',
+                      'Join via Code:  $invideCode',
                       style: const TextStyle(color: Colors.white, fontSize: 16),
                     ),
                     const Spacer(),
@@ -59,7 +59,7 @@ class InviteDialog extends StatelessWidget {
                       onPressed: () => showDialog(
                           context: context,
                           builder: (context) => QrJoinDialog(
-                                id: invideCode.toString(),
+                                id: invideCode,
                               )),
                       icon: const Icon(
                         Icons.qr_code_2_rounded,
