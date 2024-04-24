@@ -24,6 +24,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
   final int inviteCode = Random().nextInt(999999);
   late final ApiProvider _apiProvider;
   int sessionID = -1;
+  String displaySessionID = '';
   late final StorageProvider _storageProvider;
 
   void createLobby() async {
@@ -36,6 +37,14 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
           .then(
         (value) {
           sessionID = value;
+          if (value.toString().length < 6) {
+            for (int i = 0; i < 6 - value.toString().length; i++) {
+              displaySessionID += '0';
+            }
+            displaySessionID += value.toString();
+          } else {
+            displaySessionID = value.toString();
+          }
           setState(() {
             creatingLobby = false;
           });
@@ -124,7 +133,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                             padding: const EdgeInsets.all(8.0),
                             child: AddTile(
                               Dialog: InviteDialog(
-                                invideCode: inviteCode,
+                                invideCode: displaySessionID,
                               ),
                             ),
                           ),
@@ -132,7 +141,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                             padding: const EdgeInsets.all(8.0),
                             child: AddTile(
                               Dialog: InviteDialog(
-                                invideCode: inviteCode,
+                                invideCode: displaySessionID,
                               ),
                             ),
                           ),
@@ -140,7 +149,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                             padding: const EdgeInsets.all(8.0),
                             child: AddTile(
                               Dialog: InviteDialog(
-                                invideCode: inviteCode,
+                                invideCode: displaySessionID,
                               ),
                             ),
                           ),
@@ -148,7 +157,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                             padding: const EdgeInsets.all(8.0),
                             child: AddTile(
                               Dialog: InviteDialog(
-                                invideCode: inviteCode,
+                                invideCode: displaySessionID,
                               ),
                             ),
                           ),
@@ -156,7 +165,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                             padding: const EdgeInsets.all(8.0),
                             child: AddTile(
                               Dialog: InviteDialog(
-                                invideCode: inviteCode,
+                                invideCode: displaySessionID,
                               ),
                             ),
                           ),
@@ -164,7 +173,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                             padding: const EdgeInsets.all(8.0),
                             child: AddTile(
                               Dialog: InviteDialog(
-                                invideCode: inviteCode,
+                                invideCode: displaySessionID,
                               ),
                             ),
                           ),
