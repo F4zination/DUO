@@ -236,6 +236,8 @@ func (sm *LobbyManager) RemoveStreamFromLobby(lobbyId int, userId uuid.UUID) err
 	sm.SendMessageToLobby(lobbyId, &pb.LobbyStatus{
 		Users:      users,
 		IsStarting: false,
+		LobbyId:    int32(lobbyId),
+		MaxPlayers: dbLobby.MaxPlayers,
 	})
 
 	log.Printf("Removed user stream %v from session %d", userId, lobbyId)
