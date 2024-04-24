@@ -205,6 +205,8 @@ func (sm *SessionManager) RemoveStreamFromSession(sessionId int, userId uuid.UUI
 	for _, s := range sm.SessionStreams[sessionId] {
 		if s.UserId != userId {
 			newStreams = append(newStreams, s)
+		} else {
+			s.Stream.Context().Done()
 		}
 	}
 
