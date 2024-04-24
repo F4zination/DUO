@@ -40,9 +40,6 @@ func RunGrpcServer(store db.Store, config util.Config) {
 	pb.RegisterDUOServiceServer(gRPCServer, server)
 	reflection.Register(gRPCServer)
 
-	//TODO delete
-	server.SessionHandler.SendTestMessagesToAll()
-
 	listener, err := net.Listen("tcp", config.ServerAddress)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
