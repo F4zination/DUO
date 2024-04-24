@@ -9,14 +9,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class JoinDialog extends ConsumerStatefulWidget {
-  const JoinDialog({Key? key});
+  const JoinDialog({super.key});
 
   @override
   ConsumerState<JoinDialog> createState() => _JoinDialogState();
 }
 
 class _JoinDialogState extends ConsumerState<JoinDialog> {
-  TextEditingController _controller = TextEditingController();
+  final TextEditingController _controller = TextEditingController();
   bool wrongInviteCode = false;
   String hintText = 'Enter the invite code to join a game';
 
@@ -76,12 +76,19 @@ class _JoinDialogState extends ConsumerState<JoinDialog> {
                       ))),
               IconButton(
                 onPressed: () async {
-                  print('Joining session with invite code ${_controller.text}');
+                  if (_controller.text.isEmpty || _controller.text.length < 6) {
+                    setState(() {
+                      wrongInviteCode = true;
+                      hintText = 'Invite code needs to be 6 digits long';
+                    });
+                    return;
+                  }
                   int stauts = await ref.read(apiProvider).joinSession(
                       ref.read(storageProvider).accessToken,
-                      5,
-                      _controller.text);
+                      int.parse(_controller.text));
                   if (stauts == 0) {
+                    print(
+                        'Joining session with invite code ${_controller.text}');
                     Navigator.of(context)
                         .pushReplacementNamed(LobbyScreen.route);
                   } else {

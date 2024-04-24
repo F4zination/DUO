@@ -49,8 +49,8 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
   }
 
   @override
-  Future<int> joinSession(String token, int sessionId, String pin) {
-    return _serverConnection!.joinSession(token, sessionId, pin);
+  Future<int> joinSession(String token, int sessionId) {
+    return _serverConnection!.joinSession(token, sessionId);
   }
 
   @override

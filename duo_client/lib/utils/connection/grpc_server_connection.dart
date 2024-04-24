@@ -124,13 +124,12 @@ class GrpcServerConnection extends AbstractServerConnection {
   }
 
   @override
-  Future<int> joinSession(String token, int sessionId, String pin) async {
+  Future<int> joinSession(String token, int sessionId) async {
     try {
       ResponseStream<SessionStream> stream =
           client.joinSession(JoinSessionRequest()
             ..token = token
-            ..sessionId = sessionId
-            ..pin = pin);
+            ..sessionId = sessionId);
 
       await for (SessionStream ss in stream) {
         print('Received: ${ss.sessionState.users.length}');
