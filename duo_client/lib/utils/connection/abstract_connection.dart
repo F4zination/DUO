@@ -1,8 +1,12 @@
+import 'package:duo_client/pb/lobby.pb.dart';
+
 abstract class AbstractServerConnection {
+  LobbyStatus? lobbyStatus;
+
   AbstractServerConnection();
   Future<int> registerUser(String username);
   Future<int> loginUser(String uuid);
-  Future<int> createSession(String token, String pin);
-  Future<int> joinSession(String token, int sessionId);
-  Future<int> disconnectSession(String token, int sessionId);
+  Future<int> createLobby(String token);
+  Future<int> joinLobby(String token, int sessionId);
+  Future<int> disconnectLobby(String token, int sessionId);
 }

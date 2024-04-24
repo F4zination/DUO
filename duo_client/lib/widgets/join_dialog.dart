@@ -4,7 +4,6 @@ import 'package:duo_client/screens/lobby_screen.dart';
 import 'package:duo_client/screens/qr_scanner_screen.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:duo_client/utils/helpers.dart';
-import 'package:duo_client/widgets/duo_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -82,7 +81,7 @@ class _JoinDialogState extends ConsumerState<JoinDialog> {
                         const SizedBox(width: Constants.defaultPadding / 2),
                         IconButton(
                             onPressed: () async {
-                              dynamic? id = await Navigator.of(context)
+                              dynamic id = await Navigator.of(context)
                                   .pushNamed(QrCodeScanner.route);
                               if (id != null) {
                                 _controller.text =
@@ -114,7 +113,7 @@ class _JoinDialogState extends ConsumerState<JoinDialog> {
                           });
                           return;
                         }
-                        int stauts = await ref.read(apiProvider).joinSession(
+                        int stauts = await ref.read(apiProvider).joinLobby(
                             ref.read(storageProvider).accessToken,
                             int.parse(_controller.text));
                         if (stauts == 0) {

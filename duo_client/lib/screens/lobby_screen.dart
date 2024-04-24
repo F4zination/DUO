@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:animated_background/animated_background.dart';
 import 'package:duo_client/provider/api_provider.dart';
 import 'package:duo_client/provider/storage_provider.dart';
@@ -6,6 +5,7 @@ import 'package:duo_client/utils/constants.dart';
 import 'package:duo_client/utils/helpers.dart';
 import 'package:duo_client/widgets/add_tile.dart';
 import 'package:duo_client/widgets/invite_dialog.dart';
+import 'package:duo_client/widgets/user_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -23,8 +23,8 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
     with TickerProviderStateMixin {
   bool creatingLobby = true;
   late final ApiProvider _apiProvider;
-  int sessionID = -1;
-  String displaySessionID = '';
+  int lobbyID = -1;
+  String displaylobbyID = '';
   late final StorageProvider _storageProvider;
 
   void createLobby() async {
@@ -32,12 +32,10 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
       _apiProvider = ref.watch(apiProvider);
       _storageProvider = ref.watch(storageProvider);
       _apiProvider.init(ServerConnectionType.grpc);
-      _apiProvider
-          .createSession(_storageProvider.accessToken, sessionID.toString())
-          .then(
+      _apiProvider.createLobby(_storageProvider.accessToken).then(
         (value) {
-          sessionID = value;
-          displaySessionID = Helpers.fillPrefixWithZeros(sessionID);
+          lobbyID = value;
+          displaylobbyID = Helpers.fillPrefixWithZeros(lobbyID);
           setState(() {
             creatingLobby = false;
           });
@@ -122,54 +120,19 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                           childAspectRatio: 1.5,
                         ),
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: AddTile(
+                          ..._apiProvider.lobbyStatus!.users.map((user) {
+                            return UserTile(user: user);
+                          }),
+                          ...List.generate(
+                              _apiProvider.lobbyStatus!.maxPlayers -
+                                  _apiProvider.lobbyStatus!.users.length,
+                              (index) {
+                            return AddTile(
                               Dialog: InviteDialog(
-                                invideCode: displaySessionID,
+                                invideCode: displaylobbyID,
                               ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: AddTile(
-                              Dialog: InviteDialog(
-                                invideCode: displaySessionID,
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: AddTile(
-                              Dialog: InviteDialog(
-                                invideCode: displaySessionID,
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: AddTile(
-                              Dialog: InviteDialog(
-                                invideCode: displaySessionID,
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: AddTile(
-                              Dialog: InviteDialog(
-                                invideCode: displaySessionID,
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: AddTile(
-                              Dialog: InviteDialog(
-                                invideCode: displaySessionID,
-                              ),
-                            ),
-                          ),
+                            );
+                          })
                         ],
                       ),
                     ),
@@ -184,9 +147,9 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                               onPressed: () async {
                                 int status = await ref
                                     .read(apiProvider)
-                                    .disconnectSession(
+                                    .disconnectLobby(
                                         ref.read(storageProvider).accessToken,
-                                        sessionID);
+                                        lobbyID);
                                 if (status == 0) {
                                   Navigator.of(context).pop();
                                 } else {

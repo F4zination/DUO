@@ -1,8 +1,8 @@
 import 'dart:convert';
+import 'package:duo_client/pb/lobby.pb.dart';
 import 'package:duo_client/provider/storage_provider.dart';
 
 import '../../pb/auth_messages.pb.dart';
-import '../../pb/session_messages.pb.dart';
 import 'abstract_connection.dart';
 import '../constants.dart';
 import '../encryption/encryption_handler.dart';
@@ -104,17 +104,16 @@ class GrpcServerConnection extends AbstractServerConnection {
   }
 
   @override
-  Future<int> createSession(String token, String pin) async {
+  Future<int> createLobby(String token) async {
     try {
-      CreateSessionResponse response =
-          await client.createSession(CreateSessionRequest()
-            ..token = token
-            ..pin = pin);
+      ResponseStream<LobbyStatus> response =
+          await client.createLobby(CreateLobbyRequest()..token = token);
 
-      if (response.sessionId != 0) {
-        print('Session ID: ${response.sessionId}');
-
-        return response.sessionId;
+      await for (LobbyStatus ls in response) {
+        // Todo Update LobbyProvider with new state
+        //print('Received: ${ls.lobbyId}');
+        lobbyStatus = ls;
+        _notifyListeners();
       }
     } catch (e) {
       print('Error: $e');
@@ -124,15 +123,16 @@ class GrpcServerConnection extends AbstractServerConnection {
   }
 
   @override
-  Future<int> joinSession(String token, int sessionId) async {
+  Future<int> joinLobby(String token, int lobbyId) async {
     try {
-      ResponseStream<SessionStream> stream =
-          client.joinSession(JoinSessionRequest()
-            ..token = token
-            ..sessionId = sessionId);
+      ResponseStream<LobbyStatus> stream = client.joinLobby(JoinLobbyRequest()
+        ..token = token
+        ..lobbyId = lobbyId);
 
-      await for (SessionStream ss in stream) {
-        print('Received: ${ss.sessionState.users.length}');
+      await for (LobbyStatus ls in stream) {
+        //print('Received: ${ls.users}');
+        lobbyStatus = ls;
+        _notifyListeners();
       }
     } catch (e) {
       return -1;
@@ -141,12 +141,15 @@ class GrpcServerConnection extends AbstractServerConnection {
   }
 
   @override
-  Future<int> disconnectSession(String token, int sessionId) async {
+  Future<int> disconnectLobby(String token, int lobbyId) async {
     try {
-      DisconnectSessionResponse res =
-          await client.disconnectSession(DisconnectSessionRequest()
+      DisconnectLobbyResponse res =
+          await client.disconnectLobby(DisconnectLobbyRequest()
             ..token = token
-            ..sessionId = sessionId);
+            ..lobbyId = lobbyId);
+
+      lobbyStatus = null;
+      _notifyListeners();
 
       if (res.success) {
         return 0;

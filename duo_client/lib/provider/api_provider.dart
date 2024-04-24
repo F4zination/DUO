@@ -1,3 +1,5 @@
+import 'package:duo_client/pb/lobby.pb.dart';
+
 import 'storage_provider.dart';
 import '../utils/connection/abstract_connection.dart';
 import '../utils/connection/grpc_server_connection.dart';
@@ -12,6 +14,9 @@ enum ServerConnectionType {
 class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
   AbstractServerConnection? _serverConnection;
   final StorageProvider _storageProvider;
+
+  @override
+  LobbyStatus? get lobbyStatus => _serverConnection?.lobbyStatus;
 
   ApiProvider(this._storageProvider) {
     init(_storageProvider.lastSelectedConnectionType); //Defaults to grpc
@@ -39,18 +44,18 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
   }
 
   @override
-  Future<int> createSession(String token, String pin) {
-    return _serverConnection!.createSession(token, pin);
+  Future<int> createLobby(String token) {
+    return _serverConnection!.createLobby(token);
   }
 
   @override
-  Future<int> disconnectSession(String token, int sessionId) {
-    return _serverConnection!.disconnectSession(token, sessionId);
+  Future<int> disconnectLobby(String token, int lobbyId) {
+    return _serverConnection!.disconnectLobby(token, lobbyId);
   }
 
   @override
-  Future<int> joinSession(String token, int sessionId) {
-    return _serverConnection!.joinSession(token, sessionId);
+  Future<int> joinLobby(String token, int lobbyId) {
+    return _serverConnection!.joinLobby(token, lobbyId);
   }
 
   @override
@@ -62,6 +67,9 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
   Future<int> registerUser(String username) {
     return _serverConnection!.registerUser(username);
   }
+
+  @override
+  set lobbyStatus(LobbyStatus? _lobbyStatus) {}
 }
 
 final apiProvider = ChangeNotifierProvider<ApiProvider>((ref) {
