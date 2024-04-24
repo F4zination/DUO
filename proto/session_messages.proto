@@ -2,20 +2,16 @@ syntax = "proto3";
 
 package pb;
 
-option go_package = "github.com/duo/pb";
+import "user.proto";
 
-message User {
-    string uuid = 1;
-    string username = 2;
-    bool is_admin = 3;
-}
+option go_package = "github.com/duo/pb";
 
 message GameState{
 
 }
 
 message SessionState{
-    repeated User users = 1;
+    repeated user.User users = 1;
     int32 max_players = 2;
 }
 

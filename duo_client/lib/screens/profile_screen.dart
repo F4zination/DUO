@@ -1,4 +1,5 @@
 import 'package:duo_client/utils/constants.dart';
+import 'package:duo_client/utils/helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -49,8 +50,92 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
         centerTitle: true,
       ),
-      body: Center(
-        child: Text('Lol, Profile Screen!'),
+      body: Padding(
+        padding: const EdgeInsets.all(Constants.defaultPadding),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const SizedBox(
+              height: Constants.defaultPadding,
+              width: double.infinity,
+            ),
+            Helpers.getCircleAvatar(text: 'Joe Mama', radius: 70, fontSize: 32),
+            const SizedBox(height: Constants.defaultPadding),
+            Text(
+              'Joe Mama',
+              style: Theme.of(context)
+                  .textTheme
+                  .headlineMedium
+                  ?.copyWith(color: Theme.of(context).colorScheme.onPrimary),
+            ),
+            const SizedBox(height: Constants.defaultPadding * 2),
+            Row(
+              children: [
+                Text(
+                  'Score:',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.copyWith(color: Colors.white54),
+                ),
+                const Spacer(),
+                Text(
+                  '300',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.copyWith(color: Colors.white54),
+                ),
+              ],
+            ),
+            const SizedBox(height: Constants.defaultPadding),
+            Row(
+              children: [
+                Text(
+                  'Description:',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.copyWith(color: Colors.white54),
+                ),
+                const Spacer(),
+                SizedBox(
+                  width: 200,
+                  child: Text(
+                    'Ich bin ein Berliner!',
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.end,
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.copyWith(color: Colors.white54),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: Constants.defaultPadding),
+            Row(
+              children: [
+                Text(
+                  'Joined on:',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.copyWith(color: Colors.white54),
+                ),
+                const Spacer(),
+                Text(
+                  '2021-09-01',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.copyWith(color: Colors.white54),
+                ),
+              ],
+            ),
+            const SizedBox(height: Constants.defaultPadding),
+          ],
+        ),
       ),
     );
   }

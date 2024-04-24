@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package friend;
 
-option go_package = "github.com/duo/friend";
+option go_package = "github.com/duo/pb";
 
 enum FriendState {
     offline = 0;

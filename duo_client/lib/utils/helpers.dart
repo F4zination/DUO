@@ -5,6 +5,7 @@ class Helpers {
   static Widget getCircleAvatar({
     double radius = 25,
     String? displayedText,
+    double fontSize = 16,
     required String text,
   }) {
     displayedText ??= text;
@@ -21,6 +22,7 @@ class Helpers {
       child: Text(
         letter,
         style: TextStyle(
+            fontSize: fontSize,
             color: bgColor.computeLuminance() > 0.5
                 ? Colors.grey[200]
                 : Colors.white70),

@@ -13,21 +13,6 @@ import 'dart:convert' as $convert;
 import 'dart:core' as $core;
 import 'dart:typed_data' as $typed_data;
 
-@$core.Deprecated('Use userDescriptor instead')
-const User$json = {
-  '1': 'User',
-  '2': [
-    {'1': 'uuid', '3': 1, '4': 1, '5': 9, '10': 'uuid'},
-    {'1': 'username', '3': 2, '4': 1, '5': 9, '10': 'username'},
-    {'1': 'is_admin', '3': 3, '4': 1, '5': 8, '10': 'isAdmin'},
-  ],
-};
-
-/// Descriptor for `User`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List userDescriptor = $convert.base64Decode(
-    'CgRVc2VyEhIKBHV1aWQYASABKAlSBHV1aWQSGgoIdXNlcm5hbWUYAiABKAlSCHVzZXJuYW1lEh'
-    'kKCGlzX2FkbWluGAMgASgIUgdpc0FkbWlu');
-
 @$core.Deprecated('Use gameStateDescriptor instead')
 const GameState$json = {
   '1': 'GameState',
@@ -41,15 +26,15 @@ final $typed_data.Uint8List gameStateDescriptor = $convert.base64Decode(
 const SessionState$json = {
   '1': 'SessionState',
   '2': [
-    {'1': 'users', '3': 1, '4': 3, '5': 11, '6': '.pb.User', '10': 'users'},
+    {'1': 'users', '3': 1, '4': 3, '5': 11, '6': '.user.User', '10': 'users'},
     {'1': 'max_players', '3': 2, '4': 1, '5': 5, '10': 'maxPlayers'},
   ],
 };
 
 /// Descriptor for `SessionState`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List sessionStateDescriptor = $convert.base64Decode(
-    'CgxTZXNzaW9uU3RhdGUSHgoFdXNlcnMYASADKAsyCC5wYi5Vc2VyUgV1c2VycxIfCgttYXhfcG'
-    'xheWVycxgCIAEoBVIKbWF4UGxheWVycw==');
+    'CgxTZXNzaW9uU3RhdGUSIAoFdXNlcnMYASADKAsyCi51c2VyLlVzZXJSBXVzZXJzEh8KC21heF'
+    '9wbGF5ZXJzGAIgASgFUgptYXhQbGF5ZXJz');
 
 @$core.Deprecated('Use createSessionRequestDescriptor instead')
 const CreateSessionRequest$json = {

@@ -18,6 +18,7 @@ class User extends $pb.GeneratedMessage {
     $core.String? uuid,
     $core.String? name,
     $core.String? score,
+    $core.bool? isAdmin,
   }) {
     final $result = create();
     if (uuid != null) {
@@ -29,6 +30,9 @@ class User extends $pb.GeneratedMessage {
     if (score != null) {
       $result.score = score;
     }
+    if (isAdmin != null) {
+      $result.isAdmin = isAdmin;
+    }
     return $result;
   }
   User._() : super();
@@ -39,6 +43,7 @@ class User extends $pb.GeneratedMessage {
     ..aOS(1, _omitFieldNames ? '' : 'uuid')
     ..aOS(2, _omitFieldNames ? '' : 'name')
     ..aOS(3, _omitFieldNames ? '' : 'score')
+    ..aOB(4, _omitFieldNames ? '' : 'isAdmin')
     ..hasRequiredFields = false
   ;
 
@@ -89,6 +94,15 @@ class User extends $pb.GeneratedMessage {
   $core.bool hasScore() => $_has(2);
   @$pb.TagNumber(3)
   void clearScore() => clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.bool get isAdmin => $_getBF(3);
+  @$pb.TagNumber(4)
+  set isAdmin($core.bool v) { $_setBool(3, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasIsAdmin() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearIsAdmin() => clearField(4);
 }
 
 

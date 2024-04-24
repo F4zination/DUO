@@ -2,10 +2,11 @@ syntax = "proto3";
 
 package user;
 
-option go_package = "github.com/duo/user";
+option go_package = "github.com/duo/pb";
 
 message User {
     string uuid = 1;
     string name = 2;
     string score = 3;
+    bool is_admin = 4;
 }

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package gameRule;
 
-option go_package = "github.com/duo/gameRule";
+option go_package = "github.com/duo/pb";
 
 message GameRule {
     string uuid = 1;

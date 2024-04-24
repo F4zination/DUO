@@ -13,83 +13,7 @@ import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
-class User extends $pb.GeneratedMessage {
-  factory User({
-    $core.String? uuid,
-    $core.String? username,
-    $core.bool? isAdmin,
-  }) {
-    final $result = create();
-    if (uuid != null) {
-      $result.uuid = uuid;
-    }
-    if (username != null) {
-      $result.username = username;
-    }
-    if (isAdmin != null) {
-      $result.isAdmin = isAdmin;
-    }
-    return $result;
-  }
-  User._() : super();
-  factory User.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory User.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'User', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'uuid')
-    ..aOS(2, _omitFieldNames ? '' : 'username')
-    ..aOB(3, _omitFieldNames ? '' : 'isAdmin')
-    ..hasRequiredFields = false
-  ;
-
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
-  User clone() => User()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  User copyWith(void Function(User) updates) => super.copyWith((message) => updates(message as User)) as User;
-
-  $pb.BuilderInfo get info_ => _i;
-
-  @$core.pragma('dart2js:noInline')
-  static User create() => User._();
-  User createEmptyInstance() => create();
-  static $pb.PbList<User> createRepeated() => $pb.PbList<User>();
-  @$core.pragma('dart2js:noInline')
-  static User getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<User>(create);
-  static User? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  $core.String get uuid => $_getSZ(0);
-  @$pb.TagNumber(1)
-  set uuid($core.String v) { $_setString(0, v); }
-  @$pb.TagNumber(1)
-  $core.bool hasUuid() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearUuid() => clearField(1);
-
-  @$pb.TagNumber(2)
-  $core.String get username => $_getSZ(1);
-  @$pb.TagNumber(2)
-  set username($core.String v) { $_setString(1, v); }
-  @$pb.TagNumber(2)
-  $core.bool hasUsername() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearUsername() => clearField(2);
-
-  @$pb.TagNumber(3)
-  $core.bool get isAdmin => $_getBF(2);
-  @$pb.TagNumber(3)
-  set isAdmin($core.bool v) { $_setBool(2, v); }
-  @$pb.TagNumber(3)
-  $core.bool hasIsAdmin() => $_has(2);
-  @$pb.TagNumber(3)
-  void clearIsAdmin() => clearField(3);
-}
+import 'user.pb.dart' as $3;
 
 class GameState extends $pb.GeneratedMessage {
   factory GameState() => create();
@@ -125,7 +49,7 @@ class GameState extends $pb.GeneratedMessage {
 
 class SessionState extends $pb.GeneratedMessage {
   factory SessionState({
-    $core.Iterable<User>? users,
+    $core.Iterable<$3.User>? users,
     $core.int? maxPlayers,
   }) {
     final $result = create();
@@ -142,7 +66,7 @@ class SessionState extends $pb.GeneratedMessage {
   factory SessionState.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'SessionState', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
-    ..pc<User>(1, _omitFieldNames ? '' : 'users', $pb.PbFieldType.PM, subBuilder: User.create)
+    ..pc<$3.User>(1, _omitFieldNames ? '' : 'users', $pb.PbFieldType.PM, subBuilder: $3.User.create)
     ..a<$core.int>(2, _omitFieldNames ? '' : 'maxPlayers', $pb.PbFieldType.O3)
     ..hasRequiredFields = false
   ;
@@ -169,7 +93,7 @@ class SessionState extends $pb.GeneratedMessage {
   static SessionState? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.List<User> get users => $_getList(0);
+  $core.List<$3.User> get users => $_getList(0);
 
   @$pb.TagNumber(2)
   $core.int get maxPlayers => $_getIZ(1);

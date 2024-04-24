@@ -4,7 +4,7 @@ package gameStatistic;
 
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/duo/gameStatistic";
+option go_package = "github.com/duo/pb";
 
 message PlayerBoardItem {
     int32 rank = 1;
