@@ -22,6 +22,7 @@ class DuoApp extends ConsumerStatefulWidget {
 
 class _DuoAppState extends ConsumerState<DuoApp> {
   bool loginComplete = false;
+  bool loginFailed = false;
 
   // handle login
   @override
@@ -42,8 +43,6 @@ class _DuoAppState extends ConsumerState<DuoApp> {
         } else {
           // route to login/register screen
           print('Login failed');
-          showDialog(
-              context: context, builder: (context) => const GetUserDialog());
         }
       });
     });
@@ -83,24 +82,26 @@ class _DuoAppState extends ConsumerState<DuoApp> {
               LobbyScreen.route: (context) => const LobbyScreen(),
             },
           )
-        : const MaterialApp(
+        : MaterialApp(
             home: Scaffold(
             backgroundColor: Constants.bgColor,
             body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  (SpinKitFadingFour(
-                    color: Colors.white,
-                    size: 30,
-                  )),
-                  SizedBox(height: 20),
-                  Text(
-                    'Logging in...',
-                    style: TextStyle(fontSize: 20, color: Colors.white70),
-                  )
-                ],
-              ),
+              child: loginFailed
+                  ? const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        (SpinKitFadingFour(
+                          color: Colors.white,
+                          size: 30,
+                        )),
+                        SizedBox(height: 20),
+                        Text(
+                          'ToDo: Add a loading/splash screen.',
+                          style: TextStyle(fontSize: 20, color: Colors.white70),
+                        )
+                      ],
+                    )
+                  : const GetUserDialog(),
             ),
           ));
   }

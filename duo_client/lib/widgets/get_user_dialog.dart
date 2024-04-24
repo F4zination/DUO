@@ -61,7 +61,7 @@ class GetUserDialog extends StatelessWidget {
                       ))),
               IconButton(
                 icon: SvgPicture.asset(
-                  'assets/icons/arrow_right.svg',
+                  'res/icons/arrow_right.svg',
                   colorFilter:
                       const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                 ),
