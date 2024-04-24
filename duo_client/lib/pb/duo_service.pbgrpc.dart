@@ -16,6 +16,7 @@ import 'package:grpc/service_api.dart' as $grpc;
 import 'package:protobuf/protobuf.dart' as $pb;
 
 import 'auth_messages.pb.dart' as $0;
+import 'lobby.pb.dart' as $2;
 import 'session_messages.pb.dart' as $1;
 
 export 'duo_service.pb.dart';
@@ -34,14 +35,14 @@ class DUOServiceClient extends $grpc.Client {
       '/pb.DUOService/SubmitLoginChallenge',
       ($0.LoginChallengeResponse value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.LoginResponse.fromBuffer(value));
-  static final _$createSession = $grpc.ClientMethod<$1.CreateSessionRequest, $1.CreateSessionResponse>(
+  static final _$createSession = $grpc.ClientMethod<$1.CreateSessionRequest, $2.LobbyStatus>(
       '/pb.DUOService/CreateSession',
       ($1.CreateSessionRequest value) => value.writeToBuffer(),
-      ($core.List<$core.int> value) => $1.CreateSessionResponse.fromBuffer(value));
-  static final _$joinSession = $grpc.ClientMethod<$1.JoinSessionRequest, $1.SessionStream>(
+      ($core.List<$core.int> value) => $2.LobbyStatus.fromBuffer(value));
+  static final _$joinSession = $grpc.ClientMethod<$1.JoinSessionRequest, $2.LobbyStatus>(
       '/pb.DUOService/JoinSession',
       ($1.JoinSessionRequest value) => value.writeToBuffer(),
-      ($core.List<$core.int> value) => $1.SessionStream.fromBuffer(value));
+      ($core.List<$core.int> value) => $2.LobbyStatus.fromBuffer(value));
   static final _$disconnectSession = $grpc.ClientMethod<$1.DisconnectSessionRequest, $1.DisconnectSessionResponse>(
       '/pb.DUOService/DisconnectSession',
       ($1.DisconnectSessionRequest value) => value.writeToBuffer(),
@@ -65,11 +66,11 @@ class DUOServiceClient extends $grpc.Client {
     return $createUnaryCall(_$submitLoginChallenge, request, options: options);
   }
 
-  $grpc.ResponseFuture<$1.CreateSessionResponse> createSession($1.CreateSessionRequest request, {$grpc.CallOptions? options}) {
-    return $createUnaryCall(_$createSession, request, options: options);
+  $grpc.ResponseStream<$2.LobbyStatus> createSession($1.CreateSessionRequest request, {$grpc.CallOptions? options}) {
+    return $createStreamingCall(_$createSession, $async.Stream.fromIterable([request]), options: options);
   }
 
-  $grpc.ResponseStream<$1.SessionStream> joinSession($1.JoinSessionRequest request, {$grpc.CallOptions? options}) {
+  $grpc.ResponseStream<$2.LobbyStatus> joinSession($1.JoinSessionRequest request, {$grpc.CallOptions? options}) {
     return $createStreamingCall(_$joinSession, $async.Stream.fromIterable([request]), options: options);
   }
 
@@ -104,20 +105,20 @@ abstract class DUOServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $0.LoginChallengeResponse.fromBuffer(value),
         ($0.LoginResponse value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$1.CreateSessionRequest, $1.CreateSessionResponse>(
+    $addMethod($grpc.ServiceMethod<$1.CreateSessionRequest, $2.LobbyStatus>(
         'CreateSession',
         createSession_Pre,
         false,
-        false,
+        true,
         ($core.List<$core.int> value) => $1.CreateSessionRequest.fromBuffer(value),
-        ($1.CreateSessionResponse value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$1.JoinSessionRequest, $1.SessionStream>(
+        ($2.LobbyStatus value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$1.JoinSessionRequest, $2.LobbyStatus>(
         'JoinSession',
         joinSession_Pre,
         false,
         true,
         ($core.List<$core.int> value) => $1.JoinSessionRequest.fromBuffer(value),
-        ($1.SessionStream value) => value.writeToBuffer()));
+        ($2.LobbyStatus value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$1.DisconnectSessionRequest, $1.DisconnectSessionResponse>(
         'DisconnectSession',
         disconnectSession_Pre,
@@ -139,11 +140,11 @@ abstract class DUOServiceBase extends $grpc.Service {
     return submitLoginChallenge(call, await request);
   }
 
-  $async.Future<$1.CreateSessionResponse> createSession_Pre($grpc.ServiceCall call, $async.Future<$1.CreateSessionRequest> request) async {
-    return createSession(call, await request);
+  $async.Stream<$2.LobbyStatus> createSession_Pre($grpc.ServiceCall call, $async.Future<$1.CreateSessionRequest> request) async* {
+    yield* createSession(call, await request);
   }
 
-  $async.Stream<$1.SessionStream> joinSession_Pre($grpc.ServiceCall call, $async.Future<$1.JoinSessionRequest> request) async* {
+  $async.Stream<$2.LobbyStatus> joinSession_Pre($grpc.ServiceCall call, $async.Future<$1.JoinSessionRequest> request) async* {
     yield* joinSession(call, await request);
   }
 
@@ -154,7 +155,7 @@ abstract class DUOServiceBase extends $grpc.Service {
   $async.Future<$0.RegisterResponse> register($grpc.ServiceCall call, $0.RegisterRequest request);
   $async.Future<$0.LoginChallengeRequest> requestLoginChallenge($grpc.ServiceCall call, $0.LoginRequest request);
   $async.Future<$0.LoginResponse> submitLoginChallenge($grpc.ServiceCall call, $0.LoginChallengeResponse request);
-  $async.Future<$1.CreateSessionResponse> createSession($grpc.ServiceCall call, $1.CreateSessionRequest request);
-  $async.Stream<$1.SessionStream> joinSession($grpc.ServiceCall call, $1.JoinSessionRequest request);
+  $async.Stream<$2.LobbyStatus> createSession($grpc.ServiceCall call, $1.CreateSessionRequest request);
+  $async.Stream<$2.LobbyStatus> joinSession($grpc.ServiceCall call, $1.JoinSessionRequest request);
   $async.Future<$1.DisconnectSessionResponse> disconnectSession($grpc.ServiceCall call, $1.DisconnectSessionRequest request);
 }

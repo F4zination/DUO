@@ -13,7 +13,7 @@ import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
-import 'user.pb.dart' as $3;
+import 'user.pb.dart' as $4;
 
 class GameState extends $pb.GeneratedMessage {
   factory GameState() => create();
@@ -49,7 +49,7 @@ class GameState extends $pb.GeneratedMessage {
 
 class SessionState extends $pb.GeneratedMessage {
   factory SessionState({
-    $core.Iterable<$3.User>? users,
+    $core.Iterable<$4.User>? users,
     $core.int? maxPlayers,
   }) {
     final $result = create();
@@ -66,7 +66,7 @@ class SessionState extends $pb.GeneratedMessage {
   factory SessionState.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'SessionState', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
-    ..pc<$3.User>(1, _omitFieldNames ? '' : 'users', $pb.PbFieldType.PM, subBuilder: $3.User.create)
+    ..pc<$4.User>(1, _omitFieldNames ? '' : 'users', $pb.PbFieldType.PM, subBuilder: $4.User.create)
     ..a<$core.int>(2, _omitFieldNames ? '' : 'maxPlayers', $pb.PbFieldType.O3)
     ..hasRequiredFields = false
   ;
@@ -93,7 +93,7 @@ class SessionState extends $pb.GeneratedMessage {
   static SessionState? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.List<$3.User> get users => $_getList(0);
+  $core.List<$4.User> get users => $_getList(0);
 
   @$pb.TagNumber(2)
   $core.int get maxPlayers => $_getIZ(1);
@@ -251,7 +251,6 @@ class JoinSessionRequest extends $pb.GeneratedMessage {
   factory JoinSessionRequest({
     $core.String? token,
     $core.int? sessionId,
-    $core.String? pin,
   }) {
     final $result = create();
     if (token != null) {
@@ -259,9 +258,6 @@ class JoinSessionRequest extends $pb.GeneratedMessage {
     }
     if (sessionId != null) {
       $result.sessionId = sessionId;
-    }
-    if (pin != null) {
-      $result.pin = pin;
     }
     return $result;
   }
@@ -272,7 +268,6 @@ class JoinSessionRequest extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'JoinSessionRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'token')
     ..a<$core.int>(2, _omitFieldNames ? '' : 'sessionId', $pb.PbFieldType.O3)
-    ..aOS(3, _omitFieldNames ? '' : 'pin')
     ..hasRequiredFields = false
   ;
 
@@ -314,15 +309,6 @@ class JoinSessionRequest extends $pb.GeneratedMessage {
   $core.bool hasSessionId() => $_has(1);
   @$pb.TagNumber(2)
   void clearSessionId() => clearField(2);
-
-  @$pb.TagNumber(3)
-  $core.String get pin => $_getSZ(2);
-  @$pb.TagNumber(3)
-  set pin($core.String v) { $_setString(2, v); }
-  @$pb.TagNumber(3)
-  $core.bool hasPin() => $_has(2);
-  @$pb.TagNumber(3)
-  void clearPin() => clearField(3);
 }
 
 class SessionStream extends $pb.GeneratedMessage {

@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package pb;
+
+import "user.proto";
+
+option go_package = "github.com/duo/pb";
+
+message LobbyStatus {
+    repeated user.User users = 1;
+    bool isStarting = 2;
+}
