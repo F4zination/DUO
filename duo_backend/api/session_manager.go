@@ -177,10 +177,16 @@ func (sm *LobbyManager) AddStreamToLobby(lobbyId int, stream UserStream) error {
 		return userErr
 	}
 
+	dbLobby, getErr := sm.store.GetLobbyByID(context.Background(), int32(lobbyId))
+	if getErr != nil {
+		return getErr
+	}
+
 	sm.SendMessageToLobby(lobbyId, &pb.LobbyStatus{
 		Users:      users,
 		IsStarting: false,
 		LobbyId:    int32(lobbyId),
+		MaxPlayers: dbLobby.MaxPlayers,
 	})
 
 	log.Printf("Added user stream %v to session %d", stream.UserId, lobbyId)

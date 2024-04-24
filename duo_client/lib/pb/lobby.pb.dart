@@ -20,6 +20,7 @@ class LobbyStatus extends $pb.GeneratedMessage {
     $core.Iterable<$3.User>? users,
     $core.bool? isStarting,
     $core.int? lobbyId,
+    $core.int? maxPlayers,
   }) {
     final $result = create();
     if (users != null) {
@@ -31,6 +32,9 @@ class LobbyStatus extends $pb.GeneratedMessage {
     if (lobbyId != null) {
       $result.lobbyId = lobbyId;
     }
+    if (maxPlayers != null) {
+      $result.maxPlayers = maxPlayers;
+    }
     return $result;
   }
   LobbyStatus._() : super();
@@ -41,6 +45,7 @@ class LobbyStatus extends $pb.GeneratedMessage {
     ..pc<$3.User>(1, _omitFieldNames ? '' : 'users', $pb.PbFieldType.PM, subBuilder: $3.User.create)
     ..aOB(2, _omitFieldNames ? '' : 'isStarting', protoName: 'isStarting')
     ..a<$core.int>(3, _omitFieldNames ? '' : 'lobbyId', $pb.PbFieldType.O3)
+    ..a<$core.int>(4, _omitFieldNames ? '' : 'maxPlayers', $pb.PbFieldType.O3)
     ..hasRequiredFields = false
   ;
 
@@ -85,6 +90,15 @@ class LobbyStatus extends $pb.GeneratedMessage {
   $core.bool hasLobbyId() => $_has(2);
   @$pb.TagNumber(3)
   void clearLobbyId() => clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.int get maxPlayers => $_getIZ(3);
+  @$pb.TagNumber(4)
+  set maxPlayers($core.int v) { $_setSignedInt32(3, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasMaxPlayers() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearMaxPlayers() => clearField(4);
 }
 
 class CreateLobbyRequest extends $pb.GeneratedMessage {

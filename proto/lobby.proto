@@ -10,6 +10,7 @@ message LobbyStatus {
     repeated user.User users = 1;
     bool isStarting = 2;
     int32 lobby_id = 3;
+    int32 max_players = 4;
 }
 
 message CreateLobbyRequest{
