@@ -25,9 +25,9 @@ type DUOServiceClient interface {
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	RequestLoginChallenge(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginChallengeRequest, error)
 	SubmitLoginChallenge(ctx context.Context, in *LoginChallengeResponse, opts ...grpc.CallOption) (*LoginResponse, error)
-	CreateSession(ctx context.Context, in *CreateSessionRequest, opts ...grpc.CallOption) (DUOService_CreateSessionClient, error)
-	JoinSession(ctx context.Context, in *JoinSessionRequest, opts ...grpc.CallOption) (DUOService_JoinSessionClient, error)
-	DisconnectSession(ctx context.Context, in *DisconnectSessionRequest, opts ...grpc.CallOption) (*DisconnectSessionResponse, error)
+	CreateLobby(ctx context.Context, in *CreateLobbyRequest, opts ...grpc.CallOption) (DUOService_CreateLobbyClient, error)
+	JoinLobby(ctx context.Context, in *JoinLobbyRequest, opts ...grpc.CallOption) (DUOService_JoinLobbyClient, error)
+	DisconnectLobby(ctx context.Context, in *DisconnectLobbyRequest, opts ...grpc.CallOption) (*DisconnectLobbyResponse, error)
 }
 
 type dUOServiceClient struct {
@@ -65,12 +65,12 @@ func (c *dUOServiceClient) SubmitLoginChallenge(ctx context.Context, in *LoginCh
 	return out, nil
 }
 
-func (c *dUOServiceClient) CreateSession(ctx context.Context, in *CreateSessionRequest, opts ...grpc.CallOption) (DUOService_CreateSessionClient, error) {
-	stream, err := c.cc.NewStream(ctx, &DUOService_ServiceDesc.Streams[0], "/pb.DUOService/CreateSession", opts...)
+func (c *dUOServiceClient) CreateLobby(ctx context.Context, in *CreateLobbyRequest, opts ...grpc.CallOption) (DUOService_CreateLobbyClient, error) {
+	stream, err := c.cc.NewStream(ctx, &DUOService_ServiceDesc.Streams[0], "/pb.DUOService/CreateLobby", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &dUOServiceCreateSessionClient{stream}
+	x := &dUOServiceCreateLobbyClient{stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -80,16 +80,16 @@ func (c *dUOServiceClient) CreateSession(ctx context.Context, in *CreateSessionR
 	return x, nil
 }
 
-type DUOService_CreateSessionClient interface {
+type DUOService_CreateLobbyClient interface {
 	Recv() (*LobbyStatus, error)
 	grpc.ClientStream
 }
 
-type dUOServiceCreateSessionClient struct {
+type dUOServiceCreateLobbyClient struct {
 	grpc.ClientStream
 }
 
-func (x *dUOServiceCreateSessionClient) Recv() (*LobbyStatus, error) {
+func (x *dUOServiceCreateLobbyClient) Recv() (*LobbyStatus, error) {
 	m := new(LobbyStatus)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -97,12 +97,12 @@ func (x *dUOServiceCreateSessionClient) Recv() (*LobbyStatus, error) {
 	return m, nil
 }
 
-func (c *dUOServiceClient) JoinSession(ctx context.Context, in *JoinSessionRequest, opts ...grpc.CallOption) (DUOService_JoinSessionClient, error) {
-	stream, err := c.cc.NewStream(ctx, &DUOService_ServiceDesc.Streams[1], "/pb.DUOService/JoinSession", opts...)
+func (c *dUOServiceClient) JoinLobby(ctx context.Context, in *JoinLobbyRequest, opts ...grpc.CallOption) (DUOService_JoinLobbyClient, error) {
+	stream, err := c.cc.NewStream(ctx, &DUOService_ServiceDesc.Streams[1], "/pb.DUOService/JoinLobby", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &dUOServiceJoinSessionClient{stream}
+	x := &dUOServiceJoinLobbyClient{stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -112,16 +112,16 @@ func (c *dUOServiceClient) JoinSession(ctx context.Context, in *JoinSessionReque
 	return x, nil
 }
 
-type DUOService_JoinSessionClient interface {
+type DUOService_JoinLobbyClient interface {
 	Recv() (*LobbyStatus, error)
 	grpc.ClientStream
 }
 
-type dUOServiceJoinSessionClient struct {
+type dUOServiceJoinLobbyClient struct {
 	grpc.ClientStream
 }
 
-func (x *dUOServiceJoinSessionClient) Recv() (*LobbyStatus, error) {
+func (x *dUOServiceJoinLobbyClient) Recv() (*LobbyStatus, error) {
 	m := new(LobbyStatus)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -129,9 +129,9 @@ func (x *dUOServiceJoinSessionClient) Recv() (*LobbyStatus, error) {
 	return m, nil
 }
 
-func (c *dUOServiceClient) DisconnectSession(ctx context.Context, in *DisconnectSessionRequest, opts ...grpc.CallOption) (*DisconnectSessionResponse, error) {
-	out := new(DisconnectSessionResponse)
-	err := c.cc.Invoke(ctx, "/pb.DUOService/DisconnectSession", in, out, opts...)
+func (c *dUOServiceClient) DisconnectLobby(ctx context.Context, in *DisconnectLobbyRequest, opts ...grpc.CallOption) (*DisconnectLobbyResponse, error) {
+	out := new(DisconnectLobbyResponse)
+	err := c.cc.Invoke(ctx, "/pb.DUOService/DisconnectLobby", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -145,9 +145,9 @@ type DUOServiceServer interface {
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	RequestLoginChallenge(context.Context, *LoginRequest) (*LoginChallengeRequest, error)
 	SubmitLoginChallenge(context.Context, *LoginChallengeResponse) (*LoginResponse, error)
-	CreateSession(*CreateSessionRequest, DUOService_CreateSessionServer) error
-	JoinSession(*JoinSessionRequest, DUOService_JoinSessionServer) error
-	DisconnectSession(context.Context, *DisconnectSessionRequest) (*DisconnectSessionResponse, error)
+	CreateLobby(*CreateLobbyRequest, DUOService_CreateLobbyServer) error
+	JoinLobby(*JoinLobbyRequest, DUOService_JoinLobbyServer) error
+	DisconnectLobby(context.Context, *DisconnectLobbyRequest) (*DisconnectLobbyResponse, error)
 	mustEmbedUnimplementedDUOServiceServer()
 }
 
@@ -164,14 +164,14 @@ func (UnimplementedDUOServiceServer) RequestLoginChallenge(context.Context, *Log
 func (UnimplementedDUOServiceServer) SubmitLoginChallenge(context.Context, *LoginChallengeResponse) (*LoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SubmitLoginChallenge not implemented")
 }
-func (UnimplementedDUOServiceServer) CreateSession(*CreateSessionRequest, DUOService_CreateSessionServer) error {
-	return status.Errorf(codes.Unimplemented, "method CreateSession not implemented")
+func (UnimplementedDUOServiceServer) CreateLobby(*CreateLobbyRequest, DUOService_CreateLobbyServer) error {
+	return status.Errorf(codes.Unimplemented, "method CreateLobby not implemented")
 }
-func (UnimplementedDUOServiceServer) JoinSession(*JoinSessionRequest, DUOService_JoinSessionServer) error {
-	return status.Errorf(codes.Unimplemented, "method JoinSession not implemented")
+func (UnimplementedDUOServiceServer) JoinLobby(*JoinLobbyRequest, DUOService_JoinLobbyServer) error {
+	return status.Errorf(codes.Unimplemented, "method JoinLobby not implemented")
 }
-func (UnimplementedDUOServiceServer) DisconnectSession(context.Context, *DisconnectSessionRequest) (*DisconnectSessionResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DisconnectSession not implemented")
+func (UnimplementedDUOServiceServer) DisconnectLobby(context.Context, *DisconnectLobbyRequest) (*DisconnectLobbyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DisconnectLobby not implemented")
 }
 func (UnimplementedDUOServiceServer) mustEmbedUnimplementedDUOServiceServer() {}
 
@@ -240,62 +240,62 @@ func _DUOService_SubmitLoginChallenge_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _DUOService_CreateSession_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(CreateSessionRequest)
+func _DUOService_CreateLobby_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(CreateLobbyRequest)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(DUOServiceServer).CreateSession(m, &dUOServiceCreateSessionServer{stream})
+	return srv.(DUOServiceServer).CreateLobby(m, &dUOServiceCreateLobbyServer{stream})
 }
 
-type DUOService_CreateSessionServer interface {
+type DUOService_CreateLobbyServer interface {
 	Send(*LobbyStatus) error
 	grpc.ServerStream
 }
 
-type dUOServiceCreateSessionServer struct {
+type dUOServiceCreateLobbyServer struct {
 	grpc.ServerStream
 }
 
-func (x *dUOServiceCreateSessionServer) Send(m *LobbyStatus) error {
+func (x *dUOServiceCreateLobbyServer) Send(m *LobbyStatus) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func _DUOService_JoinSession_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(JoinSessionRequest)
+func _DUOService_JoinLobby_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(JoinLobbyRequest)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(DUOServiceServer).JoinSession(m, &dUOServiceJoinSessionServer{stream})
+	return srv.(DUOServiceServer).JoinLobby(m, &dUOServiceJoinLobbyServer{stream})
 }
 
-type DUOService_JoinSessionServer interface {
+type DUOService_JoinLobbyServer interface {
 	Send(*LobbyStatus) error
 	grpc.ServerStream
 }
 
-type dUOServiceJoinSessionServer struct {
+type dUOServiceJoinLobbyServer struct {
 	grpc.ServerStream
 }
 
-func (x *dUOServiceJoinSessionServer) Send(m *LobbyStatus) error {
+func (x *dUOServiceJoinLobbyServer) Send(m *LobbyStatus) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func _DUOService_DisconnectSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DisconnectSessionRequest)
+func _DUOService_DisconnectLobby_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DisconnectLobbyRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DUOServiceServer).DisconnectSession(ctx, in)
+		return srv.(DUOServiceServer).DisconnectLobby(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.DUOService/DisconnectSession",
+		FullMethod: "/pb.DUOService/DisconnectLobby",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DUOServiceServer).DisconnectSession(ctx, req.(*DisconnectSessionRequest))
+		return srv.(DUOServiceServer).DisconnectLobby(ctx, req.(*DisconnectLobbyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -320,19 +320,19 @@ var DUOService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _DUOService_SubmitLoginChallenge_Handler,
 		},
 		{
-			MethodName: "DisconnectSession",
-			Handler:    _DUOService_DisconnectSession_Handler,
+			MethodName: "DisconnectLobby",
+			Handler:    _DUOService_DisconnectLobby_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
-			StreamName:    "CreateSession",
-			Handler:       _DUOService_CreateSession_Handler,
+			StreamName:    "CreateLobby",
+			Handler:       _DUOService_CreateLobby_Handler,
 			ServerStreams: true,
 		},
 		{
-			StreamName:    "JoinSession",
-			Handler:       _DUOService_JoinSession_Handler,
+			StreamName:    "JoinLobby",
+			Handler:       _DUOService_JoinLobby_Handler,
 			ServerStreams: true,
 		},
 	},

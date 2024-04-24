@@ -10,36 +10,34 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (server *Server) CreateSession(ctx context.Context, req *pb.CreateSessionRequest) (*pb.CreateSessionResponse, error) {
-	payload, tokenErr := server.Maker.VerifyToken(req.Token)
-	if tokenErr != nil {
-		return nil, status.Errorf(codes.Unauthenticated, "invalid token")
-	}
-
-	_, getErr := server.Store.GetSessionByOwnerUUID(context.Background(), payload.UserID)
-	if getErr != sql.ErrNoRows {
-		return nil, status.Errorf(codes.AlreadyExists, "user already owns a session")
-	}
-
-	session, createErr := server.SessionHandler.CreateSession(payload.UserID, req.Pin, req.MaxPlayers)
-	if createErr != nil {
-		log.Printf("error creating session: %v", createErr)
-		return nil, status.Errorf(codes.Internal, "error creating session")
-	}
-
-	return &pb.CreateSessionResponse{
-		SessionId: session.ID,
-		Pin:       session.Pin,
-	}, nil
-}
-
-func (server *Server) JoinSession(req *pb.JoinSessionRequest, stream pb.DUOService_JoinSessionServer) error {
+func (server *Server) CreateLobby(req *pb.CreateLobbyRequest, stream pb.DUOService_CreateLobbyServer) error {
 	payload, tokenErr := server.Maker.VerifyToken(req.Token)
 	if tokenErr != nil {
 		return status.Errorf(codes.Unauthenticated, "invalid token")
 	}
 
-	dbSession, getErr := server.Store.GetSessionByID(context.Background(), req.SessionId)
+	_, getErr := server.Store.GetLobbyByOwnerUUID(context.Background(), payload.UserID)
+	if getErr != sql.ErrNoRows {
+		return status.Errorf(codes.AlreadyExists, "user already owns a session")
+	}
+
+	lobby, createErr := server.LobbyHandler.CreateLobby(payload.UserID, req.MaxPlayers)
+	if createErr != nil {
+		log.Printf("error creating session: %v", createErr)
+		return status.Errorf(codes.Internal, "error creating session")
+	}
+
+	server.LobbyHandler.AddStreamToLobby(int(lobby.ID), *NewUserStream(stream, payload.UserID, payload.Username))
+	return nil
+}
+
+func (server *Server) JoinLobby(req *pb.JoinLobbyRequest, stream pb.DUOService_JoinLobbyServer) error {
+	payload, tokenErr := server.Maker.VerifyToken(req.Token)
+	if tokenErr != nil {
+		return status.Errorf(codes.Unauthenticated, "invalid token")
+	}
+
+	lobby, getErr := server.Store.GetLobbyByID(context.Background(), req.SessionId)
 	if getErr != nil {
 		if getErr == sql.ErrNoRows {
 			return status.Errorf(codes.NotFound, "session not found")
@@ -47,33 +45,27 @@ func (server *Server) JoinSession(req *pb.JoinSessionRequest, stream pb.DUOServi
 		return status.Errorf(codes.Internal, "error getting session")
 	}
 
-	if dbSession.Pin != req.Pin {
-		return status.Errorf(codes.PermissionDenied, "invalid pin")
-	}
+	server.LobbyHandler.AddStreamToLobby(int(req.SessionId), *NewUserStream(stream, payload.UserID, payload.Username))
 
-	users, usersErr := server.SessionHandler.GetUsersInSession(int(req.SessionId))
+	users, usersErr := server.LobbyHandler.GetUsersInLobby(int(req.SessionId))
 	if usersErr != nil {
 		return status.Errorf(codes.Internal, "error getting users in session")
 	}
 
-	if int32(len(users)) >= dbSession.MaxPlayers {
+	if int32(len(users)) >= lobby.MaxPlayers {
 		return status.Errorf(codes.PermissionDenied, "session is full")
 	}
-
-	userStream := NewUserStream(stream, payload.UserID, payload.Username)
-
-	server.SessionHandler.AddStreamToSession(int(req.SessionId), *userStream)
 
 	return nil
 }
 
-func (server *Server) DisconnectSession(ctx context.Context, req *pb.DisconnectSessionRequest) (*pb.DisconnectSessionResponse, error) {
+func (server *Server) DisconnectLobby(ctx context.Context, req *pb.DisconnectLobbyRequest) (*pb.DisconnectLobbyResponse, error) {
 	payload, tokenErr := server.Maker.VerifyToken(req.Token)
 	if tokenErr != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "invalid token")
 	}
 
-	server.SessionHandler.RemoveStreamFromSession(int(req.SessionId), payload.UserID)
+	server.LobbyHandler.RemoveStreamFromLobby(int(req.SessionId), payload.UserID)
 
-	return &pb.DisconnectSessionResponse{Success: true}, nil
+	return &pb.DisconnectLobbyResponse{Success: true}, nil
 }

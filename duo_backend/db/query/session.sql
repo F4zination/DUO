@@ -1,11 +1,11 @@
--- name: CreateSession :one
-INSERT INTO game_session (pin, owner_id, max_players) VALUES ($1, $2, $3) RETURNING *;
+-- name: CreateLobby :one
+INSERT INTO lobby (owner_id, max_players) VALUES ($1, $2) RETURNING *;
 
--- name: GetSessionByID :one
-SELECT * FROM game_session WHERE id = $1;
+-- name: GetLobbyByID :one
+SELECT * FROM lobby WHERE id = $1;
 
--- name: GetSessionByOwnerUUID :one
-SELECT * FROM game_session WHERE owner_id = $1;
+-- name: GetLobbyByOwnerUUID :one
+SELECT * FROM lobby WHERE owner_id = $1;
 
--- name: DeleteSessionByID :one
-DELETE FROM game_session WHERE id = $1 RETURNING *;
+-- name: DeleteLobbyByID :one
+DELETE FROM lobby WHERE id = $1 RETURNING *;
