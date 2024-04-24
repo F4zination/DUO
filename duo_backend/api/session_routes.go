@@ -37,7 +37,7 @@ func (server *Server) JoinLobby(req *pb.JoinLobbyRequest, stream pb.DUOService_J
 		return status.Errorf(codes.Unauthenticated, "invalid token")
 	}
 
-	lobby, getErr := server.Store.GetLobbyByID(context.Background(), req.SessionId)
+	lobby, getErr := server.Store.GetLobbyByID(context.Background(), req.LobbyId)
 	if getErr != nil {
 		if getErr == sql.ErrNoRows {
 			return status.Errorf(codes.NotFound, "session not found")
@@ -45,9 +45,9 @@ func (server *Server) JoinLobby(req *pb.JoinLobbyRequest, stream pb.DUOService_J
 		return status.Errorf(codes.Internal, "error getting session")
 	}
 
-	server.LobbyHandler.AddStreamToLobby(int(req.SessionId), *NewUserStream(stream, payload.UserID, payload.Username))
+	server.LobbyHandler.AddStreamToLobby(int(req.LobbyId), *NewUserStream(stream, payload.UserID, payload.Username))
 
-	users, usersErr := server.LobbyHandler.GetUsersInLobby(int(req.SessionId))
+	users, usersErr := server.LobbyHandler.GetUsersInLobby(int(req.LobbyId))
 	if usersErr != nil {
 		return status.Errorf(codes.Internal, "error getting users in session")
 	}
@@ -65,7 +65,7 @@ func (server *Server) DisconnectLobby(ctx context.Context, req *pb.DisconnectLob
 		return nil, status.Errorf(codes.Unauthenticated, "invalid token")
 	}
 
-	server.LobbyHandler.RemoveStreamFromLobby(int(req.SessionId), payload.UserID)
+	server.LobbyHandler.RemoveStreamFromLobby(int(req.LobbyId), payload.UserID)
 
 	return &pb.DisconnectLobbyResponse{Success: true}, nil
 }

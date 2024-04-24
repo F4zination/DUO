@@ -9,6 +9,7 @@ option go_package = "github.com/duo/pb";
 message LobbyStatus {
     repeated user.User users = 1;
     bool isStarting = 2;
+    int32 lobby_id = 3;
 }
 
 message CreateLobbyRequest{
@@ -16,18 +17,14 @@ message CreateLobbyRequest{
     int32 max_players = 2;
 }
 
-message CreateLobbyResponse{
-    int32 session_id = 1;
-}
-
 message JoinLobbyRequest{
     string token = 1;
-    int32 session_id = 2;
+    int32 lobby_id = 2;
 }
 
 message DisconnectLobbyRequest{
     string token = 1;
-    int32 session_id = 2;
+    int32 lobby_id = 2;
 }
 
 message DisconnectLobbyResponse{

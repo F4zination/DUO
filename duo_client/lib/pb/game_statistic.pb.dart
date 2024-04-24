@@ -13,7 +13,7 @@ import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
-import 'google/protobuf/timestamp.pb.dart' as $3;
+import 'google/protobuf/timestamp.pb.dart' as $2;
 
 class PlayerBoardItem extends $pb.GeneratedMessage {
   factory PlayerBoardItem({
@@ -82,7 +82,7 @@ class PlayerBoardItem extends $pb.GeneratedMessage {
 class GameStatistic extends $pb.GeneratedMessage {
   factory GameStatistic({
     $core.String? uuid,
-    $3.Timestamp? playedAt,
+    $2.Timestamp? playedAt,
     $core.int? scoreBilance,
     $core.Iterable<PlayerBoardItem>? playerBoard,
     $core.String? gameTitle,
@@ -111,7 +111,7 @@ class GameStatistic extends $pb.GeneratedMessage {
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GameStatistic', package: const $pb.PackageName(_omitMessageNames ? '' : 'gameStatistic'), createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'uuid')
-    ..aOM<$3.Timestamp>(2, _omitFieldNames ? '' : 'playedAt', protoName: 'playedAt', subBuilder: $3.Timestamp.create)
+    ..aOM<$2.Timestamp>(2, _omitFieldNames ? '' : 'playedAt', protoName: 'playedAt', subBuilder: $2.Timestamp.create)
     ..a<$core.int>(3, _omitFieldNames ? '' : 'scoreBilance', $pb.PbFieldType.O3, protoName: 'scoreBilance')
     ..pc<PlayerBoardItem>(4, _omitFieldNames ? '' : 'playerBoard', $pb.PbFieldType.PM, protoName: 'playerBoard', subBuilder: PlayerBoardItem.create)
     ..aOS(5, _omitFieldNames ? '' : 'gameTitle', protoName: 'gameTitle')
@@ -149,15 +149,15 @@ class GameStatistic extends $pb.GeneratedMessage {
   void clearUuid() => clearField(1);
 
   @$pb.TagNumber(2)
-  $3.Timestamp get playedAt => $_getN(1);
+  $2.Timestamp get playedAt => $_getN(1);
   @$pb.TagNumber(2)
-  set playedAt($3.Timestamp v) { setField(2, v); }
+  set playedAt($2.Timestamp v) { setField(2, v); }
   @$pb.TagNumber(2)
   $core.bool hasPlayedAt() => $_has(1);
   @$pb.TagNumber(2)
   void clearPlayedAt() => clearField(2);
   @$pb.TagNumber(2)
-  $3.Timestamp ensurePlayedAt() => $_ensure(1);
+  $2.Timestamp ensurePlayedAt() => $_ensure(1);
 
   @$pb.TagNumber(3)
   $core.int get scoreBilance => $_getIZ(2);

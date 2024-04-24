@@ -180,6 +180,7 @@ func (sm *LobbyManager) AddStreamToLobby(lobbyId int, stream UserStream) error {
 	sm.SendMessageToLobby(lobbyId, &pb.LobbyStatus{
 		Users:      users,
 		IsStarting: false,
+		LobbyId:    int32(lobbyId),
 	})
 
 	log.Printf("Added user stream %v to session %d", stream.UserId, lobbyId)
