@@ -133,8 +133,10 @@ func (sm *LobbyManager) SendMessageToLobby(lobbyId int, message *pb.LobbyStatus)
 }
 
 func (sm *LobbyManager) DeleteLobby(lobbyId int) error {
+	fmt.Printf("Deleting lobby %d", lobbyId)
 	_, delErr := sm.store.DeleteLobbyByID(context.Background(), int32(lobbyId))
 	if delErr != nil {
+		log.Printf("error deleting session %d: %v", lobbyId, delErr)
 		return delErr
 	}
 
@@ -205,15 +207,11 @@ func (sm *LobbyManager) RemoveStreamFromLobby(lobbyId int, userId uuid.UUID) err
 		return fmt.Errorf("lobby does not exist")
 	}
 
+	fmt.Printf("Removing user %v from lobby %d", userId, lobbyId)
+
 	dbLobby, getErr := sm.store.GetLobbyByID(context.Background(), int32(lobbyId))
 	if getErr != nil {
 		return getErr
-	}
-
-	if userId == dbLobby.OwnerID {
-		log.Printf("Owner %v disconnected and lobby %d deleted", userId, lobbyId)
-		sm.DeleteLobby(lobbyId)
-		return nil
 	}
 
 	newStreams := []UserStream{}
@@ -226,13 +224,17 @@ func (sm *LobbyManager) RemoveStreamFromLobby(lobbyId int, userId uuid.UUID) err
 	}
 	sm.Mu.Lock()
 	sm.LobbyStreams[lobbyId] = newStreams
+	if userId == dbLobby.OwnerID {
+		sm.DeleteLobby(lobbyId)
+		log.Printf("Owner %v disconnected and lobby %d deleted", userId, lobbyId)
+		return nil
+	}
 	sm.Mu.Unlock()
 
 	users, userErr := sm.GetUsersInLobby(lobbyId)
 	if userErr != nil {
 		return userErr
 	}
-
 	sm.SendMessageToLobby(lobbyId, &pb.LobbyStatus{
 		Users:      users,
 		IsStarting: false,

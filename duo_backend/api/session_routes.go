@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
 
 	"github.com/duo/pb"
@@ -64,6 +65,8 @@ func (server *Server) DisconnectLobby(ctx context.Context, req *pb.DisconnectLob
 	if tokenErr != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "invalid token")
 	}
+
+	fmt.Printf("Disconnect from user %v in lobby %d", payload.UserID, req.LobbyId)
 
 	server.LobbyHandler.RemoveStreamFromLobby(int(req.LobbyId), payload.UserID)
 
