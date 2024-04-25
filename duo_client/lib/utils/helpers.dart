@@ -37,6 +37,7 @@ class Helpers {
         i++) {
       numberString = '0$numberString';
     }
+    print('Number: $numberString');
     return numberString;
   }
 

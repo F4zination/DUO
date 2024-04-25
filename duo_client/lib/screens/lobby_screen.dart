@@ -25,7 +25,6 @@ class LobbyScreen extends ConsumerStatefulWidget {
 class _LobbyScreenState extends ConsumerState<LobbyScreen>
     with TickerProviderStateMixin {
   bool creatingLobby = false;
-  int lobbyID = -1;
   String displaylobbyID = '';
 
   @override
@@ -132,11 +131,19 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                               style: ElevatedButton.styleFrom(
                                   backgroundColor: Constants.errorColor),
                               onPressed: () async {
+                                print(ref
+                                    .watch(apiProvider)
+                                    .lobbyStatus
+                                    ?.lobbyId);
                                 int status = await ref
                                     .read(apiProvider)
                                     .disconnectLobby(
                                         ref.read(storageProvider).accessToken,
-                                        lobbyID);
+                                        ref
+                                                .watch(apiProvider)
+                                                .lobbyStatus
+                                                ?.lobbyId ??
+                                            0);
                                 if (status == 0) {
                                   Navigator.of(context).pop();
                                 } else {

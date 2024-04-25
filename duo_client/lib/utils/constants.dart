@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class Constants {
   static const int port = 8080;
-  static const String host = '192.168.2.139';
+  static const String host = '10.0.5.165';
   //static const String host = 'localhost';
   static const int decryptedChallengeLength = 32;
 

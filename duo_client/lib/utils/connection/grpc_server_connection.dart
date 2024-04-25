@@ -134,6 +134,9 @@ class GrpcServerConnection extends AbstractServerConnection {
         lobbyStatus = ls;
         _notifyListeners();
       }
+
+      lobbyStatus = null;
+      _notifyListeners();
     } catch (e) {
       return -1;
     }
