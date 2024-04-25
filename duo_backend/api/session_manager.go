@@ -118,6 +118,8 @@ func (sm *LobbyManager) SendMessageToLobby(lobbyId int, message *pb.LobbyStatus)
 		return []error{fmt.Errorf("session does not exist")}
 	}
 
+	log.Printf("Sending message to session %d", lobbyId)
+
 	var errs []error
 
 	for _, s := range sm.LobbyStreams[lobbyId] {
@@ -176,20 +178,26 @@ func (sm *LobbyManager) AddStreamToLobby(lobbyId int, stream UserStream) error {
 
 	users, userErr := sm.GetUsersInLobby(lobbyId)
 	if userErr != nil {
+		log.Printf("error getting users in session %d: %v", lobbyId, userErr)
 		return userErr
 	}
 
 	dbLobby, getErr := sm.store.GetLobbyByID(context.Background(), int32(lobbyId))
 	if getErr != nil {
+		log.Printf("error getting session %d: %v", lobbyId, getErr)
 		return getErr
 	}
 
-	sm.SendMessageToLobby(lobbyId, &pb.LobbyStatus{
+	err := sm.SendMessageToLobby(lobbyId, &pb.LobbyStatus{
 		Users:      users,
 		IsStarting: false,
 		LobbyId:    int32(lobbyId),
 		MaxPlayers: dbLobby.MaxPlayers,
 	})
+	if err != nil {
+		log.Printf("error sending message to session %d: %v", lobbyId, err[0])
+		return err[0]
+	}
 
 	log.Printf("Added user stream %v to session %d", stream.UserId, lobbyId)
 
