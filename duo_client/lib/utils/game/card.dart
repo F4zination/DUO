@@ -5,6 +5,12 @@ class PlayingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: Image.asset(
+        scale: 0.5,
+        "assets/game/Kartendeck.png",
+      ),
+    );
   }
 }

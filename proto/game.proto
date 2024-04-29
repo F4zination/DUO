@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package game;
+
+option go_package = "github.com/duo/pb";
+
+
+message Card {
+    string card_id = 1;
+    bool is_face_up = 2;
+}
+
+message PlaceStackState {
+    int32 amount_cards = 1;
+    Card card_on_top = 2;
+}
+
+message DrawStackState {
+    int32 stack_id = 1;
+    int32 stack_size = 2;
+    int32 stack_type = 3;
+    repeated Card cards = 4;
+    }

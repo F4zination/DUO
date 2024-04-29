@@ -1,5 +1,6 @@
 import 'package:duo_client/provider/api_provider.dart';
 import 'package:duo_client/provider/storage_provider.dart';
+import 'package:duo_client/screens/game_screen.dart';
 import 'package:duo_client/screens/home_screen.dart';
 import 'package:duo_client/screens/lobby_screen.dart';
 import 'package:duo_client/screens/qr_scanner_screen.dart';
@@ -74,6 +75,7 @@ class _DuoAppState extends ConsumerState<DuoApp> {
             ),
         QrCodeScanner.route: (context) => const QrCodeScanner(),
         HomeScreen.route: (context) => const HomeScreen(),
+        GameScreen.route: (context) => const GameScreen(),
         LobbyScreen.route: (context) => const LobbyScreen(),
       },
     );

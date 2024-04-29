@@ -1,4 +1,5 @@
 import 'package:duo_client/provider/storage_provider.dart';
+import 'package:duo_client/screens/game_screen.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:duo_client/utils/helpers.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +38,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 BlendMode.srcIn,
               ),
             ),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).pushNamed(GameScreen.route);
+            },
           ),
           const SizedBox(width: Constants.defaultPadding / 2),
           IconButton(

@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:animated_background/animated_background.dart';
 import 'package:duo_client/provider/api_provider.dart';
 import 'package:duo_client/provider/storage_provider.dart';
@@ -11,7 +9,6 @@ import 'package:duo_client/widgets/user_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:grpc/grpc.dart';
 
 class LobbyScreen extends ConsumerStatefulWidget {
   const LobbyScreen({super.key});
