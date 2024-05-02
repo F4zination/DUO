@@ -16,7 +16,14 @@ class _CardScrollViewState extends State<CardScrollView> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: Constants.defaultPadding, top: 70),
-      child: ListView.builder(
+      child: ReorderableListView.builder(
+        onReorder: (oldIndex, newIndex) => setState(() {
+          if (newIndex > oldIndex) {
+            newIndex -= 1;
+          }
+          final card = widget.cards.removeAt(oldIndex);
+          widget.cards.insert(newIndex, card);
+        }),
         scrollDirection: Axis.horizontal,
         itemCount: widget.cards.length,
         itemBuilder: (context, index) {
