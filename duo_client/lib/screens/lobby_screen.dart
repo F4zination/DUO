@@ -142,6 +142,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                                                 ?.lobbyId ??
                                             0);
                                 if (status == 0) {
+                                  print('Disconnected from lobby');
                                   Navigator.of(context).pop();
                                 } else {
                                   print('Error leaving lobby');

@@ -14,6 +14,7 @@ class CardScrollView extends ConsumerStatefulWidget {
 }
 
 class _CardScrollViewState extends ConsumerState<CardScrollView> {
+  //ToDo: BUG if the cards are removed before the animation is done it will crash
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -34,9 +35,9 @@ class _CardScrollViewState extends ConsumerState<CardScrollView> {
             direction: DismissDirection.up,
             onDismissed: (direction) {
               setState(() {
+                widget.cards.removeAt(index);
                 print(
                     'Removing card with value ${widget.cards[index].cardName}');
-
                 ref.read(gameStateProvider).removeCard(index);
               });
             },

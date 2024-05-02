@@ -11,8 +11,10 @@ class GameStateProvider extends ChangeNotifier {
     pb.Card(cardId: 'red_1', isFaceUp: true),
     pb.Card(cardId: 'green_2', isFaceUp: true),
     pb.Card(cardId: 'purple_3', isFaceUp: true),
+    pb.Card(cardId: 'red_change_directions', isFaceUp: true),
     pb.Card(cardId: 'yellow_4', isFaceUp: true),
     pb.Card(cardId: 'purple_5', isFaceUp: true),
+    pb.Card(cardId: 'draw_4', isFaceUp: true),
     pb.Card(cardId: 'red_6', isFaceUp: true),
     pb.Card(cardId: 'green_7', isFaceUp: true),
   ];

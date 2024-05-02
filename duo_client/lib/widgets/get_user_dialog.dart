@@ -3,7 +3,6 @@ import 'package:duo_client/screens/home_screen.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:duo_client/widgets/duo_container.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -54,7 +53,7 @@ class _GetUserDialogState extends ConsumerState<GetUserDialog> {
                       controller: _controller,
                       decoration: InputDecoration(
                         hintText: 'Username',
-                        contentPadding: EdgeInsets.all(15),
+                        contentPadding: const EdgeInsets.all(15),
                         hintStyle: TextStyle(
                           color: wrongUsername
                               ? Constants.errorColor
