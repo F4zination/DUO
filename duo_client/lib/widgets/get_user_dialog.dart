@@ -17,6 +17,7 @@ class GetUserDialog extends ConsumerStatefulWidget {
 class _GetUserDialogState extends ConsumerState<GetUserDialog> {
   final TextEditingController _controller = TextEditingController();
   bool wrongUsername = false;
+  bool loading = false;
   String hintText = 'Enter your username to join the game';
 
   @override
@@ -78,6 +79,9 @@ class _GetUserDialogState extends ConsumerState<GetUserDialog> {
                             hintText = 'Please enter a username to continue';
                           });
                         } else {
+                          setState(() {
+                            loading = true;
+                          });
                           int status = await ref
                               .read(apiProvider)
                               .registerUser(_controller.text);
@@ -96,33 +100,40 @@ class _GetUserDialogState extends ConsumerState<GetUserDialog> {
                       style: const TextStyle(
                         color: Colors.white70,
                       ))),
-              IconButton(
-                  icon: SvgPicture.asset(
-                    'res/icons/arrow_right.svg',
-                    colorFilter:
-                        const ColorFilter.mode(Colors.white, BlendMode.srcIn),
-                  ),
-                  onPressed: () async {
-                    if (_controller.text.isEmpty) {
-                      setState(() {
-                        wrongUsername = true;
-                      });
-                    } else {
-                      int status = await ref
-                          .read(apiProvider)
-                          .registerUser(_controller.text);
-                      if (status == 0) {
-                        Navigator.of(context)
-                            .pushReplacementNamed(HomeScreen.route);
-                      } else {
-                        print('registerUser returned $status');
-                        setState(() {
-                          wrongUsername = true;
-                          hintText = 'User not found';
-                        });
-                      }
-                    }
-                  }),
+              const SizedBox(height: 20),
+              loading
+                  ? const CircularProgressIndicator()
+                  : IconButton(
+                      icon: SvgPicture.asset(
+                        'res/icons/arrow_right.svg',
+                        colorFilter: const ColorFilter.mode(
+                            Colors.white, BlendMode.srcIn),
+                      ),
+                      onPressed: () async {
+                        if (_controller.text.isEmpty) {
+                          setState(() {
+                            wrongUsername = true;
+                          });
+                        } else {
+                          setState(() {
+                            loading = true;
+                          });
+                          int status = await ref
+                              .read(apiProvider)
+                              .registerUser(_controller.text);
+                          if (status == 0) {
+                            Navigator.of(context)
+                                .pushReplacementNamed(HomeScreen.route);
+                          } else {
+                            print('registerUser returned $status');
+                            setState(() {
+                              wrongUsername = true;
+                              loading = false;
+                              hintText = 'User not found';
+                            });
+                          }
+                        }
+                      }),
             ],
           ),
         ),

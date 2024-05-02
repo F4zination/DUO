@@ -35,6 +35,11 @@ class GameStateProvider extends ChangeNotifier {
     _discardPile.add(card);
     notifyListeners();
   }
+
+  void removeCard(int index) {
+    playersCards.removeAt(index);
+    notifyListeners();
+  }
 }
 
 final gameStateProvider = ChangeNotifierProvider<GameStateProvider>((ref) {

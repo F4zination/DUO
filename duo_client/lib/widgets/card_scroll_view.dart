@@ -1,17 +1,19 @@
+import 'package:duo_client/provider/game_state_provider.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:duo_client/widgets/playingcard.dart' as duo;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class CardScrollView extends StatefulWidget {
+class CardScrollView extends ConsumerStatefulWidget {
   CardScrollView({super.key, required this.cards});
 
   List<duo.PlayingCard> cards;
 
   @override
-  State<CardScrollView> createState() => _CardScrollViewState();
+  ConsumerState<CardScrollView> createState() => _CardScrollViewState();
 }
 
-class _CardScrollViewState extends State<CardScrollView> {
+class _CardScrollViewState extends ConsumerState<CardScrollView> {
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -34,7 +36,8 @@ class _CardScrollViewState extends State<CardScrollView> {
               setState(() {
                 print(
                     'Removing card with value ${widget.cards[index].cardName}');
-                widget.cards.removeAt(index);
+
+                ref.read(gameStateProvider).removeCard(index);
               });
             },
             child: Padding(
