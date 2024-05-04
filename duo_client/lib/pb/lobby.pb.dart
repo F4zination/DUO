@@ -13,11 +13,11 @@ import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
-import 'user.pb.dart' as $3;
+import 'user.pb.dart' as $5;
 
 class LobbyStatus extends $pb.GeneratedMessage {
   factory LobbyStatus({
-    $core.Iterable<$3.User>? users,
+    $core.Iterable<$5.User>? users,
     $core.bool? isStarting,
     $core.int? lobbyId,
     $core.int? maxPlayers,
@@ -42,7 +42,7 @@ class LobbyStatus extends $pb.GeneratedMessage {
   factory LobbyStatus.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'LobbyStatus', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
-    ..pc<$3.User>(1, _omitFieldNames ? '' : 'users', $pb.PbFieldType.PM, subBuilder: $3.User.create)
+    ..pc<$5.User>(1, _omitFieldNames ? '' : 'users', $pb.PbFieldType.PM, subBuilder: $5.User.create)
     ..aOB(2, _omitFieldNames ? '' : 'isStarting', protoName: 'isStarting')
     ..a<$core.int>(3, _omitFieldNames ? '' : 'lobbyId', $pb.PbFieldType.O3)
     ..a<$core.int>(4, _omitFieldNames ? '' : 'maxPlayers', $pb.PbFieldType.O3)
@@ -71,7 +71,7 @@ class LobbyStatus extends $pb.GeneratedMessage {
   static LobbyStatus? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.List<$3.User> get users => $_getList(0);
+  $core.List<$5.User> get users => $_getList(0);
 
   @$pb.TagNumber(2)
   $core.bool get isStarting => $_getBF(1);

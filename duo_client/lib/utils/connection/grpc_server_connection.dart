@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 import 'package:duo_client/pb/lobby.pb.dart';
 import 'package:duo_client/provider/storage_provider.dart';
 
@@ -9,6 +10,7 @@ import '../encryption/encryption_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:grpc/grpc.dart';
 import '../../pb/duo_service.pbgrpc.dart';
+import '../../pb/game.pb.dart';
 import 'package:pointycastle/export.dart';
 import 'package:rsa_encrypt/rsa_encrypt.dart';
 
@@ -162,5 +164,68 @@ class GrpcServerConnection extends AbstractServerConnection {
     } catch (e) {
       return -1;
     }
+  }
+
+  @override
+  Future<int> startGame(String token, String gameId) async {
+    try {
+      ResponseStream<GameState> gameStream = client.startGame(StartGameRequest()
+        ..token = token
+        ..gameId = gameId);
+
+      await for (GameState gs in gameStream) {
+        gameState = gs;
+        _notifyListeners();
+      }
+    } catch (e) {
+      return -1;
+    }
+    return 0;
+  }
+
+  @override
+  Future<int> getPlayerStream(String token, String gameId) async {
+    try {
+      ResponseStream<PlayerState> playerStream =
+          client.getPlayerStream(GetPlayerStateRequest()
+            ..token = token
+            ..gameId = gameId);
+
+      await for (PlayerState ps in playerStream) {
+        playerState = ps;
+        _notifyListeners();
+      }
+    } catch (e) {
+      return -1;
+    }
+    return 0;
+  }
+
+  @override
+  Future<int> getStackStream(String token, String gameId) async {
+    try {
+      ResponseStream<StackState> stackStream =
+          client.getStackStream(GetStackStateRequest()
+            ..token = token
+            ..gameId = gameId);
+
+      await for (StackState ss in stackStream) {
+        stackState = ss;
+        _notifyListeners();
+      }
+    } catch (e) {
+      return -1;
+    }
+    return 0;
+  }
+
+  @override
+  Future<int> streamPlayerAction(Stream<PlayerAction> action) async {
+    try {
+      await client.streamPlayerActions(action);
+    } catch (e) {
+      return -1;
+    }
+    return 0;
   }
 }

@@ -13,7 +13,7 @@ import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
-import 'google/protobuf/timestamp.pb.dart' as $2;
+import 'google/protobuf/timestamp.pb.dart' as $4;
 
 class RegisterRequest extends $pb.GeneratedMessage {
   factory RegisterRequest({
@@ -310,7 +310,7 @@ class LoginChallengeResponse extends $pb.GeneratedMessage {
 class LoginResponse extends $pb.GeneratedMessage {
   factory LoginResponse({
     $core.String? token,
-    $2.Timestamp? expiresAt,
+    $4.Timestamp? expiresAt,
   }) {
     final $result = create();
     if (token != null) {
@@ -327,7 +327,7 @@ class LoginResponse extends $pb.GeneratedMessage {
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'LoginResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'token')
-    ..aOM<$2.Timestamp>(2, _omitFieldNames ? '' : 'expiresAt', subBuilder: $2.Timestamp.create)
+    ..aOM<$4.Timestamp>(2, _omitFieldNames ? '' : 'expiresAt', subBuilder: $4.Timestamp.create)
     ..hasRequiredFields = false
   ;
 
@@ -362,15 +362,15 @@ class LoginResponse extends $pb.GeneratedMessage {
   void clearToken() => clearField(1);
 
   @$pb.TagNumber(2)
-  $2.Timestamp get expiresAt => $_getN(1);
+  $4.Timestamp get expiresAt => $_getN(1);
   @$pb.TagNumber(2)
-  set expiresAt($2.Timestamp v) { setField(2, v); }
+  set expiresAt($4.Timestamp v) { setField(2, v); }
   @$pb.TagNumber(2)
   $core.bool hasExpiresAt() => $_has(1);
   @$pb.TagNumber(2)
   void clearExpiresAt() => clearField(2);
   @$pb.TagNumber(2)
-  $2.Timestamp ensureExpiresAt() => $_ensure(1);
+  $4.Timestamp ensureExpiresAt() => $_ensure(1);
 }
 
 

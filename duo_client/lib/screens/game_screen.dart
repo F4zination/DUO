@@ -1,4 +1,6 @@
+import 'package:duo_client/provider/api_provider.dart';
 import 'package:duo_client/provider/game_state_provider.dart';
+import 'package:duo_client/provider/storage_provider.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,6 +18,8 @@ class GameScreen extends ConsumerStatefulWidget {
 }
 
 class _GameScreenState extends ConsumerState<GameScreen> {
+  late bool is_turn;
+
   @override
   void initState() {
     super.initState();
@@ -41,11 +45,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       body: Stack(children: [
         Container(
           color: Constants.bgColor,
-          child: CardScrollView(
-            cards: ref.watch(gameStateProvider).playersCards.map((card) {
-              return duo.PlayingCard.fromCard(cardName: card.cardId);
-            }).toList(),
-          ),
+          child: CardScrollView(),
         ),
         Positioned(
           top: 10,

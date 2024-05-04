@@ -1,9 +1,59 @@
 syntax = "proto3";
 
-package game;
+package pb;
 
 option go_package = "github.com/duo/pb";
 
+
+message StartGameRequest {
+    string game_id = 1;
+    string token = 2;
+}
+
+message GetPlayerStateRequest {
+    string game_id = 1;
+    string token = 2;
+}
+
+message GetStackStateRequest {
+    string game_id = 1;
+    string token = 2;
+}
+
+
+message GameState {
+    string current_player = 1;
+    Card card_on_top_of_discard = 2;
+}
+
+message PlayerState {
+    repeated Card hand = 1;
+    Alert alert = 2;
+}
+
+message StackState {
+    PlaceStackState place_stack = 1;
+    DrawStackState draw_stack = 2;
+    enum Direction {
+        CLOCKWISE = 0;
+        COUNTER_CLOCKWISE = 1;
+    }
+    Direction direction = 3;
+}
+
+message PlayerAction {
+    enum ActionType {
+        DRAW = 0;
+        PLACE = 1;
+        SKIP = 2;
+    }
+    ActionType action = 1;
+    string card_id = 2;
+}
+
+message Alert {
+    string message = 1;
+}
 
 message Card {
     string card_id = 1;
@@ -17,7 +67,5 @@ message PlaceStackState {
 
 message DrawStackState {
     int32 stack_id = 1;
-    int32 stack_size = 2;
-    int32 stack_type = 3;
     repeated Card cards = 4;
-    }
+}

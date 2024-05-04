@@ -1,4 +1,6 @@
 import 'package:duo_client/pb/lobby.pb.dart';
+import 'package:duo_client/pb/game.pb.dart';
+import 'package:flutter/widgets.dart';
 
 import 'storage_provider.dart';
 import '../utils/connection/abstract_connection.dart';
@@ -17,6 +19,15 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
 
   @override
   LobbyStatus? get lobbyStatus => _serverConnection?.lobbyStatus;
+
+  @override
+  StackState? get stackState => _serverConnection?.stackState;
+
+  @override
+  PlayerState? get playerState => _serverConnection?.playerState;
+
+  @override
+  GameState? get gameState => _serverConnection?.gameState;
 
   ApiProvider(this._storageProvider) {
     init(_storageProvider.lastSelectedConnectionType); //Defaults to grpc
@@ -69,7 +80,36 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
   }
 
   @override
+  Future<int> startGame(String token, String gameId) {
+    return _serverConnection!.startGame(token, gameId);
+  }
+
+  @override
+  Future<int> getPlayerStream(String token, String gameId) {
+    return _serverConnection!.getPlayerStream(token, gameId);
+  }
+
+  @override
+  Future<int> getStackStream(String token, String gameId) {
+    return _serverConnection!.getStackStream(token, gameId);
+  }
+
+  @override
+  Future<int> streamPlayerAction(Stream<PlayerAction> action) {
+    return _serverConnection!.streamPlayerAction(action);
+  }
+
+  @override
+  set playerState(PlayerState? _playerState) {}
+
+  @override
+  set stackState(StackState? _stackState) {}
+
+  @override
   set lobbyStatus(LobbyStatus? _lobbyStatus) {}
+
+  @override
+  set gameState(GameState? _gameState) {}
 }
 
 final apiProvider = ChangeNotifierProvider<ApiProvider>((ref) {

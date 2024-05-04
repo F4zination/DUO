@@ -161,7 +161,9 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                               style: ElevatedButton.styleFrom(
                                   backgroundColor: Constants.successColor),
                               onPressed: () {
-                                Navigator.of(context).pop();
+                                // create a game id
+                                // send GetPlayerState request
+                                // change to game screen
                               },
                               child: const Padding(
                                 padding: EdgeInsets.all(3.0),
