@@ -50,29 +50,8 @@ class _DuoAppState extends ConsumerState<DuoApp> {
         ),
         textTheme: GoogleFonts.aDLaMDisplayTextTheme(),
       ),
-      initialRoute: SplashScreen.route,
+      initialRoute: HomeScreen.route,
       routes: {
-        SplashScreen.route: (context) => SplashScreen(
-              onLoading: () async {
-                print('onLoading');
-                await ref.read(storageProvider).init();
-                ref.read(apiProvider).init(ServerConnectionType.grpc);
-                return await ref
-                    .read(apiProvider)
-                    .loginUser(ref.read(storageProvider).userId);
-              },
-              onLoadingComplete: (dynamic status) {
-                if (status == 0) {
-                  Navigator.of(context).pushReplacementNamed(HomeScreen.route);
-                } else {
-                  print('User not found');
-                  showDialog(
-                    context: context,
-                    builder: (context) => const GetUserDialog(),
-                  );
-                }
-              },
-            ),
         QrCodeScanner.route: (context) => const QrCodeScanner(),
         HomeScreen.route: (context) => const HomeScreen(),
         GameScreen.route: (context) => const GameScreen(),

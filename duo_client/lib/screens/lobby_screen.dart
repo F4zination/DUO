@@ -1,6 +1,7 @@
 import 'package:animated_background/animated_background.dart';
 import 'package:duo_client/provider/api_provider.dart';
 import 'package:duo_client/provider/storage_provider.dart';
+import 'package:duo_client/screens/game_screen.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:duo_client/utils/helpers.dart';
 import 'package:duo_client/widgets/add_tile.dart';
@@ -128,25 +129,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                               style: ElevatedButton.styleFrom(
                                   backgroundColor: Constants.errorColor),
                               onPressed: () async {
-                                print(ref
-                                    .watch(apiProvider)
-                                    .lobbyStatus
-                                    ?.lobbyId);
-                                int status = await ref
-                                    .read(apiProvider)
-                                    .disconnectLobby(
-                                        ref.read(storageProvider).accessToken,
-                                        ref
-                                                .watch(apiProvider)
-                                                .lobbyStatus
-                                                ?.lobbyId ??
-                                            0);
-                                if (status == 0) {
-                                  print('Disconnected from lobby');
-                                  Navigator.of(context).pop();
-                                } else {
-                                  print('Error leaving lobby');
-                                }
+                                Navigator.of(context).pop();
                               },
                               child: const Padding(
                                 padding: EdgeInsets.all(3),
@@ -163,7 +146,9 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                               onPressed: () {
                                 // create a game id
                                 // send GetPlayerState request
-                                // change to game screen
+                                // change to game
+                                Navigator.of(context)
+                                    .pushNamed(GameScreen.route);
                               },
                               child: const Padding(
                                 padding: EdgeInsets.all(3.0),

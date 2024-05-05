@@ -16,8 +16,7 @@ class ProfileScreen extends ConsumerStatefulWidget {
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
-    String username = ref.watch(storageProvider).username;
-
+    String username = 'John Doe';
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -38,9 +37,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 BlendMode.srcIn,
               ),
             ),
-            onPressed: () {
-              Navigator.of(context).pushNamed(GameScreen.route);
-            },
+            onPressed: () {},
           ),
           const SizedBox(width: Constants.defaultPadding / 2),
           IconButton(

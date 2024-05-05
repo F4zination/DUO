@@ -1,6 +1,7 @@
 import 'package:duo_client/provider/api_provider.dart';
 import 'package:duo_client/provider/game_state_provider.dart';
 import 'package:duo_client/provider/storage_provider.dart';
+import 'package:duo_client/screens/home_screen.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -37,6 +38,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   }
 
   @override
@@ -59,7 +61,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               ),
             ),
             onPressed: () {
-              Navigator.of(context).pop();
+              Navigator.of(context)
+                  .pushNamedAndRemoveUntil(HomeScreen.route, (route) => false);
             },
           ),
         ),

@@ -29,13 +29,17 @@ class _CardScrollViewState extends ConsumerState<CardScrollView> {
 
   @override
   Widget build(BuildContext context) {
-    ref.watch(apiProvider).playerState!.hand.forEach((element) {
-      cards.add(duo.PlayingCard.fromCard(
-        cardName: element.cardId,
-      ));
-    });
-    isTurn = ref.watch(apiProvider).gameState!.currentPlayer ==
-        ref.watch(storageProvider).username;
+    cards = [
+      duo.PlayingCard.fromCard(cardName: 'green_3'),
+      duo.PlayingCard.fromCard(cardName: 'green_draw_2'),
+      duo.PlayingCard.fromCard(cardName: 'draw_4'),
+      duo.PlayingCard.fromCard(cardName: 'purple_change_directions'),
+      duo.PlayingCard.fromCard(cardName: 'red_5'),
+      duo.PlayingCard.fromCard(cardName: 'yellow_7'),
+      duo.PlayingCard.fromCard(cardName: 'yellow_suspend'),
+      duo.PlayingCard.fromCard(cardName: 'select_color'),
+    ];
+    isTurn = true;
     return Padding(
       padding: const EdgeInsets.only(bottom: Constants.defaultPadding, top: 70),
       child: ReorderableListView.builder(
