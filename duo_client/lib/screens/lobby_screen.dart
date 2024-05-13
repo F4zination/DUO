@@ -1,6 +1,7 @@
 import 'package:animated_background/animated_background.dart';
 import 'package:duo_client/provider/api_provider.dart';
 import 'package:duo_client/provider/storage_provider.dart';
+import 'package:duo_client/screens/game_screen.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:duo_client/utils/helpers.dart';
 import 'package:duo_client/widgets/add_tile.dart';
@@ -21,13 +22,20 @@ class LobbyScreen extends ConsumerStatefulWidget {
 
 class _LobbyScreenState extends ConsumerState<LobbyScreen>
     with TickerProviderStateMixin {
-  bool creatingLobby = false;
-  String displaylobbyID = '';
-
   @override
   Widget build(BuildContext context) {
-    displaylobbyID = Helpers.fillPrefixWithZeros(
-        ref.watch(apiProvider).lobbyStatus?.lobbyId ?? 0);
+    bool creatingLobby = ref.watch(apiProvider).lobbyStatus == null;
+    int lobbyId = ref.watch(apiProvider).lobbyStatus?.lobbyId ?? 0;
+
+    // Future.delayed(const Duration(seconds: 5), () {
+    //   if (creatingLobby) {
+    //     setState(() {
+    //       lobbyId = -1;
+    //       print('Lobby creation failed');
+    //     });
+    //   }
+    // });
+
     return Scaffold(
       backgroundColor: Constants.bgColor,
       appBar: AppBar(
@@ -43,19 +51,26 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
         ),
       ),
       body: creatingLobby
-          ? const Column(
+          ? Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SpinKitChasingDots(
+                const SpinKitChasingDots(
                   color: Constants.secondaryColor,
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
-                Text(
+                const Text(
                   'Creating Lobby...',
                   style: TextStyle(fontSize: 20, color: Colors.white70),
-                )
+                ),
+                lobbyId == -1
+                    ? IconButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        icon: const Icon(Icons.exit_to_app_outlined))
+                    : const SizedBox(),
               ],
             )
           : AnimatedBackground(
@@ -97,7 +112,14 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                             return Padding(
                               padding: const EdgeInsets.all(
                                   Constants.defaultPadding / 2),
-                              child: UserTile(user: user),
+                              child: user.uuid ==
+                                      ref
+                                          .read(apiProvider)
+                                          .lobbyStatus!
+                                          .users[0]
+                                          .uuid
+                                  ? UserTile(user: user, isStack: true)
+                                  : UserTile(user: user, isStack: false),
                             );
                           }),
                           ...List.generate(
@@ -111,7 +133,8 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                                   Constants.defaultPadding / 2),
                               child: AddTile(
                                 Dialog: InviteDialog(
-                                  invideCode: displaylobbyID,
+                                  invideCode:
+                                      Helpers.fillPrefixWithZeros(lobbyId),
                                 ),
                               ),
                             );
@@ -128,10 +151,6 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                               style: ElevatedButton.styleFrom(
                                   backgroundColor: Constants.errorColor),
                               onPressed: () async {
-                                print(ref
-                                    .watch(apiProvider)
-                                    .lobbyStatus
-                                    ?.lobbyId);
                                 int status = await ref
                                     .read(apiProvider)
                                     .disconnectLobby(
@@ -142,7 +161,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                                                 ?.lobbyId ??
                                             0);
                                 if (status == 0) {
-                                  print('Disconnected from lobby');
+                                  print('Disconnected sucessfully from lobby');
                                   Navigator.of(context).pop();
                                 } else {
                                   print('Error leaving lobby');
@@ -164,6 +183,8 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                                 // create a game id
                                 // send GetPlayerState request
                                 // change to game screen
+                                Navigator.of(context)
+                                    .pushNamed(GameScreen.route);
                               },
                               child: const Padding(
                                 padding: EdgeInsets.all(3.0),

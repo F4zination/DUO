@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+/// A dialog that allows the user to create or join a game.
+///
 class GameDialog extends ConsumerStatefulWidget {
   const GameDialog({super.key});
 
@@ -44,7 +46,8 @@ class _GameDialogState extends ConsumerState<GameDialog> {
                     title: 'Host Game',
                     onPressed: () {
                       ref.read(apiProvider).createLobby(
-                          ref.read(storageProvider).accessToken, 8);
+                          ref.read(storageProvider).accessToken,
+                          Constants.maxPlayers);
                       Navigator.of(context).pushNamed(LobbyScreen.route);
                     },
                     backgroundColor: Constants.primaryColor,
@@ -54,7 +57,6 @@ class _GameDialogState extends ConsumerState<GameDialog> {
                   DuoSelectTile(
                     title: 'Join Game',
                     onPressed: () {
-                      print('Join Game');
                       showDialog(
                           context: context,
                           builder: (context) => const JoinDialog());
