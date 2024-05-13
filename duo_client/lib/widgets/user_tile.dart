@@ -34,14 +34,42 @@ class UserTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const Spacer(),
-                SvgPicture.asset(
-                  isStack ? 'res/icons/stack.svg' : 'res/icons/user.svg',
-                  colorFilter: ColorFilter.mode(
-                    Theme.of(context).colorScheme.onPrimary,
-                    BlendMode.srcIn,
+                IconButton(
+                  onPressed: () {
+                    String message = isStack
+                        ? 'This device will be used as the Stack and therefore will not be able to participate'
+                        : 'This is a normal player device and will be able to participate in the game';
+                    showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                              title: Text('Info',
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimary)),
+                              content: Text(message,
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onPrimary)),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text('Close'),
+                                ),
+                              ],
+                            ));
+                  },
+                  icon: SvgPicture.asset(
+                    isStack ? 'res/icons/stack.svg' : 'res/icons/user.svg',
+                    colorFilter: ColorFilter.mode(
+                      Theme.of(context).colorScheme.onPrimary,
+                      BlendMode.srcIn,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 10),
                 Text(
                   user.name,
                   style: TextStyle(
