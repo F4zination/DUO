@@ -1,5 +1,4 @@
 import 'package:duo_client/screens/dashboard_screen.dart';
-import 'package:duo_client/screens/game_screen.dart';
 import 'package:duo_client/screens/leaderboard_screen.dart';
 import 'package:duo_client/screens/profile_screen.dart';
 import 'package:duo_client/utils/constants.dart';

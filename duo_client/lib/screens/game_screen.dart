@@ -1,10 +1,6 @@
-import 'package:duo_client/provider/api_provider.dart';
-import 'package:duo_client/provider/game_state_provider.dart';
-import 'package:duo_client/provider/storage_provider.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:duo_client/widgets/playingcard.dart' as duo;
 import 'package:duo_client/widgets/card_scroll_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -18,25 +14,23 @@ class GameScreen extends ConsumerStatefulWidget {
 }
 
 class _GameScreenState extends ConsumerState<GameScreen> {
-  late bool is_turn;
-
   @override
   void initState() {
-    super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
+    super.initState();
   }
 
   @override
   void dispose() {
-    super.dispose();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+    super.dispose();
   }
 
   @override
@@ -45,7 +39,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       body: Stack(children: [
         Container(
           color: Constants.bgColor,
-          child: CardScrollView(),
+          child: const CardScrollView(),
         ),
         Positioned(
           top: 10,
