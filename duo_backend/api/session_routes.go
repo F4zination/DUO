@@ -28,7 +28,13 @@ func (server *Server) CreateLobby(req *pb.CreateLobbyRequest, stream pb.DUOServi
 		return status.Errorf(codes.Internal, "error creating session")
 	}
 
-	server.LobbyHandler.AddStreamToLobby(int(lobby.ID), *NewUserStream(stream, payload.UserID, payload.Username))
+	fmt.Printf("%v", server.LobbyHandler.LobbyStreams)
+
+	addErr := server.LobbyHandler.AddStreamToLobby(int(lobby.ID), *NewUserStream(stream, payload.UserID, payload.Username))
+	if addErr != nil {
+		log.Printf("error adding user to session: %v", addErr)
+		return status.Errorf(codes.Internal, "error adding user to session")
+	}
 	return nil
 }
 
@@ -59,6 +65,9 @@ func (server *Server) JoinLobby(req *pb.JoinLobbyRequest, stream pb.DUOService_J
 
 	return nil
 }
+
+//07542 4254 ZinsiBinsi Festnetz
+//0160 91182690 Handy
 
 func (server *Server) DisconnectLobby(ctx context.Context, req *pb.DisconnectLobbyRequest) (*pb.DisconnectLobbyResponse, error) {
 	payload, tokenErr := server.Maker.VerifyToken(req.Token)

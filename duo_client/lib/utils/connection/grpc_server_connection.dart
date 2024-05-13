@@ -20,6 +20,11 @@ class GrpcServerConnection extends AbstractServerConnection {
   late final VoidCallback _notifyListeners;
   final StorageProvider _storage;
 
+  ResponseStream<LobbyStatus>? lobbyStream;
+  ResponseStream<GameState>? gameStream;
+  ResponseStream<PlayerState>? playerStream;
+  ResponseStream<StackState>? stackStream;
+
   GrpcServerConnection(this._storage, this._notifyListeners) : super() {
     channel = ClientChannel(
       Constants.host,
@@ -39,9 +44,10 @@ class GrpcServerConnection extends AbstractServerConnection {
 
     // Try to register the user with the server and store the private key and user id
     try {
-      RegisterResponse resp = await client.register(RegisterRequest()
-        ..username = username
-        ..publicKey = publicPEMKey);
+      RegisterResponse resp = await client.register(RegisterRequest(
+        username: username,
+        publicKey: publicPEMKey,
+      ));
 
       await _storage.setUsername(username);
       await _storage.setUserId(resp.uuid);
@@ -65,7 +71,7 @@ class GrpcServerConnection extends AbstractServerConnection {
     ////////////////////////////////////////////
     try {
       LoginChallengeRequest lcr =
-          await client.requestLoginChallenge(LoginRequest()..uuid = uuid);
+          await client.requestLoginChallenge(LoginRequest(uuid: uuid));
 
       String privateKey = _storage.privateKey;
       var helper = RsaKeyHelper();
@@ -90,9 +96,10 @@ class GrpcServerConnection extends AbstractServerConnection {
     ////////////////////////////////////////////
     try {
       LoginResponse lr =
-          await client.submitLoginChallenge(LoginChallengeResponse()
-            ..uuid = uuid
-            ..decryptedChallenge = decryptedChallenge);
+          await client.submitLoginChallenge(LoginChallengeResponse(
+        uuid: uuid,
+        decryptedChallenge: decryptedChallenge,
+      ));
 
       await _storage.setExpireDate(lr.expiresAt.toDateTime());
       await _storage.setAccessToken(lr.token);
@@ -108,15 +115,28 @@ class GrpcServerConnection extends AbstractServerConnection {
   @override
   Future<int> createLobby(String token, int maxPlayers) async {
     try {
-      ResponseStream<LobbyStatus> response = client.createLobby(
+      ResponseStream<LobbyStatus> stream = client.createLobby(
           CreateLobbyRequest(maxPlayers: maxPlayers, token: token));
 
-      await for (LobbyStatus ls in response) {
-        // Todo Update LobbyProvider with new state
-        print('Received: ${ls.lobbyId}');
-        lobbyStatus = ls;
-        _notifyListeners();
-      }
+      lobbyStream = stream;
+      debugPrint(lobbyStream.toString());
+
+      lobbyStream?.listen(
+        (value) {
+          lobbyStatus = value;
+          _notifyListeners();
+        },
+        cancelOnError: true,
+        onError: (e) {
+          debugPrint('Error: $e');
+        },
+        onDone: () {
+          lobbyStatus = null;
+          lobbyStream = null;
+          _notifyListeners();
+          debugPrint('Lobby Stream Done');
+        },
+      );
     } catch (e) {
       print('Error: $e');
       return -1;
@@ -127,18 +147,31 @@ class GrpcServerConnection extends AbstractServerConnection {
   @override
   Future<int> joinLobby(String token, int lobbyId) async {
     try {
-      ResponseStream<LobbyStatus> stream = client.joinLobby(JoinLobbyRequest()
-        ..token = token
-        ..lobbyId = lobbyId);
+      debugPrint(lobbyStream.toString());
 
-      await for (LobbyStatus ls in stream) {
-        //print('Received: ${ls.users}');
-        lobbyStatus = ls;
-        _notifyListeners();
-      }
+      ResponseStream<LobbyStatus> stream = client.joinLobby(JoinLobbyRequest(
+        token: token,
+        lobbyId: lobbyId,
+      ));
+      lobbyStream = stream;
 
-      lobbyStatus = null;
-      _notifyListeners();
+      lobbyStream?.listen(
+        (value) {
+          lobbyStatus = value;
+          _notifyListeners();
+        },
+        cancelOnError: true,
+        onError: (e) {
+          debugPrint('Error: $e');
+          return -1;
+        },
+        onDone: () {
+          lobbyStatus = null;
+          lobbyStream = null;
+          _notifyListeners();
+          debugPrint('Lobby Stream Done');
+        },
+      );
     } catch (e) {
       return -1;
     }
@@ -148,19 +181,23 @@ class GrpcServerConnection extends AbstractServerConnection {
   @override
   Future<int> disconnectLobby(String token, int lobbyId) async {
     try {
-      DisconnectLobbyResponse res =
-          await client.disconnectLobby(DisconnectLobbyRequest()
-            ..token = token
-            ..lobbyId = lobbyId);
+      //TODO delete disconnect call from Proto DuoService
+      // DisconnectLobbyResponse res =
+      //     await client.disconnectLobby(DisconnectLobbyRequest(
+      //   token: token,
+      //   lobbyId: lobbyId,
+      // ));
+      // debugPrint('Response: ${res.success}');
 
+      await lobbyStream?.cancel();
       lobbyStatus = null;
+      lobbyStream = null;
+
+      debugPrint('Lobby Stream Cancelled');
+
       _notifyListeners();
 
-      if (res.success) {
-        return 0;
-      } else {
-        return -1;
-      }
+      return 0;
     } catch (e) {
       return -1;
     }
@@ -169,9 +206,10 @@ class GrpcServerConnection extends AbstractServerConnection {
   @override
   Future<int> startGame(String token, String gameId) async {
     try {
-      ResponseStream<GameState> gameStream = client.startGame(StartGameRequest()
-        ..token = token
-        ..gameId = gameId);
+      ResponseStream<GameState> gameStream = client.startGame(StartGameRequest(
+        token: token,
+        gameId: gameId,
+      ));
 
       await for (GameState gs in gameStream) {
         gameState = gs;
@@ -187,9 +225,10 @@ class GrpcServerConnection extends AbstractServerConnection {
   Future<int> getPlayerStream(String token, String gameId) async {
     try {
       ResponseStream<PlayerState> playerStream =
-          client.getPlayerStream(GetPlayerStateRequest()
-            ..token = token
-            ..gameId = gameId);
+          client.getPlayerStream(GetPlayerStateRequest(
+        token: token,
+        gameId: gameId,
+      ));
 
       await for (PlayerState ps in playerStream) {
         playerState = ps;
@@ -205,9 +244,10 @@ class GrpcServerConnection extends AbstractServerConnection {
   Future<int> getStackStream(String token, String gameId) async {
     try {
       ResponseStream<StackState> stackStream =
-          client.getStackStream(GetStackStateRequest()
-            ..token = token
-            ..gameId = gameId);
+          client.getStackStream(GetStackStateRequest(
+        token: token,
+        gameId: gameId,
+      ));
 
       await for (StackState ss in stackStream) {
         stackState = ss;

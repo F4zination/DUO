@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 class PlayingCard extends StatelessWidget {
-  PlayingCard({super.key});
+  const PlayingCard({super.key, this.cardName = 'red_1'});
 
-  PlayingCard.fromCard({super.key, required this.cardName});
+  const PlayingCard.fromCard({super.key, required this.cardName});
 
-  String cardName = 'red_1';
+  final String cardName;
 
   @override
   Widget build(BuildContext context) {

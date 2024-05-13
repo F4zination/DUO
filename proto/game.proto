@@ -22,8 +22,9 @@ message GetStackStateRequest {
 
 
 message GameState {
-    string current_player = 1;
-    Card card_on_top_of_discard = 2;
+    string current_player_uuid = 1;
+    string current_player_name = 2;
+    Card card_on_top_of_discard = 3;
 }
 
 message PlayerState {

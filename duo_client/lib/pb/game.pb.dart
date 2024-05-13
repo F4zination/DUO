@@ -211,12 +211,16 @@ class GetStackStateRequest extends $pb.GeneratedMessage {
 
 class GameState extends $pb.GeneratedMessage {
   factory GameState({
-    $core.String? currentPlayer,
+    $core.String? currentPlayerUuid,
+    $core.String? currentPlayerName,
     Card? cardOnTopOfDiscard,
   }) {
     final $result = create();
-    if (currentPlayer != null) {
-      $result.currentPlayer = currentPlayer;
+    if (currentPlayerUuid != null) {
+      $result.currentPlayerUuid = currentPlayerUuid;
+    }
+    if (currentPlayerName != null) {
+      $result.currentPlayerName = currentPlayerName;
     }
     if (cardOnTopOfDiscard != null) {
       $result.cardOnTopOfDiscard = cardOnTopOfDiscard;
@@ -228,8 +232,9 @@ class GameState extends $pb.GeneratedMessage {
   factory GameState.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GameState', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'currentPlayer')
-    ..aOM<Card>(2, _omitFieldNames ? '' : 'cardOnTopOfDiscard', subBuilder: Card.create)
+    ..aOS(1, _omitFieldNames ? '' : 'currentPlayerUuid')
+    ..aOS(2, _omitFieldNames ? '' : 'currentPlayerName')
+    ..aOM<Card>(3, _omitFieldNames ? '' : 'cardOnTopOfDiscard', subBuilder: Card.create)
     ..hasRequiredFields = false
   ;
 
@@ -255,24 +260,33 @@ class GameState extends $pb.GeneratedMessage {
   static GameState? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.String get currentPlayer => $_getSZ(0);
+  $core.String get currentPlayerUuid => $_getSZ(0);
   @$pb.TagNumber(1)
-  set currentPlayer($core.String v) { $_setString(0, v); }
+  set currentPlayerUuid($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
-  $core.bool hasCurrentPlayer() => $_has(0);
+  $core.bool hasCurrentPlayerUuid() => $_has(0);
   @$pb.TagNumber(1)
-  void clearCurrentPlayer() => clearField(1);
+  void clearCurrentPlayerUuid() => clearField(1);
 
   @$pb.TagNumber(2)
-  Card get cardOnTopOfDiscard => $_getN(1);
+  $core.String get currentPlayerName => $_getSZ(1);
   @$pb.TagNumber(2)
-  set cardOnTopOfDiscard(Card v) { setField(2, v); }
+  set currentPlayerName($core.String v) { $_setString(1, v); }
   @$pb.TagNumber(2)
-  $core.bool hasCardOnTopOfDiscard() => $_has(1);
+  $core.bool hasCurrentPlayerName() => $_has(1);
   @$pb.TagNumber(2)
-  void clearCardOnTopOfDiscard() => clearField(2);
-  @$pb.TagNumber(2)
-  Card ensureCardOnTopOfDiscard() => $_ensure(1);
+  void clearCurrentPlayerName() => clearField(2);
+
+  @$pb.TagNumber(3)
+  Card get cardOnTopOfDiscard => $_getN(2);
+  @$pb.TagNumber(3)
+  set cardOnTopOfDiscard(Card v) { setField(3, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasCardOnTopOfDiscard() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearCardOnTopOfDiscard() => clearField(3);
+  @$pb.TagNumber(3)
+  Card ensureCardOnTopOfDiscard() => $_ensure(2);
 }
 
 class PlayerState extends $pb.GeneratedMessage {

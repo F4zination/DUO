@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:duo_client/pb/game.pb.dart';
 import 'package:duo_client/provider/api_provider.dart';
-import 'package:duo_client/provider/game_state_provider.dart';
 import 'package:duo_client/provider/storage_provider.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class CardScrollView extends ConsumerStatefulWidget {
-  CardScrollView({super.key});
+  const CardScrollView({super.key});
 
   final Duration _waitDuration = const Duration(milliseconds: 100);
 
@@ -29,13 +28,14 @@ class _CardScrollViewState extends ConsumerState<CardScrollView> {
 
   @override
   Widget build(BuildContext context) {
-    ref.watch(apiProvider).playerState!.hand.forEach((element) {
-      cards.add(duo.PlayingCard.fromCard(
-        cardName: element.cardId,
-      ));
-    });
-    isTurn = ref.watch(apiProvider).gameState!.currentPlayer ==
-        ref.watch(storageProvider).username;
+    final _apiProvider = ref.watch(apiProvider);
+    final _storageProvider = ref.watch(storageProvider);
+    cards = _apiProvider.playerState!.hand
+        .map<duo.PlayingCard>(
+            (e) => duo.PlayingCard.fromCard(cardName: e.cardId))
+        .toList();
+    isTurn =
+        _apiProvider.gameState!.currentPlayerUuid == _storageProvider.userId;
     return Padding(
       padding: const EdgeInsets.only(bottom: Constants.defaultPadding, top: 70),
       child: ReorderableListView.builder(
@@ -92,9 +92,10 @@ class _CardScrollViewState extends ConsumerState<CardScrollView> {
   }
 
   void playCard(int index) {
-    _playerActionController.add(PlayerAction()
-      ..action = PlayerAction_ActionType.PLACE
-      ..cardId = cards[index].cardName);
+    _playerActionController.add(PlayerAction(
+      action: PlayerAction_ActionType.PLACE,
+      cardId: cards[index].cardName,
+    ));
   }
 
   void drawCard() {

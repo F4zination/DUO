@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"sync"
 
 	db "github.com/duo/db/sqlc"
 	"github.com/duo/pb"
@@ -28,14 +27,14 @@ func NewUserStream(stream pb.DUOService_JoinLobbyServer, userId uuid.UUID, usern
 type LobbyManager struct {
 	LobbyStreams map[int][]UserStream
 	store        db.Store
-	Mu           sync.Mutex
+	// Mu           sync.Mutex
 }
 
 func NewLobbyManager(store db.Store) *LobbyManager {
 	return &LobbyManager{
 		LobbyStreams: make(map[int][]UserStream),
 		store:        store,
-		Mu:           sync.Mutex{},
+		// Mu:           sync.Mutex{},
 	}
 }
 
@@ -72,11 +71,11 @@ func (sm *LobbyManager) CreateLobby(userUUID uuid.UUID, maxPlayers int32) (*db.L
 		return nil, createErr
 	}
 
-	sm.Mu.Lock()
+	// sm.Mu.Lock()
 
 	sm.LobbyStreams[int(dbSession.ID)] = []UserStream{}
 
-	sm.Mu.Unlock()
+	// sm.Mu.Unlock()
 
 	return &dbSession, nil
 }
@@ -88,8 +87,8 @@ func (sm *LobbyManager) GetUsersInLobby(lobbyId int) ([]*pb.User, error) {
 		return []*pb.User{}, getErr
 	}
 
-	sm.Mu.Lock()
-	defer sm.Mu.Unlock()
+	// sm.Mu.Lock()
+	// defer sm.Mu.Unlock()
 	//Session must exist
 	if sm.LobbyStreams[lobbyId] == nil {
 		return []*pb.User{}, fmt.Errorf("session does not exist")
@@ -142,8 +141,8 @@ func (sm *LobbyManager) DeleteLobby(lobbyId int) error {
 		return delErr
 	}
 
-	sm.Mu.Lock()
-	defer sm.Mu.Unlock()
+	// sm.Mu.Lock()
+	// defer sm.Mu.Unlock()
 
 	for _, s := range sm.LobbyStreams[lobbyId] {
 		//TODO Close client connection correctly
@@ -154,12 +153,13 @@ func (sm *LobbyManager) DeleteLobby(lobbyId int) error {
 	return nil
 }
 
-func (sm *LobbyManager) GetLobbyStreams(sessionId int) ([]UserStream, error) {
-	return sm.LobbyStreams[sessionId], nil
+func (sm *LobbyManager) GetLobbyStreams(lobbyId int) ([]UserStream, error) {
+	return sm.LobbyStreams[lobbyId], nil
 }
 
 func (sm *LobbyManager) AddStreamToLobby(lobbyId int, stream UserStream) error {
 
+	userId := stream.UserId
 	//Stream must exist
 	if sm.LobbyStreams[lobbyId] == nil {
 		return fmt.Errorf("session does not exist")
@@ -167,14 +167,14 @@ func (sm *LobbyManager) AddStreamToLobby(lobbyId int, stream UserStream) error {
 
 	//Stream must be unique
 	for _, s := range sm.LobbyStreams[lobbyId] {
-		if s.UserId == stream.UserId {
+		if s.UserId == userId {
 			return fmt.Errorf("stream already exists in session")
 		}
 	}
 
-	sm.Mu.Lock()
+	// sm.Mu.Lock()
 	sm.LobbyStreams[lobbyId] = append(sm.LobbyStreams[lobbyId], stream)
-	sm.Mu.Unlock()
+	// sm.Mu.Unlock()
 
 	users, userErr := sm.GetUsersInLobby(lobbyId)
 	if userErr != nil {
@@ -199,19 +199,26 @@ func (sm *LobbyManager) AddStreamToLobby(lobbyId int, stream UserStream) error {
 		return err[0]
 	}
 
-	log.Printf("Added user stream %v to session %d", stream.UserId, lobbyId)
+	log.Printf("Added user stream %v to session %d", userId, lobbyId)
 
-	//Wait for client to disconnect
+	// Wait for client to disconnect
 	<-stream.Stream.Context().Done()
 
-	log.Printf("Client %v disconnected", stream.UserId)
-	sm.RemoveStreamFromLobby(lobbyId, stream.UserId)
+	streams, _ := sm.GetLobbyStreams(lobbyId)
+	log.Printf("Lobby %v %v", lobbyId, streams)
+	log.Printf("Client %v disconnected", userId)
+	removingErr := sm.RemoveStreamFromLobby(lobbyId, userId)
+	if removingErr != nil {
+		log.Printf("error removing user stream %v from session %d: %v", userId, lobbyId, removingErr)
+		return removingErr
+	}
 	return nil
 }
 
 func (sm *LobbyManager) RemoveStreamFromLobby(lobbyId int, userId uuid.UUID) error {
 	//Stream must exist
-	if sm.LobbyStreams[lobbyId] == nil {
+	if sm.LobbyStreams[lobbyId] == nil || len(sm.LobbyStreams[lobbyId]) == 0 {
+		fmt.Printf("Lobby does not exist")
 		return fmt.Errorf("lobby does not exist")
 	}
 
@@ -227,17 +234,17 @@ func (sm *LobbyManager) RemoveStreamFromLobby(lobbyId int, userId uuid.UUID) err
 		if s.UserId != userId {
 			newStreams = append(newStreams, s)
 		} else {
-			s.Stream.Context().Done()
+
 		}
 	}
-	sm.Mu.Lock()
+	// sm.Mu.Lock()
 	sm.LobbyStreams[lobbyId] = newStreams
 	if userId == dbLobby.OwnerID {
 		sm.DeleteLobby(lobbyId)
 		log.Printf("Owner %v disconnected and lobby %d deleted", userId, lobbyId)
 		return nil
 	}
-	sm.Mu.Unlock()
+	// sm.Mu.Unlock()
 
 	users, userErr := sm.GetUsersInLobby(lobbyId)
 	if userErr != nil {

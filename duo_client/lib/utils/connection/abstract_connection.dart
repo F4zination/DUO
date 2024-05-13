@@ -1,6 +1,5 @@
 import 'package:duo_client/pb/game.pb.dart';
 import 'package:duo_client/pb/lobby.pb.dart';
-import 'package:duo_client/utils/game/player.dart';
 
 abstract class AbstractServerConnection {
   LobbyStatus? lobbyStatus;
@@ -16,8 +15,8 @@ abstract class AbstractServerConnection {
 
   // Lobby management
   Future<int> createLobby(String token, int maxPlayers);
-  Future<int> joinLobby(String token, int sessionId);
-  Future<int> disconnectLobby(String token, int sessionId);
+  Future<int> joinLobby(String token, int lobbyId);
+  Future<int> disconnectLobby(String token, int lobbyId);
 
   // Game management
   Future<int> startGame(String token, String gameId);

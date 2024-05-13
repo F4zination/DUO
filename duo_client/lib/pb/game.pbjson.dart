@@ -59,16 +59,18 @@ final $typed_data.Uint8List getStackStateRequestDescriptor = $convert.base64Deco
 const GameState$json = {
   '1': 'GameState',
   '2': [
-    {'1': 'current_player', '3': 1, '4': 1, '5': 9, '10': 'currentPlayer'},
-    {'1': 'card_on_top_of_discard', '3': 2, '4': 1, '5': 11, '6': '.pb.Card', '10': 'cardOnTopOfDiscard'},
+    {'1': 'current_player_uuid', '3': 1, '4': 1, '5': 9, '10': 'currentPlayerUuid'},
+    {'1': 'current_player_name', '3': 2, '4': 1, '5': 9, '10': 'currentPlayerName'},
+    {'1': 'card_on_top_of_discard', '3': 3, '4': 1, '5': 11, '6': '.pb.Card', '10': 'cardOnTopOfDiscard'},
   ],
 };
 
 /// Descriptor for `GameState`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List gameStateDescriptor = $convert.base64Decode(
-    'CglHYW1lU3RhdGUSJQoOY3VycmVudF9wbGF5ZXIYASABKAlSDWN1cnJlbnRQbGF5ZXISPAoWY2'
-    'FyZF9vbl90b3Bfb2ZfZGlzY2FyZBgCIAEoCzIILnBiLkNhcmRSEmNhcmRPblRvcE9mRGlzY2Fy'
-    'ZA==');
+    'CglHYW1lU3RhdGUSLgoTY3VycmVudF9wbGF5ZXJfdXVpZBgBIAEoCVIRY3VycmVudFBsYXllcl'
+    'V1aWQSLgoTY3VycmVudF9wbGF5ZXJfbmFtZRgCIAEoCVIRY3VycmVudFBsYXllck5hbWUSPAoW'
+    'Y2FyZF9vbl90b3Bfb2ZfZGlzY2FyZBgDIAEoCzIILnBiLkNhcmRSEmNhcmRPblRvcE9mRGlzY2'
+    'FyZA==');
 
 @$core.Deprecated('Use playerStateDescriptor instead')
 const PlayerState$json = {
