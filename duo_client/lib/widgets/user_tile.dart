@@ -1,10 +1,12 @@
 import 'package:duo_client/pb/user.pb.dart';
+import 'package:duo_client/provider/api_provider.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:duo_client/widgets/duo_container.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class UserTile extends StatelessWidget {
+class UserTile extends ConsumerWidget {
   const UserTile({
     super.key,
     required this.user,
@@ -15,11 +17,9 @@ class UserTile extends StatelessWidget {
   final bool isStack;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    print(
-        'UserTile: width: $width, height: $height, isStack: $isStack, user: $user');
     return DuoContainer(
       width: width / 3.5,
       height: height / 4.5,
@@ -27,6 +27,31 @@ class UserTile extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(Constants.defaultRadius),
+          onLongPress: () {
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('Change to Stack',
+                    style: TextStyle(color: Colors.white)),
+                content: Text('Do you want to change ${user.name} to a Stack?',
+                    style: const TextStyle(color: Colors.white)),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('No'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Yes'),
+                  ),
+                ],
+              ),
+            );
+          },
           child: Padding(
             padding: const EdgeInsets.all(Constants.defaultPadding),
             child: Column(

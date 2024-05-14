@@ -24,17 +24,14 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
     with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
-    bool creatingLobby = ref.watch(apiProvider).lobbyStatus == null;
-    int lobbyId = ref.watch(apiProvider).lobbyStatus?.lobbyId ?? 0;
-
-    // Future.delayed(const Duration(seconds: 5), () {
-    //   if (creatingLobby) {
-    //     setState(() {
-    //       lobbyId = -1;
-    //       print('Lobby creation failed');
-    //     });
-    //   }
-    // });
+    ApiProvider _apiProvider = ref.watch(apiProvider);
+    bool creatingLobby = _apiProvider.lobbyStatus == null;
+    int lobbyId = _apiProvider.lobbyStatus?.lobbyId ?? 0;
+    if (_apiProvider.lobbyStatus?.isDeleted == true) {
+      _apiProvider.disconnectLobby(
+          ref.read(storageProvider).accessToken, lobbyId);
+      Navigator.of(context).pop();
+    }
 
     return Scaffold(
       backgroundColor: Constants.bgColor,
