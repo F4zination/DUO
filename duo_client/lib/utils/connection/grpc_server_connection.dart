@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:duo_client/pb/lobby.pb.dart';
 import 'package:duo_client/provider/storage_provider.dart';
+import 'package:duo_client/utils/game/player.dart';
 
 import '../../pb/auth_messages.pb.dart';
 import 'abstract_connection.dart';
@@ -24,6 +25,9 @@ class GrpcServerConnection extends AbstractServerConnection {
   ResponseStream<GameState>? gameStream;
   ResponseStream<PlayerState>? playerStream;
   ResponseStream<StackState>? stackStream;
+  Stream<PlayerAction> playerActionStream = Stream.empty();
+  StreamController<PlayerAction> playerActionStreamController =
+      StreamController<PlayerAction>.broadcast();
 
   GrpcServerConnection(this._storage, this._notifyListeners) : super() {
     channel = ClientChannel(
@@ -219,21 +223,44 @@ class GrpcServerConnection extends AbstractServerConnection {
   }
 
   @override
-  Future<int> getPlayerStream(String token, int gameId) async {
-    // try {
-    //   ResponseStream<PlayerState> playerStream =
-    //       client.getPlayerStream(GetPlayerStateRequest(
-    //     token: token,
-    //     gameId: gameId,
-    //   ));
+  Future<int> changeStackDevice(String token, String deviceId) async {
+    try {
+      await client.changeStackDevice(ChangeStackDeviceRequest(
+        token: token,
+        userUuid: deviceId,
+      ));
+      _notifyListeners();
+    } catch (e) {
+      return -1;
+    }
+    return 0;
+  }
 
-    //   await for (PlayerState ps in playerStream) {
-    //     playerState = ps;
-    //     _notifyListeners();
-    //   }
-    // } catch (e) {
-    //   return -1;
-    // }
+  @override
+  Future<int> getPlayerStream(String token, int gameId) async {
+    try {
+      ResponseStream<PlayerState> playerStream =
+          client.getPlayerStream(playerActionStream);
+
+      playerStream.listen(
+        (value) {
+          playerState = value;
+          _notifyListeners();
+        },
+        cancelOnError: true,
+        onError: (e) {
+          debugPrint('Error: $e');
+        },
+        onDone: () {
+          playerState = null;
+          gameStream = null;
+          _notifyListeners();
+          debugPrint('Player Stream Done');
+        },
+      );
+    } catch (e) {
+      return -1;
+    }
     return 0;
   }
 
@@ -257,18 +284,40 @@ class GrpcServerConnection extends AbstractServerConnection {
   }
 
   @override
-  Future<int> streamPlayerAction(Stream<PlayerAction> action) async {
-    // try {
-    //   await client.streamPlayerActions(action);
-    // } catch (e) {
-    //   return -1;
-    // }
+  Future<int> streamPlayerAction(PlayerAction action) async {
+    playerActionStreamController.add(action);
     return 0;
   }
 
   @override
   Future<int> getGameStateStream(String token, int gameId) {
     // TODO: implement getGameStateStream
-    throw UnimplementedError();
+    try {
+      ResponseStream<GameState> gameStateStream =
+          client.getGameState(GetGameStateRequest(
+        token: token,
+        gameId: gameId,
+      ));
+
+      gameStateStream.listen(
+        (value) {
+          gameState = value;
+          _notifyListeners();
+        },
+        cancelOnError: true,
+        onError: (e) {
+          debugPrint('Error: $e');
+        },
+        onDone: () {
+          gameState = null;
+          gameStream = null;
+          _notifyListeners();
+          debugPrint('Game Stream Done');
+        },
+      );
+    } catch (e) {
+      return Future(() => -1);
+    }
+    return Future(() => 0);
   }
 }

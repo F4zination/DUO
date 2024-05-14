@@ -1,22 +1,22 @@
+import 'package:duo_client/widgets/playingcard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:duo_client/pb/game.pb.dart' as pb;
 
 class GameStateProvider extends ChangeNotifier {
   GameStateProvider();
 
-  List<pb.Card> _drawPile = [];
-  List<pb.Card> _discardPile = [];
-  List<pb.Card> playersCards = [
-    pb.Card(cardId: 'red_1', isFaceUp: true),
-    pb.Card(cardId: 'green_2', isFaceUp: true),
-    pb.Card(cardId: 'purple_3', isFaceUp: true),
-    pb.Card(cardId: 'red_change_directions', isFaceUp: true),
-    pb.Card(cardId: 'yellow_4', isFaceUp: true),
-    pb.Card(cardId: 'purple_5', isFaceUp: true),
-    pb.Card(cardId: 'draw_4', isFaceUp: true),
-    pb.Card(cardId: 'red_6', isFaceUp: true),
-    pb.Card(cardId: 'green_7', isFaceUp: true),
+  List<PlayingCard> _drawPile = [];
+  List<PlayingCard> _discardPile = [];
+  List<PlayingCard> playersCards = const [
+    PlayingCard(cardName: 'red_1', isFaceUp: true),
+    PlayingCard(cardName: 'green_2', isFaceUp: true),
+    PlayingCard(cardName: 'purple_3', isFaceUp: true),
+    PlayingCard(cardName: 'red_change_directions', isFaceUp: true),
+    PlayingCard(cardName: 'yellow_4', isFaceUp: true),
+    PlayingCard(cardName: 'purple_5', isFaceUp: true),
+    PlayingCard(cardName: 'draw_4', isFaceUp: true),
+    PlayingCard(cardName: 'red_6', isFaceUp: true),
+    PlayingCard(cardName: 'green_7', isFaceUp: true),
   ];
 
   int disconnect() {
@@ -26,14 +26,14 @@ class GameStateProvider extends ChangeNotifier {
     return 0;
   }
 
-  pb.Card get nextDrawCard {
+  PlayingCard get nextDrawCard {
     if (_drawPile.isEmpty) {
-      return pb.Card(isFaceUp: false, cardId: '-1');
+      return const PlayingCard(isFaceUp: false, cardName: '-1');
     }
     return _drawPile.first;
   }
 
-  void addCardToDiscardPile(pb.Card card) {
+  void addCardToDiscardPile(PlayingCard card) {
     _discardPile.add(card);
     notifyListeners();
   }

@@ -1,4 +1,5 @@
 import 'package:animated_background/animated_background.dart';
+import 'package:duo_client/pb/user.pb.dart';
 import 'package:duo_client/provider/api_provider.dart';
 import 'package:duo_client/provider/storage_provider.dart';
 import 'package:duo_client/screens/game_screen.dart';
@@ -32,6 +33,8 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
           ref.read(storageProvider).accessToken, lobbyId);
       Navigator.of(context).pop();
     }
+    User testuser = getStackUser(_apiProvider.lobbyStatus?.users ?? []);
+    print('testuser: ${testuser.name} ${testuser.isStack}');
 
     return Scaffold(
       backgroundColor: Constants.bgColor,
@@ -111,7 +114,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                                   Constants.defaultPadding / 2),
                               child: user.uuid ==
                                       ref
-                                          .read(apiProvider)
+                                          .watch(apiProvider)
                                           .lobbyStatus!
                                           .users[0]
                                           .uuid
@@ -180,8 +183,13 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                                 // create a game id
                                 // send GetPlayerState request
                                 // change to game screen
-                                Navigator.of(context)
-                                    .pushNamed(GameScreen.route);
+                                Navigator.of(context).pushNamed(
+                                    GameScreen.route,
+                                    arguments: ref
+                                        .watch(apiProvider)
+                                        .lobbyStatus!
+                                        .users[0]
+                                        .isStack);
                               },
                               child: const Padding(
                                 padding: EdgeInsets.all(3.0),
@@ -196,5 +204,14 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                 ),
               )),
     );
+  }
+
+  User getStackUser(List<User> users) {
+    for (User user in users) {
+      if (user.isStack) {
+        return user;
+      }
+    }
+    return User();
   }
 }

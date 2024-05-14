@@ -1,5 +1,6 @@
 import 'package:duo_client/pb/user.pb.dart';
 import 'package:duo_client/provider/api_provider.dart';
+import 'package:duo_client/provider/storage_provider.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:duo_client/widgets/duo_container.dart';
 import 'package:flutter/material.dart';
@@ -43,7 +44,24 @@ class UserTile extends ConsumerWidget {
                     child: const Text('No'),
                   ),
                   TextButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      int status = await ref
+                          .read(apiProvider)
+                          .changeStackDevice(
+                              ref.read(storageProvider).accessToken, user.uuid);
+                      if (status == 0) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Device changed to Stack'),
+                          ),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Failed to change device to Stack'),
+                          ),
+                        );
+                      }
                       Navigator.of(context).pop();
                     },
                     child: const Text('Yes'),

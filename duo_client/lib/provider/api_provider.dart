@@ -90,12 +90,17 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
   }
 
   @override
+  Future<int> changeStackDevice(String token, String deviceId) {
+    return _serverConnection!.changeStackDevice(token, deviceId);
+  }
+
+  @override
   Future<int> getStackStream(String token, int gameId) {
     return _serverConnection!.getStackStream(token, gameId);
   }
 
   @override
-  Future<int> streamPlayerAction(Stream<PlayerAction> action) {
+  Future<int> streamPlayerAction(PlayerAction action) {
     return _serverConnection!.streamPlayerAction(action);
   }
 

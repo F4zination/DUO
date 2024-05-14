@@ -7,10 +7,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class DUOCardStack extends ConsumerStatefulWidget {
   const DUOCardStack(
-      {super.key, required this.cards, this.randomAngles = false});
+      {super.key, required this.cards, this.randomAngles = false, this.onTap});
 
   final List<duo.PlayingCard> cards;
   final bool randomAngles;
+  final Function? onTap;
 
   @override
   ConsumerState<DUOCardStack> createState() => _DUOCardStackState();
@@ -33,9 +34,15 @@ class _DUOCardStackState extends ConsumerState<DUOCardStack> {
               child: Transform.rotate(
                 angle: widget.randomAngles ? randomOffset() * 0.03 : 0,
                 child: SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.4,
-                    width: MediaQuery.of(context).size.width * 0.2,
-                    child: widget.cards[i]),
+                  height: MediaQuery.of(context).size.height * 0.4,
+                  width: MediaQuery.of(context).size.width * 0.2,
+                  child: InkWell(
+                    onTap: widget.onTap != null
+                        ? () => widget.onTap!(widget.cards[i])
+                        : null,
+                    child: widget.cards[i],
+                  ),
+                ),
               ),
             ),
         ],

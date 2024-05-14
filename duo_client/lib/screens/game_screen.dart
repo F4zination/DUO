@@ -1,11 +1,15 @@
+import 'dart:math';
+
 import 'package:duo_client/provider/api_provider.dart';
+import 'package:duo_client/provider/game_state_provider.dart';
+import 'package:duo_client/provider/storage_provider.dart';
 import 'package:duo_client/utils/constants.dart';
+import 'package:duo_client/utils/helpers.dart';
 import 'package:duo_client/widgets/game_stacks.dart';
-import 'package:duo_client/widgets/playingcard.dart';
+import 'package:duo_client/widgets/pause_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:duo_client/widgets/card_scroll_view.dart';
-import 'package:duo_client/widgets/duo_card_stack.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -19,8 +23,9 @@ class GameScreen extends ConsumerStatefulWidget {
 }
 
 class _GameScreenState extends ConsumerState<GameScreen> {
-  bool isStack = true;
   bool isLoading = false;
+  late ApiProvider _apiProvider;
+  int gameId = int.parse(Helpers.fillPrefixWithZeros(Random().nextInt(1000)));
 
   @override
   void initState() {
@@ -29,7 +34,12 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
-
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      ref.read(apiProvider).getGameStateStream(
+            ref.read(storageProvider).accessToken,
+            gameId,
+          );
+    });
     super.initState();
   }
 
@@ -44,6 +54,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool isStack = ModalRoute.of(context)!.settings.arguments as bool;
     return Scaffold(
       body: isLoading
           ? const Column(
@@ -62,13 +73,21 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               ],
             )
           : Stack(children: [
+              // Main game screen either card scroll view or game stacks
               Container(
                 color: Constants.bgColor,
-                child: isStack ? const GameStacks() : const CardScrollView(),
+                child: isStack
+                    ? GameStacks(
+                        gameId: gameId,
+                      )
+                    : CardScrollView(
+                        gameId: gameId,
+                      ),
               ),
               Positioned(
                 top: 10,
                 right: 20,
+                // Settings button
                 child: IconButton(
                   icon: SvgPicture.asset(
                     'res/icons/settings.svg',
@@ -78,7 +97,10 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    showDialog(
+                      context: context,
+                      builder: (context) => const PauseDialog(),
+                    );
                   },
                 ),
               ),

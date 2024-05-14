@@ -10,7 +10,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class CardScrollView extends ConsumerStatefulWidget {
-  const CardScrollView({super.key});
+  const CardScrollView({super.key, required this.gameId});
+
+  final int gameId;
 
   final Duration _waitDuration = const Duration(milliseconds: 100);
 
@@ -27,6 +29,14 @@ class _CardScrollViewState extends ConsumerState<CardScrollView> {
   //ToDo: BUG if the cards are removed before the animation is done it will crash or before on Reorder is done
 
   @override
+  void initState() {
+    final _apiProvider = ref.watch(apiProvider);
+    _apiProvider.getPlayerStream(
+        ref.read(storageProvider).accessToken, widget.gameId);
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final _apiProvider = ref.watch(apiProvider);
     final _storageProvider = ref.watch(storageProvider);
@@ -39,8 +49,7 @@ class _CardScrollViewState extends ConsumerState<CardScrollView> {
             const duo.PlayingCard.fromCard(cardName: 'draw_4'),
           ]
         : _apiProvider.playerState!.hand
-            .map<duo.PlayingCard>(
-                (e) => duo.PlayingCard.fromCard(cardName: e.cardId))
+            .map<duo.PlayingCard>((e) => duo.PlayingCard.fromCard(cardName: e))
             .toList();
     isTurn = _apiProvider.gameState == null
         ? false
