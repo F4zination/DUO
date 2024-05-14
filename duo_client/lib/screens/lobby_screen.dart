@@ -180,16 +180,35 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                               style: ElevatedButton.styleFrom(
                                   backgroundColor: Constants.successColor),
                               onPressed: () {
-                                // create a game id
-                                // send GetPlayerState request
-                                // change to game screen
-                                Navigator.of(context).pushNamed(
-                                    GameScreen.route,
-                                    arguments: ref
-                                        .watch(apiProvider)
+                                if (ref.read(storageProvider).userId ==
+                                    ref
+                                        .read(apiProvider)
                                         .lobbyStatus!
-                                        .users[0]
-                                        .isStack);
+                                        .users
+                                        .where((element) => element.isAdmin)
+                                        .first
+                                        .uuid) {
+                                  ref.read(apiProvider).disconnectLobby(
+                                      ref.read(storageProvider).accessToken,
+                                      lobbyId);
+                                  ref.read(apiProvider).startGame(
+                                      ref.read(storageProvider).accessToken,
+                                      lobbyId);
+                                  Navigator.of(context).pushNamed(
+                                      GameScreen.route,
+                                      arguments: ref
+                                          .watch(apiProvider)
+                                          .lobbyStatus!
+                                          .users[0]
+                                          .isStack);
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                          'Only the admin can start the game'),
+                                    ),
+                                  );
+                                }
                               },
                               child: const Padding(
                                 padding: EdgeInsets.all(3.0),
