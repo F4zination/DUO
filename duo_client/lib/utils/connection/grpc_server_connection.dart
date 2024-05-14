@@ -223,49 +223,49 @@ class GrpcServerConnection extends AbstractServerConnection {
 
   @override
   Future<int> getPlayerStream(String token, String gameId) async {
-    try {
-      ResponseStream<PlayerState> playerStream =
-          client.getPlayerStream(GetPlayerStateRequest(
-        token: token,
-        gameId: gameId,
-      ));
+    // try {
+    //   ResponseStream<PlayerState> playerStream =
+    //       client.getPlayerStream(GetPlayerStateRequest(
+    //     token: token,
+    //     gameId: gameId,
+    //   ));
 
-      await for (PlayerState ps in playerStream) {
-        playerState = ps;
-        _notifyListeners();
-      }
-    } catch (e) {
-      return -1;
-    }
+    //   await for (PlayerState ps in playerStream) {
+    //     playerState = ps;
+    //     _notifyListeners();
+    //   }
+    // } catch (e) {
+    //   return -1;
+    // }
     return 0;
   }
 
   @override
   Future<int> getStackStream(String token, String gameId) async {
-    try {
-      ResponseStream<StackState> stackStream =
-          client.getStackStream(GetStackStateRequest(
-        token: token,
-        gameId: gameId,
-      ));
+    // try {
+    //   ResponseStream<StackState> stackStream =
+    //       client.getStackStream(GetStackStateRequest(
+    //     token: token,
+    //     gameId: gameId,
+    //   ));
 
-      await for (StackState ss in stackStream) {
-        stackState = ss;
-        _notifyListeners();
-      }
-    } catch (e) {
-      return -1;
-    }
+    //   await for (StackState ss in stackStream) {
+    //     stackState = ss;
+    //     _notifyListeners();
+    //   }
+    // } catch (e) {
+    //   return -1;
+    // }
     return 0;
   }
 
   @override
   Future<int> streamPlayerAction(Stream<PlayerAction> action) async {
-    try {
-      await client.streamPlayerActions(action);
-    } catch (e) {
-      return -1;
-    }
+    // try {
+    //   await client.streamPlayerActions(action);
+    // } catch (e) {
+    //   return -1;
+    // }
     return 0;
   }
 }

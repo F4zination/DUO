@@ -80,6 +80,7 @@ func (sm *LobbyManager) GetUsersInLobby(lobbyId int) ([]*pb.User, error) {
 			Uuid:    s.UserId.String(),
 			Name:    s.Username,
 			IsAdmin: dbSession.OwnerID == s.UserId,
+			IsStack: dbSession.StackID == s.UserId,
 		})
 	}
 	lobby.Mu.RUnlock()

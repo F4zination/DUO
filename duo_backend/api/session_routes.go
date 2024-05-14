@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"log"
 
+	db "github.com/duo/db/sqlc"
 	"github.com/duo/pb"
+	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -66,7 +68,42 @@ func (server *Server) JoinLobby(req *pb.JoinLobbyRequest, stream pb.DUOService_J
 	return nil
 }
 
-func (server *Server) 
+func (server *Server) ChangeStackDevice(ctx context.Context, req *pb.ChangeStackDeviceRequest) (*pb.Void, error) {
+	payload, tokenErr := server.Maker.VerifyToken(req.Token)
+	if tokenErr != nil {
+		log.Printf("error verifying token: %v", tokenErr)
+		return nil, status.Errorf(codes.Unauthenticated, "invalid token")
+	}
+
+	//Is token lobby owner
+	lobby, getErr := server.Store.GetLobbyByOwnerUUID(context.Background(), payload.UserID)
+	if getErr != nil {
+		if getErr == sql.ErrNoRows {
+			return nil, status.Errorf(codes.PermissionDenied, "user is not lobby owner")
+		}
+		log.Printf("error getting lobby: %v", getErr)
+		return nil, status.Errorf(codes.Internal, "error getting lobby")
+	}
+
+	//Is user in lobby
+	_, userErr := server.LobbyHandler.GetUsersInLobby(int(lobby.ID))
+	if userErr != nil {
+		log.Printf("error getting users in session %d: %v", lobby.ID, userErr)
+		return nil, status.Errorf(codes.PermissionDenied, "user is not in lobby")
+	}
+
+	//Change stack device
+	_, dbErr := server.Store.UpdateStackUUID(context.Background(), db.UpdateStackUUIDParams{
+		StackID: uuid.MustParse(req.UserUuid),
+		ID:      lobby.ID,
+	})
+	if dbErr != nil {
+		log.Printf("error changing stack device: %v", dbErr)
+		return nil, status.Errorf(codes.Internal, "error changing stack device")
+	}
+
+	return &pb.Void{}, nil
+}
 
 //07542 4254 ZinsiBinsi Festnetz
 //0160 91182690 Handy

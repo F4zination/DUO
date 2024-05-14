@@ -26,7 +26,7 @@ class StorageProvider extends ChangeNotifier {
   StorageProvider();
 
   Future<void> init() async {
-    await dotenv.load();
+    await dotenv.load(fileName: ".env");
     _grpcHost = dotenv.get('GRPC_HOST');
     _userId = await _read(key: _keyToUserId) ?? "";
     _username = await _read(key: _keyToUsername) ?? "";
