@@ -21,11 +21,13 @@ const User$json = {
     {'1': 'name', '3': 2, '4': 1, '5': 9, '10': 'name'},
     {'1': 'score', '3': 3, '4': 1, '5': 9, '10': 'score'},
     {'1': 'is_admin', '3': 4, '4': 1, '5': 8, '10': 'isAdmin'},
+    {'1': 'is_stack', '3': 5, '4': 1, '5': 8, '10': 'isStack'},
   ],
 };
 
 /// Descriptor for `User`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List userDescriptor = $convert.base64Decode(
     'CgRVc2VyEhIKBHV1aWQYASABKAlSBHV1aWQSEgoEbmFtZRgCIAEoCVIEbmFtZRIUCgVzY29yZR'
-    'gDIAEoCVIFc2NvcmUSGQoIaXNfYWRtaW4YBCABKAhSB2lzQWRtaW4=');
+    'gDIAEoCVIFc2NvcmUSGQoIaXNfYWRtaW4YBCABKAhSB2lzQWRtaW4SGQoIaXNfc3RhY2sYBSAB'
+    'KAhSB2lzU3RhY2s=');
 

@@ -1,5 +1,6 @@
 import 'package:duo_client/provider/api_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -20,10 +21,13 @@ class StorageProvider extends ChangeNotifier {
   DateTime? _expireDate;
   String _privateKey = "";
   bool _isFirstTime = true;
+  String _grpcHost = "";
 
   StorageProvider();
 
   Future<void> init() async {
+    await dotenv.load();
+    _grpcHost = dotenv.get('GRPC_HOST');
     _userId = await _read(key: _keyToUserId) ?? "";
     _username = await _read(key: _keyToUsername) ?? "";
     _accessToken = await _read(key: _keyToAccessToken) ?? "";
@@ -68,6 +72,10 @@ class StorageProvider extends ChangeNotifier {
 
   ServerConnectionType get lastSelectedConnectionType {
     return _lastSelectedConnectionType;
+  }
+
+  String get grpcHost {
+    return _grpcHost;
   }
 
   bool get isFirstTime {

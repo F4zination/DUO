@@ -9,4 +9,5 @@ message User {
     string name = 2;
     string score = 3;
     bool is_admin = 4;
+    bool is_stack = 5;
 }

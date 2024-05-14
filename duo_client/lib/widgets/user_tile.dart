@@ -33,7 +33,6 @@ class UserTile extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Spacer(),
                 IconButton(
                   onPressed: () {
                     String message = isStack

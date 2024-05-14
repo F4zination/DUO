@@ -81,134 +81,6 @@ class StartGameRequest extends $pb.GeneratedMessage {
   void clearToken() => clearField(2);
 }
 
-class GetPlayerStateRequest extends $pb.GeneratedMessage {
-  factory GetPlayerStateRequest({
-    $core.String? gameId,
-    $core.String? token,
-  }) {
-    final $result = create();
-    if (gameId != null) {
-      $result.gameId = gameId;
-    }
-    if (token != null) {
-      $result.token = token;
-    }
-    return $result;
-  }
-  GetPlayerStateRequest._() : super();
-  factory GetPlayerStateRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory GetPlayerStateRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GetPlayerStateRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'gameId')
-    ..aOS(2, _omitFieldNames ? '' : 'token')
-    ..hasRequiredFields = false
-  ;
-
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
-  GetPlayerStateRequest clone() => GetPlayerStateRequest()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  GetPlayerStateRequest copyWith(void Function(GetPlayerStateRequest) updates) => super.copyWith((message) => updates(message as GetPlayerStateRequest)) as GetPlayerStateRequest;
-
-  $pb.BuilderInfo get info_ => _i;
-
-  @$core.pragma('dart2js:noInline')
-  static GetPlayerStateRequest create() => GetPlayerStateRequest._();
-  GetPlayerStateRequest createEmptyInstance() => create();
-  static $pb.PbList<GetPlayerStateRequest> createRepeated() => $pb.PbList<GetPlayerStateRequest>();
-  @$core.pragma('dart2js:noInline')
-  static GetPlayerStateRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<GetPlayerStateRequest>(create);
-  static GetPlayerStateRequest? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  $core.String get gameId => $_getSZ(0);
-  @$pb.TagNumber(1)
-  set gameId($core.String v) { $_setString(0, v); }
-  @$pb.TagNumber(1)
-  $core.bool hasGameId() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearGameId() => clearField(1);
-
-  @$pb.TagNumber(2)
-  $core.String get token => $_getSZ(1);
-  @$pb.TagNumber(2)
-  set token($core.String v) { $_setString(1, v); }
-  @$pb.TagNumber(2)
-  $core.bool hasToken() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearToken() => clearField(2);
-}
-
-class GetStackStateRequest extends $pb.GeneratedMessage {
-  factory GetStackStateRequest({
-    $core.String? gameId,
-    $core.String? token,
-  }) {
-    final $result = create();
-    if (gameId != null) {
-      $result.gameId = gameId;
-    }
-    if (token != null) {
-      $result.token = token;
-    }
-    return $result;
-  }
-  GetStackStateRequest._() : super();
-  factory GetStackStateRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory GetStackStateRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GetStackStateRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'gameId')
-    ..aOS(2, _omitFieldNames ? '' : 'token')
-    ..hasRequiredFields = false
-  ;
-
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
-  GetStackStateRequest clone() => GetStackStateRequest()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  GetStackStateRequest copyWith(void Function(GetStackStateRequest) updates) => super.copyWith((message) => updates(message as GetStackStateRequest)) as GetStackStateRequest;
-
-  $pb.BuilderInfo get info_ => _i;
-
-  @$core.pragma('dart2js:noInline')
-  static GetStackStateRequest create() => GetStackStateRequest._();
-  GetStackStateRequest createEmptyInstance() => create();
-  static $pb.PbList<GetStackStateRequest> createRepeated() => $pb.PbList<GetStackStateRequest>();
-  @$core.pragma('dart2js:noInline')
-  static GetStackStateRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<GetStackStateRequest>(create);
-  static GetStackStateRequest? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  $core.String get gameId => $_getSZ(0);
-  @$pb.TagNumber(1)
-  set gameId($core.String v) { $_setString(0, v); }
-  @$pb.TagNumber(1)
-  $core.bool hasGameId() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearGameId() => clearField(1);
-
-  @$pb.TagNumber(2)
-  $core.String get token => $_getSZ(1);
-  @$pb.TagNumber(2)
-  set token($core.String v) { $_setString(1, v); }
-  @$pb.TagNumber(2)
-  $core.bool hasToken() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearToken() => clearField(2);
-}
-
 class GameState extends $pb.GeneratedMessage {
   factory GameState({
     $core.String? currentPlayerUuid,
@@ -435,6 +307,7 @@ class PlayerAction extends $pb.GeneratedMessage {
   factory PlayerAction({
     PlayerAction_ActionType? action,
     $core.String? cardId,
+    $core.String? token,
   }) {
     final $result = create();
     if (action != null) {
@@ -442,6 +315,9 @@ class PlayerAction extends $pb.GeneratedMessage {
     }
     if (cardId != null) {
       $result.cardId = cardId;
+    }
+    if (token != null) {
+      $result.token = token;
     }
     return $result;
   }
@@ -452,6 +328,7 @@ class PlayerAction extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'PlayerAction', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
     ..e<PlayerAction_ActionType>(1, _omitFieldNames ? '' : 'action', $pb.PbFieldType.OE, defaultOrMaker: PlayerAction_ActionType.DRAW, valueOf: PlayerAction_ActionType.valueOf, enumValues: PlayerAction_ActionType.values)
     ..aOS(2, _omitFieldNames ? '' : 'cardId')
+    ..aOS(3, _omitFieldNames ? '' : 'token')
     ..hasRequiredFields = false
   ;
 
@@ -493,6 +370,65 @@ class PlayerAction extends $pb.GeneratedMessage {
   $core.bool hasCardId() => $_has(1);
   @$pb.TagNumber(2)
   void clearCardId() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get token => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set token($core.String v) { $_setString(2, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasToken() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearToken() => clearField(3);
+}
+
+class StackRequest extends $pb.GeneratedMessage {
+  factory StackRequest({
+    $core.String? token,
+  }) {
+    final $result = create();
+    if (token != null) {
+      $result.token = token;
+    }
+    return $result;
+  }
+  StackRequest._() : super();
+  factory StackRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory StackRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'StackRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'token')
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  StackRequest clone() => StackRequest()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  StackRequest copyWith(void Function(StackRequest) updates) => super.copyWith((message) => updates(message as StackRequest)) as StackRequest;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static StackRequest create() => StackRequest._();
+  StackRequest createEmptyInstance() => create();
+  static $pb.PbList<StackRequest> createRepeated() => $pb.PbList<StackRequest>();
+  @$core.pragma('dart2js:noInline')
+  static StackRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<StackRequest>(create);
+  static StackRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get token => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set token($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasToken() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearToken() => clearField(1);
 }
 
 class Alert extends $pb.GeneratedMessage {

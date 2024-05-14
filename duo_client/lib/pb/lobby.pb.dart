@@ -13,14 +13,15 @@ import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
-import 'user.pb.dart' as $5;
+import 'user.pb.dart' as $4;
 
 class LobbyStatus extends $pb.GeneratedMessage {
   factory LobbyStatus({
-    $core.Iterable<$5.User>? users,
+    $core.Iterable<$4.User>? users,
     $core.bool? isStarting,
     $core.int? lobbyId,
     $core.int? maxPlayers,
+    $core.bool? isDeleted,
   }) {
     final $result = create();
     if (users != null) {
@@ -35,6 +36,9 @@ class LobbyStatus extends $pb.GeneratedMessage {
     if (maxPlayers != null) {
       $result.maxPlayers = maxPlayers;
     }
+    if (isDeleted != null) {
+      $result.isDeleted = isDeleted;
+    }
     return $result;
   }
   LobbyStatus._() : super();
@@ -42,10 +46,11 @@ class LobbyStatus extends $pb.GeneratedMessage {
   factory LobbyStatus.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'LobbyStatus', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
-    ..pc<$5.User>(1, _omitFieldNames ? '' : 'users', $pb.PbFieldType.PM, subBuilder: $5.User.create)
+    ..pc<$4.User>(1, _omitFieldNames ? '' : 'users', $pb.PbFieldType.PM, subBuilder: $4.User.create)
     ..aOB(2, _omitFieldNames ? '' : 'isStarting', protoName: 'isStarting')
     ..a<$core.int>(3, _omitFieldNames ? '' : 'lobbyId', $pb.PbFieldType.O3)
     ..a<$core.int>(4, _omitFieldNames ? '' : 'maxPlayers', $pb.PbFieldType.O3)
+    ..aOB(5, _omitFieldNames ? '' : 'isDeleted', protoName: 'isDeleted')
     ..hasRequiredFields = false
   ;
 
@@ -71,7 +76,7 @@ class LobbyStatus extends $pb.GeneratedMessage {
   static LobbyStatus? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.List<$5.User> get users => $_getList(0);
+  $core.List<$4.User> get users => $_getList(0);
 
   @$pb.TagNumber(2)
   $core.bool get isStarting => $_getBF(1);
@@ -99,6 +104,15 @@ class LobbyStatus extends $pb.GeneratedMessage {
   $core.bool hasMaxPlayers() => $_has(3);
   @$pb.TagNumber(4)
   void clearMaxPlayers() => clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.bool get isDeleted => $_getBF(4);
+  @$pb.TagNumber(5)
+  set isDeleted($core.bool v) { $_setBool(4, v); }
+  @$pb.TagNumber(5)
+  $core.bool hasIsDeleted() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearIsDeleted() => clearField(5);
 }
 
 class CreateLobbyRequest extends $pb.GeneratedMessage {

@@ -10,16 +10,6 @@ message StartGameRequest {
     string token = 2;
 }
 
-message GetPlayerStateRequest {
-    string game_id = 1;
-    string token = 2;
-}
-
-message GetStackStateRequest {
-    string game_id = 1;
-    string token = 2;
-}
-
 
 message GameState {
     string current_player_uuid = 1;
@@ -50,6 +40,11 @@ message PlayerAction {
     }
     ActionType action = 1;
     string card_id = 2;
+    string token = 3;
+}
+
+message StackRequest {
+    string token = 1;
 }
 
 message Alert {

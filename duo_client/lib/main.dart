@@ -8,6 +8,7 @@ import 'package:duo_client/screens/splash_screen.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:duo_client/widgets/get_user_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -55,6 +56,7 @@ class _DuoAppState extends ConsumerState<DuoApp> {
         SplashScreen.route: (context) => SplashScreen(
               onLoading: () async {
                 print('onLoading');
+                // await dotenv.load(fileName: '.env');
                 await ref.read(storageProvider).init();
                 ref.read(apiProvider).init(ServerConnectionType.grpc);
                 return await ref

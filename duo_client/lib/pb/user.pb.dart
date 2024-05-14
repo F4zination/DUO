@@ -19,6 +19,7 @@ class User extends $pb.GeneratedMessage {
     $core.String? name,
     $core.String? score,
     $core.bool? isAdmin,
+    $core.bool? isStack,
   }) {
     final $result = create();
     if (uuid != null) {
@@ -33,6 +34,9 @@ class User extends $pb.GeneratedMessage {
     if (isAdmin != null) {
       $result.isAdmin = isAdmin;
     }
+    if (isStack != null) {
+      $result.isStack = isStack;
+    }
     return $result;
   }
   User._() : super();
@@ -44,6 +48,7 @@ class User extends $pb.GeneratedMessage {
     ..aOS(2, _omitFieldNames ? '' : 'name')
     ..aOS(3, _omitFieldNames ? '' : 'score')
     ..aOB(4, _omitFieldNames ? '' : 'isAdmin')
+    ..aOB(5, _omitFieldNames ? '' : 'isStack')
     ..hasRequiredFields = false
   ;
 
@@ -103,6 +108,15 @@ class User extends $pb.GeneratedMessage {
   $core.bool hasIsAdmin() => $_has(3);
   @$pb.TagNumber(4)
   void clearIsAdmin() => clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.bool get isStack => $_getBF(4);
+  @$pb.TagNumber(5)
+  set isStack($core.bool v) { $_setBool(4, v); }
+  @$pb.TagNumber(5)
+  $core.bool hasIsStack() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearIsStack() => clearField(5);
 }
 
 

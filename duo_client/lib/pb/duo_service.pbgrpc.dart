@@ -18,7 +18,6 @@ import 'package:protobuf/protobuf.dart' as $pb;
 import 'auth_messages.pb.dart' as $0;
 import 'game.pb.dart' as $2;
 import 'lobby.pb.dart' as $1;
-import 'void.pb.dart' as $3;
 
 export 'duo_service.pb.dart';
 
@@ -52,18 +51,14 @@ class DUOServiceClient extends $grpc.Client {
       '/pb.DUOService/StartGame',
       ($2.StartGameRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $2.GameState.fromBuffer(value));
-  static final _$getPlayerStream = $grpc.ClientMethod<$2.GetPlayerStateRequest, $2.PlayerState>(
+  static final _$getPlayerStream = $grpc.ClientMethod<$2.PlayerAction, $2.PlayerState>(
       '/pb.DUOService/GetPlayerStream',
-      ($2.GetPlayerStateRequest value) => value.writeToBuffer(),
-      ($core.List<$core.int> value) => $2.PlayerState.fromBuffer(value));
-  static final _$getStackStream = $grpc.ClientMethod<$2.GetStackStateRequest, $2.StackState>(
-      '/pb.DUOService/GetStackStream',
-      ($2.GetStackStateRequest value) => value.writeToBuffer(),
-      ($core.List<$core.int> value) => $2.StackState.fromBuffer(value));
-  static final _$streamPlayerActions = $grpc.ClientMethod<$2.PlayerAction, $3.void_>(
-      '/pb.DUOService/StreamPlayerActions',
       ($2.PlayerAction value) => value.writeToBuffer(),
-      ($core.List<$core.int> value) => $3.void_.fromBuffer(value));
+      ($core.List<$core.int> value) => $2.PlayerState.fromBuffer(value));
+  static final _$getStackStream = $grpc.ClientMethod<$2.StackRequest, $2.StackState>(
+      '/pb.DUOService/GetStackStream',
+      ($2.StackRequest value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $2.StackState.fromBuffer(value));
 
   DUOServiceClient($grpc.ClientChannel channel,
       {$grpc.CallOptions? options,
@@ -99,16 +94,12 @@ class DUOServiceClient extends $grpc.Client {
     return $createStreamingCall(_$startGame, $async.Stream.fromIterable([request]), options: options);
   }
 
-  $grpc.ResponseStream<$2.PlayerState> getPlayerStream($2.GetPlayerStateRequest request, {$grpc.CallOptions? options}) {
-    return $createStreamingCall(_$getPlayerStream, $async.Stream.fromIterable([request]), options: options);
+  $grpc.ResponseStream<$2.PlayerState> getPlayerStream($async.Stream<$2.PlayerAction> request, {$grpc.CallOptions? options}) {
+    return $createStreamingCall(_$getPlayerStream, request, options: options);
   }
 
-  $grpc.ResponseStream<$2.StackState> getStackStream($2.GetStackStateRequest request, {$grpc.CallOptions? options}) {
+  $grpc.ResponseStream<$2.StackState> getStackStream($2.StackRequest request, {$grpc.CallOptions? options}) {
     return $createStreamingCall(_$getStackStream, $async.Stream.fromIterable([request]), options: options);
-  }
-
-  $grpc.ResponseFuture<$3.void_> streamPlayerActions($async.Stream<$2.PlayerAction> request, {$grpc.CallOptions? options}) {
-    return $createStreamingCall(_$streamPlayerActions, request, options: options).single;
   }
 }
 
@@ -166,27 +157,20 @@ abstract class DUOServiceBase extends $grpc.Service {
         true,
         ($core.List<$core.int> value) => $2.StartGameRequest.fromBuffer(value),
         ($2.GameState value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$2.GetPlayerStateRequest, $2.PlayerState>(
+    $addMethod($grpc.ServiceMethod<$2.PlayerAction, $2.PlayerState>(
         'GetPlayerStream',
-        getPlayerStream_Pre,
-        false,
+        getPlayerStream,
         true,
-        ($core.List<$core.int> value) => $2.GetPlayerStateRequest.fromBuffer(value),
+        true,
+        ($core.List<$core.int> value) => $2.PlayerAction.fromBuffer(value),
         ($2.PlayerState value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$2.GetStackStateRequest, $2.StackState>(
+    $addMethod($grpc.ServiceMethod<$2.StackRequest, $2.StackState>(
         'GetStackStream',
         getStackStream_Pre,
         false,
         true,
-        ($core.List<$core.int> value) => $2.GetStackStateRequest.fromBuffer(value),
+        ($core.List<$core.int> value) => $2.StackRequest.fromBuffer(value),
         ($2.StackState value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$2.PlayerAction, $3.void_>(
-        'StreamPlayerActions',
-        streamPlayerActions,
-        true,
-        false,
-        ($core.List<$core.int> value) => $2.PlayerAction.fromBuffer(value),
-        ($3.void_ value) => value.writeToBuffer()));
   }
 
   $async.Future<$0.RegisterResponse> register_Pre($grpc.ServiceCall call, $async.Future<$0.RegisterRequest> request) async {
@@ -217,11 +201,7 @@ abstract class DUOServiceBase extends $grpc.Service {
     yield* startGame(call, await request);
   }
 
-  $async.Stream<$2.PlayerState> getPlayerStream_Pre($grpc.ServiceCall call, $async.Future<$2.GetPlayerStateRequest> request) async* {
-    yield* getPlayerStream(call, await request);
-  }
-
-  $async.Stream<$2.StackState> getStackStream_Pre($grpc.ServiceCall call, $async.Future<$2.GetStackStateRequest> request) async* {
+  $async.Stream<$2.StackState> getStackStream_Pre($grpc.ServiceCall call, $async.Future<$2.StackRequest> request) async* {
     yield* getStackStream(call, await request);
   }
 
@@ -232,7 +212,6 @@ abstract class DUOServiceBase extends $grpc.Service {
   $async.Stream<$1.LobbyStatus> joinLobby($grpc.ServiceCall call, $1.JoinLobbyRequest request);
   $async.Future<$1.DisconnectLobbyResponse> disconnectLobby($grpc.ServiceCall call, $1.DisconnectLobbyRequest request);
   $async.Stream<$2.GameState> startGame($grpc.ServiceCall call, $2.StartGameRequest request);
-  $async.Stream<$2.PlayerState> getPlayerStream($grpc.ServiceCall call, $2.GetPlayerStateRequest request);
-  $async.Stream<$2.StackState> getStackStream($grpc.ServiceCall call, $2.GetStackStateRequest request);
-  $async.Future<$3.void_> streamPlayerActions($grpc.ServiceCall call, $async.Stream<$2.PlayerAction> request);
+  $async.Stream<$2.PlayerState> getPlayerStream($grpc.ServiceCall call, $async.Stream<$2.PlayerAction> request);
+  $async.Stream<$2.StackState> getStackStream($grpc.ServiceCall call, $2.StackRequest request);
 }

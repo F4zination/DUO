@@ -11,6 +11,7 @@ message LobbyStatus {
     bool isStarting = 2;
     int32 lobby_id = 3;
     int32 max_players = 4;
+    bool isDeleted = 5;
 }
 
 message CreateLobbyRequest{

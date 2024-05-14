@@ -27,7 +27,7 @@ class GrpcServerConnection extends AbstractServerConnection {
 
   GrpcServerConnection(this._storage, this._notifyListeners) : super() {
     channel = ClientChannel(
-      Constants.host,
+      _storage.grpcHost,
       port: Constants.port,
       //TODO make secure
       options: const ChannelOptions(credentials: ChannelCredentials.insecure()),

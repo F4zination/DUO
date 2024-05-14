@@ -27,34 +27,6 @@ final $typed_data.Uint8List startGameRequestDescriptor = $convert.base64Decode(
     'ChBTdGFydEdhbWVSZXF1ZXN0EhcKB2dhbWVfaWQYASABKAlSBmdhbWVJZBIUCgV0b2tlbhgCIA'
     'EoCVIFdG9rZW4=');
 
-@$core.Deprecated('Use getPlayerStateRequestDescriptor instead')
-const GetPlayerStateRequest$json = {
-  '1': 'GetPlayerStateRequest',
-  '2': [
-    {'1': 'game_id', '3': 1, '4': 1, '5': 9, '10': 'gameId'},
-    {'1': 'token', '3': 2, '4': 1, '5': 9, '10': 'token'},
-  ],
-};
-
-/// Descriptor for `GetPlayerStateRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List getPlayerStateRequestDescriptor = $convert.base64Decode(
-    'ChVHZXRQbGF5ZXJTdGF0ZVJlcXVlc3QSFwoHZ2FtZV9pZBgBIAEoCVIGZ2FtZUlkEhQKBXRva2'
-    'VuGAIgASgJUgV0b2tlbg==');
-
-@$core.Deprecated('Use getStackStateRequestDescriptor instead')
-const GetStackStateRequest$json = {
-  '1': 'GetStackStateRequest',
-  '2': [
-    {'1': 'game_id', '3': 1, '4': 1, '5': 9, '10': 'gameId'},
-    {'1': 'token', '3': 2, '4': 1, '5': 9, '10': 'token'},
-  ],
-};
-
-/// Descriptor for `GetStackStateRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List getStackStateRequestDescriptor = $convert.base64Decode(
-    'ChRHZXRTdGFja1N0YXRlUmVxdWVzdBIXCgdnYW1lX2lkGAEgASgJUgZnYW1lSWQSFAoFdG9rZW'
-    '4YAiABKAlSBXRva2Vu');
-
 @$core.Deprecated('Use gameStateDescriptor instead')
 const GameState$json = {
   '1': 'GameState',
@@ -120,6 +92,7 @@ const PlayerAction$json = {
   '2': [
     {'1': 'action', '3': 1, '4': 1, '5': 14, '6': '.pb.PlayerAction.ActionType', '10': 'action'},
     {'1': 'card_id', '3': 2, '4': 1, '5': 9, '10': 'cardId'},
+    {'1': 'token', '3': 3, '4': 1, '5': 9, '10': 'token'},
   ],
   '4': [PlayerAction_ActionType$json],
 };
@@ -137,8 +110,20 @@ const PlayerAction_ActionType$json = {
 /// Descriptor for `PlayerAction`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List playerActionDescriptor = $convert.base64Decode(
     'CgxQbGF5ZXJBY3Rpb24SMwoGYWN0aW9uGAEgASgOMhsucGIuUGxheWVyQWN0aW9uLkFjdGlvbl'
-    'R5cGVSBmFjdGlvbhIXCgdjYXJkX2lkGAIgASgJUgZjYXJkSWQiKwoKQWN0aW9uVHlwZRIICgRE'
-    'UkFXEAASCQoFUExBQ0UQARIICgRTS0lQEAI=');
+    'R5cGVSBmFjdGlvbhIXCgdjYXJkX2lkGAIgASgJUgZjYXJkSWQSFAoFdG9rZW4YAyABKAlSBXRv'
+    'a2VuIisKCkFjdGlvblR5cGUSCAoERFJBVxAAEgkKBVBMQUNFEAESCAoEU0tJUBAC');
+
+@$core.Deprecated('Use stackRequestDescriptor instead')
+const StackRequest$json = {
+  '1': 'StackRequest',
+  '2': [
+    {'1': 'token', '3': 1, '4': 1, '5': 9, '10': 'token'},
+  ],
+};
+
+/// Descriptor for `StackRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List stackRequestDescriptor = $convert.base64Decode(
+    'CgxTdGFja1JlcXVlc3QSFAoFdG9rZW4YASABKAlSBXRva2Vu');
 
 @$core.Deprecated('Use alertDescriptor instead')
 const Alert$json = {

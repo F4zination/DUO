@@ -21,6 +21,7 @@ const LobbyStatus$json = {
     {'1': 'isStarting', '3': 2, '4': 1, '5': 8, '10': 'isStarting'},
     {'1': 'lobby_id', '3': 3, '4': 1, '5': 5, '10': 'lobbyId'},
     {'1': 'max_players', '3': 4, '4': 1, '5': 5, '10': 'maxPlayers'},
+    {'1': 'isDeleted', '3': 5, '4': 1, '5': 8, '10': 'isDeleted'},
   ],
 };
 
@@ -28,7 +29,8 @@ const LobbyStatus$json = {
 final $typed_data.Uint8List lobbyStatusDescriptor = $convert.base64Decode(
     'CgtMb2JieVN0YXR1cxIgCgV1c2VycxgBIAMoCzIKLnVzZXIuVXNlclIFdXNlcnMSHgoKaXNTdG'
     'FydGluZxgCIAEoCFIKaXNTdGFydGluZxIZCghsb2JieV9pZBgDIAEoBVIHbG9iYnlJZBIfCgtt'
-    'YXhfcGxheWVycxgEIAEoBVIKbWF4UGxheWVycw==');
+    'YXhfcGxheWVycxgEIAEoBVIKbWF4UGxheWVycxIcCglpc0RlbGV0ZWQYBSABKAhSCWlzRGVsZX'
+    'RlZA==');
 
 @$core.Deprecated('Use createLobbyRequestDescriptor instead')
 const CreateLobbyRequest$json = {

@@ -51,6 +51,7 @@ dependencies:
   share_plus: 7.0.2
   qr_scanner_overlay: ^0.0.2
   mobile_scanner: 3.2.0
+  flutter_dotenv: ^5.1.0
 
 
 dev_dependencies:
