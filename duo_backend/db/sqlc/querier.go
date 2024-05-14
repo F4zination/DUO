@@ -20,6 +20,7 @@ type Querier interface {
 	GetLobbyByOwnerUUID(ctx context.Context, ownerID uuid.UUID) (Lobby, error)
 	GetUserByUUID(ctx context.Context, uuid uuid.UUID) (Duouser, error)
 	GetUserLoginByUUID(ctx context.Context, userUuid uuid.UUID) (UserLogin, error)
+	UpdateStackUUID(ctx context.Context, arg UpdateStackUUIDParams) (Lobby, error)
 }
 
 var _ Querier = (*Queries)(nil)

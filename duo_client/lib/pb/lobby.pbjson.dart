@@ -13,6 +13,20 @@ import 'dart:convert' as $convert;
 import 'dart:core' as $core;
 import 'dart:typed_data' as $typed_data;
 
+@$core.Deprecated('Use changeStackDeviceRequestDescriptor instead')
+const ChangeStackDeviceRequest$json = {
+  '1': 'ChangeStackDeviceRequest',
+  '2': [
+    {'1': 'token', '3': 1, '4': 1, '5': 9, '10': 'token'},
+    {'1': 'user_uuid', '3': 2, '4': 1, '5': 9, '10': 'userUuid'},
+  ],
+};
+
+/// Descriptor for `ChangeStackDeviceRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List changeStackDeviceRequestDescriptor = $convert.base64Decode(
+    'ChhDaGFuZ2VTdGFja0RldmljZVJlcXVlc3QSFAoFdG9rZW4YASABKAlSBXRva2VuEhsKCXVzZX'
+    'JfdXVpZBgCIAEoCVIIdXNlclV1aWQ=');
+
 @$core.Deprecated('Use lobbyStatusDescriptor instead')
 const LobbyStatus$json = {
   '1': 'LobbyStatus',

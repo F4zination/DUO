@@ -19,6 +19,7 @@ type Duouser struct {
 type Lobby struct {
 	ID         int32     `json:"id"`
 	OwnerID    uuid.UUID `json:"owner_id"`
+	StackID    uuid.UUID `json:"stack_id"`
 	MaxPlayers int32     `json:"max_players"`
 }
 

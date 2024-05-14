@@ -44,10 +44,11 @@ func NewLobbyManager(store db.Store) *LobbyManager {
 	}
 }
 
-func (sm *LobbyManager) CreateLobby(userUUID uuid.UUID, maxPlayers int32) (*db.Lobby, error) {
+func (sm *LobbyManager) CreateLobby(userUUID uuid.UUID, stackUUID uuid.UUID, maxPlayers int32) (*db.Lobby, error) {
 	dbSession, createErr := sm.store.CreateLobby(context.Background(), db.CreateLobbyParams{
 		OwnerID:    userUUID,
 		MaxPlayers: maxPlayers,
+		StackID:    stackUUID,
 	})
 	if createErr != nil {
 		return nil, createErr

@@ -3,7 +3,7 @@ syntax = "proto3";
 package pb;
 
 import "game.proto";
-// import  "void.proto";
+import  "void.proto";
 import "auth_messages.proto";
 import "lobby.proto";
 
@@ -17,11 +17,11 @@ service DUOService {
     
     rpc CreateLobby(CreateLobbyRequest) returns (stream LobbyStatus) {}
     rpc JoinLobby(JoinLobbyRequest) returns (stream LobbyStatus) {}
+    rpc ChangeStackDevice(ChangeStackDeviceRequest) returns (void) {}
     rpc DisconnectLobby(DisconnectLobbyRequest) returns (DisconnectLobbyResponse) {}  
     
     rpc StartGame(StartGameRequest) returns (stream GameState) {}
     rpc GetPlayerStream(stream PlayerAction) returns (stream PlayerState) {}
     rpc GetStackStream(StackRequest) returns (stream StackState) {}
-    // rpc StreamPlayerActions(stream PlayerAction) returns (void) {}
 }
 

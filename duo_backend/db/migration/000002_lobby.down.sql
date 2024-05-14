@@ -1,1 +1,1 @@
-DROP TABLE game_session;
+DROP TABLE lobby;

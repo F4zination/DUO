@@ -22,7 +22,7 @@ func (server *Server) CreateLobby(req *pb.CreateLobbyRequest, stream pb.DUOServi
 		return status.Errorf(codes.AlreadyExists, "user already owns a session")
 	}
 
-	lobby, createErr := server.LobbyHandler.CreateLobby(payload.UserID, req.MaxPlayers)
+	lobby, createErr := server.LobbyHandler.CreateLobby(payload.UserID, payload.UserID, req.MaxPlayers)
 	if createErr != nil {
 		log.Printf("error creating session: %v", createErr)
 		return status.Errorf(codes.Internal, "error creating session")
@@ -65,6 +65,8 @@ func (server *Server) JoinLobby(req *pb.JoinLobbyRequest, stream pb.DUOService_J
 
 	return nil
 }
+
+func (server *Server) 
 
 //07542 4254 ZinsiBinsi Festnetz
 //0160 91182690 Handy

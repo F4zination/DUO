@@ -27,6 +27,7 @@ type DUOServiceClient interface {
 	SubmitLoginChallenge(ctx context.Context, in *LoginChallengeResponse, opts ...grpc.CallOption) (*LoginResponse, error)
 	CreateLobby(ctx context.Context, in *CreateLobbyRequest, opts ...grpc.CallOption) (DUOService_CreateLobbyClient, error)
 	JoinLobby(ctx context.Context, in *JoinLobbyRequest, opts ...grpc.CallOption) (DUOService_JoinLobbyClient, error)
+	ChangeStackDevice(ctx context.Context, in *ChangeStackDeviceRequest, opts ...grpc.CallOption) (*Void, error)
 	DisconnectLobby(ctx context.Context, in *DisconnectLobbyRequest, opts ...grpc.CallOption) (*DisconnectLobbyResponse, error)
 	StartGame(ctx context.Context, in *StartGameRequest, opts ...grpc.CallOption) (DUOService_StartGameClient, error)
 	GetPlayerStream(ctx context.Context, opts ...grpc.CallOption) (DUOService_GetPlayerStreamClient, error)
@@ -130,6 +131,15 @@ func (x *dUOServiceJoinLobbyClient) Recv() (*LobbyStatus, error) {
 		return nil, err
 	}
 	return m, nil
+}
+
+func (c *dUOServiceClient) ChangeStackDevice(ctx context.Context, in *ChangeStackDeviceRequest, opts ...grpc.CallOption) (*Void, error) {
+	out := new(Void)
+	err := c.cc.Invoke(ctx, "/pb.DUOService/ChangeStackDevice", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *dUOServiceClient) DisconnectLobby(ctx context.Context, in *DisconnectLobbyRequest, opts ...grpc.CallOption) (*DisconnectLobbyResponse, error) {
@@ -245,6 +255,7 @@ type DUOServiceServer interface {
 	SubmitLoginChallenge(context.Context, *LoginChallengeResponse) (*LoginResponse, error)
 	CreateLobby(*CreateLobbyRequest, DUOService_CreateLobbyServer) error
 	JoinLobby(*JoinLobbyRequest, DUOService_JoinLobbyServer) error
+	ChangeStackDevice(context.Context, *ChangeStackDeviceRequest) (*Void, error)
 	DisconnectLobby(context.Context, *DisconnectLobbyRequest) (*DisconnectLobbyResponse, error)
 	StartGame(*StartGameRequest, DUOService_StartGameServer) error
 	GetPlayerStream(DUOService_GetPlayerStreamServer) error
@@ -270,6 +281,9 @@ func (UnimplementedDUOServiceServer) CreateLobby(*CreateLobbyRequest, DUOService
 }
 func (UnimplementedDUOServiceServer) JoinLobby(*JoinLobbyRequest, DUOService_JoinLobbyServer) error {
 	return status.Errorf(codes.Unimplemented, "method JoinLobby not implemented")
+}
+func (UnimplementedDUOServiceServer) ChangeStackDevice(context.Context, *ChangeStackDeviceRequest) (*Void, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ChangeStackDevice not implemented")
 }
 func (UnimplementedDUOServiceServer) DisconnectLobby(context.Context, *DisconnectLobbyRequest) (*DisconnectLobbyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DisconnectLobby not implemented")
@@ -392,6 +406,24 @@ func (x *dUOServiceJoinLobbyServer) Send(m *LobbyStatus) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _DUOService_ChangeStackDevice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ChangeStackDeviceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DUOServiceServer).ChangeStackDevice(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.DUOService/ChangeStackDevice",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DUOServiceServer).ChangeStackDevice(ctx, req.(*ChangeStackDeviceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _DUOService_DisconnectLobby_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DisconnectLobbyRequest)
 	if err := dec(in); err != nil {
@@ -496,6 +528,10 @@ var DUOService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SubmitLoginChallenge",
 			Handler:    _DUOService_SubmitLoginChallenge_Handler,
+		},
+		{
+			MethodName: "ChangeStackDevice",
+			Handler:    _DUOService_ChangeStackDevice_Handler,
 		},
 		{
 			MethodName: "DisconnectLobby",

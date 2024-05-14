@@ -16,8 +16,9 @@ import 'package:grpc/service_api.dart' as $grpc;
 import 'package:protobuf/protobuf.dart' as $pb;
 
 import 'auth_messages.pb.dart' as $0;
-import 'game.pb.dart' as $2;
+import 'game.pb.dart' as $3;
 import 'lobby.pb.dart' as $1;
+import 'void.pb.dart' as $2;
 
 export 'duo_service.pb.dart';
 
@@ -43,22 +44,26 @@ class DUOServiceClient extends $grpc.Client {
       '/pb.DUOService/JoinLobby',
       ($1.JoinLobbyRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $1.LobbyStatus.fromBuffer(value));
+  static final _$changeStackDevice = $grpc.ClientMethod<$1.ChangeStackDeviceRequest, $2.void_>(
+      '/pb.DUOService/ChangeStackDevice',
+      ($1.ChangeStackDeviceRequest value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $2.void_.fromBuffer(value));
   static final _$disconnectLobby = $grpc.ClientMethod<$1.DisconnectLobbyRequest, $1.DisconnectLobbyResponse>(
       '/pb.DUOService/DisconnectLobby',
       ($1.DisconnectLobbyRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $1.DisconnectLobbyResponse.fromBuffer(value));
-  static final _$startGame = $grpc.ClientMethod<$2.StartGameRequest, $2.GameState>(
+  static final _$startGame = $grpc.ClientMethod<$3.StartGameRequest, $3.GameState>(
       '/pb.DUOService/StartGame',
-      ($2.StartGameRequest value) => value.writeToBuffer(),
-      ($core.List<$core.int> value) => $2.GameState.fromBuffer(value));
-  static final _$getPlayerStream = $grpc.ClientMethod<$2.PlayerAction, $2.PlayerState>(
+      ($3.StartGameRequest value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $3.GameState.fromBuffer(value));
+  static final _$getPlayerStream = $grpc.ClientMethod<$3.PlayerAction, $3.PlayerState>(
       '/pb.DUOService/GetPlayerStream',
-      ($2.PlayerAction value) => value.writeToBuffer(),
-      ($core.List<$core.int> value) => $2.PlayerState.fromBuffer(value));
-  static final _$getStackStream = $grpc.ClientMethod<$2.StackRequest, $2.StackState>(
+      ($3.PlayerAction value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $3.PlayerState.fromBuffer(value));
+  static final _$getStackStream = $grpc.ClientMethod<$3.StackRequest, $3.StackState>(
       '/pb.DUOService/GetStackStream',
-      ($2.StackRequest value) => value.writeToBuffer(),
-      ($core.List<$core.int> value) => $2.StackState.fromBuffer(value));
+      ($3.StackRequest value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $3.StackState.fromBuffer(value));
 
   DUOServiceClient($grpc.ClientChannel channel,
       {$grpc.CallOptions? options,
@@ -86,19 +91,23 @@ class DUOServiceClient extends $grpc.Client {
     return $createStreamingCall(_$joinLobby, $async.Stream.fromIterable([request]), options: options);
   }
 
+  $grpc.ResponseFuture<$2.void_> changeStackDevice($1.ChangeStackDeviceRequest request, {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$changeStackDevice, request, options: options);
+  }
+
   $grpc.ResponseFuture<$1.DisconnectLobbyResponse> disconnectLobby($1.DisconnectLobbyRequest request, {$grpc.CallOptions? options}) {
     return $createUnaryCall(_$disconnectLobby, request, options: options);
   }
 
-  $grpc.ResponseStream<$2.GameState> startGame($2.StartGameRequest request, {$grpc.CallOptions? options}) {
+  $grpc.ResponseStream<$3.GameState> startGame($3.StartGameRequest request, {$grpc.CallOptions? options}) {
     return $createStreamingCall(_$startGame, $async.Stream.fromIterable([request]), options: options);
   }
 
-  $grpc.ResponseStream<$2.PlayerState> getPlayerStream($async.Stream<$2.PlayerAction> request, {$grpc.CallOptions? options}) {
+  $grpc.ResponseStream<$3.PlayerState> getPlayerStream($async.Stream<$3.PlayerAction> request, {$grpc.CallOptions? options}) {
     return $createStreamingCall(_$getPlayerStream, request, options: options);
   }
 
-  $grpc.ResponseStream<$2.StackState> getStackStream($2.StackRequest request, {$grpc.CallOptions? options}) {
+  $grpc.ResponseStream<$3.StackState> getStackStream($3.StackRequest request, {$grpc.CallOptions? options}) {
     return $createStreamingCall(_$getStackStream, $async.Stream.fromIterable([request]), options: options);
   }
 }
@@ -143,6 +152,13 @@ abstract class DUOServiceBase extends $grpc.Service {
         true,
         ($core.List<$core.int> value) => $1.JoinLobbyRequest.fromBuffer(value),
         ($1.LobbyStatus value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$1.ChangeStackDeviceRequest, $2.void_>(
+        'ChangeStackDevice',
+        changeStackDevice_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $1.ChangeStackDeviceRequest.fromBuffer(value),
+        ($2.void_ value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$1.DisconnectLobbyRequest, $1.DisconnectLobbyResponse>(
         'DisconnectLobby',
         disconnectLobby_Pre,
@@ -150,27 +166,27 @@ abstract class DUOServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $1.DisconnectLobbyRequest.fromBuffer(value),
         ($1.DisconnectLobbyResponse value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$2.StartGameRequest, $2.GameState>(
+    $addMethod($grpc.ServiceMethod<$3.StartGameRequest, $3.GameState>(
         'StartGame',
         startGame_Pre,
         false,
         true,
-        ($core.List<$core.int> value) => $2.StartGameRequest.fromBuffer(value),
-        ($2.GameState value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$2.PlayerAction, $2.PlayerState>(
+        ($core.List<$core.int> value) => $3.StartGameRequest.fromBuffer(value),
+        ($3.GameState value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$3.PlayerAction, $3.PlayerState>(
         'GetPlayerStream',
         getPlayerStream,
         true,
         true,
-        ($core.List<$core.int> value) => $2.PlayerAction.fromBuffer(value),
-        ($2.PlayerState value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$2.StackRequest, $2.StackState>(
+        ($core.List<$core.int> value) => $3.PlayerAction.fromBuffer(value),
+        ($3.PlayerState value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$3.StackRequest, $3.StackState>(
         'GetStackStream',
         getStackStream_Pre,
         false,
         true,
-        ($core.List<$core.int> value) => $2.StackRequest.fromBuffer(value),
-        ($2.StackState value) => value.writeToBuffer()));
+        ($core.List<$core.int> value) => $3.StackRequest.fromBuffer(value),
+        ($3.StackState value) => value.writeToBuffer()));
   }
 
   $async.Future<$0.RegisterResponse> register_Pre($grpc.ServiceCall call, $async.Future<$0.RegisterRequest> request) async {
@@ -193,15 +209,19 @@ abstract class DUOServiceBase extends $grpc.Service {
     yield* joinLobby(call, await request);
   }
 
+  $async.Future<$2.void_> changeStackDevice_Pre($grpc.ServiceCall call, $async.Future<$1.ChangeStackDeviceRequest> request) async {
+    return changeStackDevice(call, await request);
+  }
+
   $async.Future<$1.DisconnectLobbyResponse> disconnectLobby_Pre($grpc.ServiceCall call, $async.Future<$1.DisconnectLobbyRequest> request) async {
     return disconnectLobby(call, await request);
   }
 
-  $async.Stream<$2.GameState> startGame_Pre($grpc.ServiceCall call, $async.Future<$2.StartGameRequest> request) async* {
+  $async.Stream<$3.GameState> startGame_Pre($grpc.ServiceCall call, $async.Future<$3.StartGameRequest> request) async* {
     yield* startGame(call, await request);
   }
 
-  $async.Stream<$2.StackState> getStackStream_Pre($grpc.ServiceCall call, $async.Future<$2.StackRequest> request) async* {
+  $async.Stream<$3.StackState> getStackStream_Pre($grpc.ServiceCall call, $async.Future<$3.StackRequest> request) async* {
     yield* getStackStream(call, await request);
   }
 
@@ -210,8 +230,9 @@ abstract class DUOServiceBase extends $grpc.Service {
   $async.Future<$0.LoginResponse> submitLoginChallenge($grpc.ServiceCall call, $0.LoginChallengeResponse request);
   $async.Stream<$1.LobbyStatus> createLobby($grpc.ServiceCall call, $1.CreateLobbyRequest request);
   $async.Stream<$1.LobbyStatus> joinLobby($grpc.ServiceCall call, $1.JoinLobbyRequest request);
+  $async.Future<$2.void_> changeStackDevice($grpc.ServiceCall call, $1.ChangeStackDeviceRequest request);
   $async.Future<$1.DisconnectLobbyResponse> disconnectLobby($grpc.ServiceCall call, $1.DisconnectLobbyRequest request);
-  $async.Stream<$2.GameState> startGame($grpc.ServiceCall call, $2.StartGameRequest request);
-  $async.Stream<$2.PlayerState> getPlayerStream($grpc.ServiceCall call, $async.Stream<$2.PlayerAction> request);
-  $async.Stream<$2.StackState> getStackStream($grpc.ServiceCall call, $2.StackRequest request);
+  $async.Stream<$3.GameState> startGame($grpc.ServiceCall call, $3.StartGameRequest request);
+  $async.Stream<$3.PlayerState> getPlayerStream($grpc.ServiceCall call, $async.Stream<$3.PlayerAction> request);
+  $async.Stream<$3.StackState> getStackStream($grpc.ServiceCall call, $3.StackRequest request);
 }

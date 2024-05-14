@@ -13,11 +13,75 @@ import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
-import 'user.pb.dart' as $4;
+import 'user.pb.dart' as $5;
+
+class ChangeStackDeviceRequest extends $pb.GeneratedMessage {
+  factory ChangeStackDeviceRequest({
+    $core.String? token,
+    $core.String? userUuid,
+  }) {
+    final $result = create();
+    if (token != null) {
+      $result.token = token;
+    }
+    if (userUuid != null) {
+      $result.userUuid = userUuid;
+    }
+    return $result;
+  }
+  ChangeStackDeviceRequest._() : super();
+  factory ChangeStackDeviceRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory ChangeStackDeviceRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ChangeStackDeviceRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'token')
+    ..aOS(2, _omitFieldNames ? '' : 'userUuid')
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  ChangeStackDeviceRequest clone() => ChangeStackDeviceRequest()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  ChangeStackDeviceRequest copyWith(void Function(ChangeStackDeviceRequest) updates) => super.copyWith((message) => updates(message as ChangeStackDeviceRequest)) as ChangeStackDeviceRequest;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static ChangeStackDeviceRequest create() => ChangeStackDeviceRequest._();
+  ChangeStackDeviceRequest createEmptyInstance() => create();
+  static $pb.PbList<ChangeStackDeviceRequest> createRepeated() => $pb.PbList<ChangeStackDeviceRequest>();
+  @$core.pragma('dart2js:noInline')
+  static ChangeStackDeviceRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ChangeStackDeviceRequest>(create);
+  static ChangeStackDeviceRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get token => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set token($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasToken() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearToken() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get userUuid => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set userUuid($core.String v) { $_setString(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasUserUuid() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearUserUuid() => clearField(2);
+}
 
 class LobbyStatus extends $pb.GeneratedMessage {
   factory LobbyStatus({
-    $core.Iterable<$4.User>? users,
+    $core.Iterable<$5.User>? users,
     $core.bool? isStarting,
     $core.int? lobbyId,
     $core.int? maxPlayers,
@@ -46,7 +110,7 @@ class LobbyStatus extends $pb.GeneratedMessage {
   factory LobbyStatus.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'LobbyStatus', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
-    ..pc<$4.User>(1, _omitFieldNames ? '' : 'users', $pb.PbFieldType.PM, subBuilder: $4.User.create)
+    ..pc<$5.User>(1, _omitFieldNames ? '' : 'users', $pb.PbFieldType.PM, subBuilder: $5.User.create)
     ..aOB(2, _omitFieldNames ? '' : 'isStarting', protoName: 'isStarting')
     ..a<$core.int>(3, _omitFieldNames ? '' : 'lobbyId', $pb.PbFieldType.O3)
     ..a<$core.int>(4, _omitFieldNames ? '' : 'maxPlayers', $pb.PbFieldType.O3)
@@ -76,7 +140,7 @@ class LobbyStatus extends $pb.GeneratedMessage {
   static LobbyStatus? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.List<$4.User> get users => $_getList(0);
+  $core.List<$5.User> get users => $_getList(0);
 
   @$pb.TagNumber(2)
   $core.bool get isStarting => $_getBF(1);
