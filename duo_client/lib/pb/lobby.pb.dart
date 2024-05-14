@@ -86,6 +86,7 @@ class LobbyStatus extends $pb.GeneratedMessage {
     $core.int? lobbyId,
     $core.int? maxPlayers,
     $core.bool? isDeleted,
+    $core.int? gameId,
   }) {
     final $result = create();
     if (users != null) {
@@ -103,6 +104,9 @@ class LobbyStatus extends $pb.GeneratedMessage {
     if (isDeleted != null) {
       $result.isDeleted = isDeleted;
     }
+    if (gameId != null) {
+      $result.gameId = gameId;
+    }
     return $result;
   }
   LobbyStatus._() : super();
@@ -115,6 +119,7 @@ class LobbyStatus extends $pb.GeneratedMessage {
     ..a<$core.int>(3, _omitFieldNames ? '' : 'lobbyId', $pb.PbFieldType.O3)
     ..a<$core.int>(4, _omitFieldNames ? '' : 'maxPlayers', $pb.PbFieldType.O3)
     ..aOB(5, _omitFieldNames ? '' : 'isDeleted', protoName: 'isDeleted')
+    ..a<$core.int>(6, _omitFieldNames ? '' : 'gameId', $pb.PbFieldType.O3)
     ..hasRequiredFields = false
   ;
 
@@ -177,6 +182,17 @@ class LobbyStatus extends $pb.GeneratedMessage {
   $core.bool hasIsDeleted() => $_has(4);
   @$pb.TagNumber(5)
   void clearIsDeleted() => clearField(5);
+
+  /// Game Id is set when isStarting is true
+  /// Otherwise it is not set
+  @$pb.TagNumber(6)
+  $core.int get gameId => $_getIZ(5);
+  @$pb.TagNumber(6)
+  set gameId($core.int v) { $_setSignedInt32(5, v); }
+  @$pb.TagNumber(6)
+  $core.bool hasGameId() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearGameId() => clearField(6);
 }
 
 class CreateLobbyRequest extends $pb.GeneratedMessage {

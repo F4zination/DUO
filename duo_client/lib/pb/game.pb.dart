@@ -19,7 +19,7 @@ export 'game.pbenum.dart';
 
 class StartGameRequest extends $pb.GeneratedMessage {
   factory StartGameRequest({
-    $core.String? gameId,
+    $core.int? gameId,
     $core.String? token,
   }) {
     final $result = create();
@@ -36,7 +36,7 @@ class StartGameRequest extends $pb.GeneratedMessage {
   factory StartGameRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'StartGameRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'gameId')
+    ..a<$core.int>(1, _omitFieldNames ? '' : 'gameId', $pb.PbFieldType.O3)
     ..aOS(2, _omitFieldNames ? '' : 'token')
     ..hasRequiredFields = false
   ;
@@ -63,9 +63,73 @@ class StartGameRequest extends $pb.GeneratedMessage {
   static StartGameRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.String get gameId => $_getSZ(0);
+  $core.int get gameId => $_getIZ(0);
   @$pb.TagNumber(1)
-  set gameId($core.String v) { $_setString(0, v); }
+  set gameId($core.int v) { $_setSignedInt32(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasGameId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearGameId() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get token => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set token($core.String v) { $_setString(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasToken() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearToken() => clearField(2);
+}
+
+class GetGameStateRequest extends $pb.GeneratedMessage {
+  factory GetGameStateRequest({
+    $core.int? gameId,
+    $core.String? token,
+  }) {
+    final $result = create();
+    if (gameId != null) {
+      $result.gameId = gameId;
+    }
+    if (token != null) {
+      $result.token = token;
+    }
+    return $result;
+  }
+  GetGameStateRequest._() : super();
+  factory GetGameStateRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory GetGameStateRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GetGameStateRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
+    ..a<$core.int>(1, _omitFieldNames ? '' : 'gameId', $pb.PbFieldType.O3)
+    ..aOS(2, _omitFieldNames ? '' : 'token')
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  GetGameStateRequest clone() => GetGameStateRequest()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  GetGameStateRequest copyWith(void Function(GetGameStateRequest) updates) => super.copyWith((message) => updates(message as GetGameStateRequest)) as GetGameStateRequest;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static GetGameStateRequest create() => GetGameStateRequest._();
+  GetGameStateRequest createEmptyInstance() => create();
+  static $pb.PbList<GetGameStateRequest> createRepeated() => $pb.PbList<GetGameStateRequest>();
+  @$core.pragma('dart2js:noInline')
+  static GetGameStateRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<GetGameStateRequest>(create);
+  static GetGameStateRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.int get gameId => $_getIZ(0);
+  @$pb.TagNumber(1)
+  set gameId($core.int v) { $_setSignedInt32(0, v); }
   @$pb.TagNumber(1)
   $core.bool hasGameId() => $_has(0);
   @$pb.TagNumber(1)
@@ -83,11 +147,19 @@ class StartGameRequest extends $pb.GeneratedMessage {
 
 class GameState extends $pb.GeneratedMessage {
   factory GameState({
+    $core.int? gameId,
     $core.String? currentPlayerUuid,
     $core.String? currentPlayerName,
-    Card? cardOnTopOfDiscard,
+    $core.String? cardOnTopOfDiscard,
+    $core.bool? isGameOver,
+    $core.String? gameOverReason,
+    Direction? direction,
+    $core.bool? allPlayersReady,
   }) {
     final $result = create();
+    if (gameId != null) {
+      $result.gameId = gameId;
+    }
     if (currentPlayerUuid != null) {
       $result.currentPlayerUuid = currentPlayerUuid;
     }
@@ -97,6 +169,18 @@ class GameState extends $pb.GeneratedMessage {
     if (cardOnTopOfDiscard != null) {
       $result.cardOnTopOfDiscard = cardOnTopOfDiscard;
     }
+    if (isGameOver != null) {
+      $result.isGameOver = isGameOver;
+    }
+    if (gameOverReason != null) {
+      $result.gameOverReason = gameOverReason;
+    }
+    if (direction != null) {
+      $result.direction = direction;
+    }
+    if (allPlayersReady != null) {
+      $result.allPlayersReady = allPlayersReady;
+    }
     return $result;
   }
   GameState._() : super();
@@ -104,9 +188,14 @@ class GameState extends $pb.GeneratedMessage {
   factory GameState.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GameState', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'currentPlayerUuid')
-    ..aOS(2, _omitFieldNames ? '' : 'currentPlayerName')
-    ..aOM<Card>(3, _omitFieldNames ? '' : 'cardOnTopOfDiscard', subBuilder: Card.create)
+    ..a<$core.int>(1, _omitFieldNames ? '' : 'gameId', $pb.PbFieldType.O3)
+    ..aOS(2, _omitFieldNames ? '' : 'currentPlayerUuid')
+    ..aOS(3, _omitFieldNames ? '' : 'currentPlayerName')
+    ..aOS(4, _omitFieldNames ? '' : 'cardOnTopOfDiscard')
+    ..aOB(5, _omitFieldNames ? '' : 'isGameOver')
+    ..aOS(6, _omitFieldNames ? '' : 'gameOverReason')
+    ..e<Direction>(7, _omitFieldNames ? '' : 'direction', $pb.PbFieldType.OE, defaultOrMaker: Direction.CLOCKWISE, valueOf: Direction.valueOf, enumValues: Direction.values)
+    ..aOB(8, _omitFieldNames ? '' : 'allPlayersReady', protoName: 'allPlayersReady')
     ..hasRequiredFields = false
   ;
 
@@ -132,38 +221,81 @@ class GameState extends $pb.GeneratedMessage {
   static GameState? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.String get currentPlayerUuid => $_getSZ(0);
+  $core.int get gameId => $_getIZ(0);
   @$pb.TagNumber(1)
-  set currentPlayerUuid($core.String v) { $_setString(0, v); }
+  set gameId($core.int v) { $_setSignedInt32(0, v); }
   @$pb.TagNumber(1)
-  $core.bool hasCurrentPlayerUuid() => $_has(0);
+  $core.bool hasGameId() => $_has(0);
   @$pb.TagNumber(1)
-  void clearCurrentPlayerUuid() => clearField(1);
+  void clearGameId() => clearField(1);
 
   @$pb.TagNumber(2)
-  $core.String get currentPlayerName => $_getSZ(1);
+  $core.String get currentPlayerUuid => $_getSZ(1);
   @$pb.TagNumber(2)
-  set currentPlayerName($core.String v) { $_setString(1, v); }
+  set currentPlayerUuid($core.String v) { $_setString(1, v); }
   @$pb.TagNumber(2)
-  $core.bool hasCurrentPlayerName() => $_has(1);
+  $core.bool hasCurrentPlayerUuid() => $_has(1);
   @$pb.TagNumber(2)
-  void clearCurrentPlayerName() => clearField(2);
+  void clearCurrentPlayerUuid() => clearField(2);
 
   @$pb.TagNumber(3)
-  Card get cardOnTopOfDiscard => $_getN(2);
+  $core.String get currentPlayerName => $_getSZ(2);
   @$pb.TagNumber(3)
-  set cardOnTopOfDiscard(Card v) { setField(3, v); }
+  set currentPlayerName($core.String v) { $_setString(2, v); }
   @$pb.TagNumber(3)
-  $core.bool hasCardOnTopOfDiscard() => $_has(2);
+  $core.bool hasCurrentPlayerName() => $_has(2);
   @$pb.TagNumber(3)
-  void clearCardOnTopOfDiscard() => clearField(3);
-  @$pb.TagNumber(3)
-  Card ensureCardOnTopOfDiscard() => $_ensure(2);
+  void clearCurrentPlayerName() => clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get cardOnTopOfDiscard => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set cardOnTopOfDiscard($core.String v) { $_setString(3, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasCardOnTopOfDiscard() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearCardOnTopOfDiscard() => clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.bool get isGameOver => $_getBF(4);
+  @$pb.TagNumber(5)
+  set isGameOver($core.bool v) { $_setBool(4, v); }
+  @$pb.TagNumber(5)
+  $core.bool hasIsGameOver() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearIsGameOver() => clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.String get gameOverReason => $_getSZ(5);
+  @$pb.TagNumber(6)
+  set gameOverReason($core.String v) { $_setString(5, v); }
+  @$pb.TagNumber(6)
+  $core.bool hasGameOverReason() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearGameOverReason() => clearField(6);
+
+  @$pb.TagNumber(7)
+  Direction get direction => $_getN(6);
+  @$pb.TagNumber(7)
+  set direction(Direction v) { setField(7, v); }
+  @$pb.TagNumber(7)
+  $core.bool hasDirection() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearDirection() => clearField(7);
+
+  @$pb.TagNumber(8)
+  $core.bool get allPlayersReady => $_getBF(7);
+  @$pb.TagNumber(8)
+  set allPlayersReady($core.bool v) { $_setBool(7, v); }
+  @$pb.TagNumber(8)
+  $core.bool hasAllPlayersReady() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearAllPlayersReady() => clearField(8);
 }
 
 class PlayerState extends $pb.GeneratedMessage {
   factory PlayerState({
-    $core.Iterable<Card>? hand,
+    $core.Iterable<$core.String>? hand,
     Alert? alert,
   }) {
     final $result = create();
@@ -180,7 +312,7 @@ class PlayerState extends $pb.GeneratedMessage {
   factory PlayerState.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'PlayerState', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
-    ..pc<Card>(1, _omitFieldNames ? '' : 'hand', $pb.PbFieldType.PM, subBuilder: Card.create)
+    ..pPS(1, _omitFieldNames ? '' : 'hand')
     ..aOM<Alert>(2, _omitFieldNames ? '' : 'alert', subBuilder: Alert.create)
     ..hasRequiredFields = false
   ;
@@ -207,7 +339,7 @@ class PlayerState extends $pb.GeneratedMessage {
   static PlayerState? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.List<Card> get hand => $_getList(0);
+  $core.List<$core.String> get hand => $_getList(0);
 
   @$pb.TagNumber(2)
   Alert get alert => $_getN(1);
@@ -225,7 +357,7 @@ class StackState extends $pb.GeneratedMessage {
   factory StackState({
     PlaceStackState? placeStack,
     DrawStackState? drawStack,
-    StackState_Direction? direction,
+    Direction? direction,
   }) {
     final $result = create();
     if (placeStack != null) {
@@ -246,7 +378,7 @@ class StackState extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'StackState', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
     ..aOM<PlaceStackState>(1, _omitFieldNames ? '' : 'placeStack', subBuilder: PlaceStackState.create)
     ..aOM<DrawStackState>(2, _omitFieldNames ? '' : 'drawStack', subBuilder: DrawStackState.create)
-    ..e<StackState_Direction>(3, _omitFieldNames ? '' : 'direction', $pb.PbFieldType.OE, defaultOrMaker: StackState_Direction.CLOCKWISE, valueOf: StackState_Direction.valueOf, enumValues: StackState_Direction.values)
+    ..e<Direction>(3, _omitFieldNames ? '' : 'direction', $pb.PbFieldType.OE, defaultOrMaker: Direction.CLOCKWISE, valueOf: Direction.valueOf, enumValues: Direction.values)
     ..hasRequiredFields = false
   ;
 
@@ -294,9 +426,9 @@ class StackState extends $pb.GeneratedMessage {
   DrawStackState ensureDrawStack() => $_ensure(1);
 
   @$pb.TagNumber(3)
-  StackState_Direction get direction => $_getN(2);
+  Direction get direction => $_getN(2);
   @$pb.TagNumber(3)
-  set direction(StackState_Direction v) { setField(3, v); }
+  set direction(Direction v) { setField(3, v); }
   @$pb.TagNumber(3)
   $core.bool hasDirection() => $_has(2);
   @$pb.TagNumber(3)
@@ -384,10 +516,14 @@ class PlayerAction extends $pb.GeneratedMessage {
 class StackRequest extends $pb.GeneratedMessage {
   factory StackRequest({
     $core.String? token,
+    $core.int? gameId,
   }) {
     final $result = create();
     if (token != null) {
       $result.token = token;
+    }
+    if (gameId != null) {
+      $result.gameId = gameId;
     }
     return $result;
   }
@@ -397,6 +533,7 @@ class StackRequest extends $pb.GeneratedMessage {
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'StackRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'token')
+    ..a<$core.int>(2, _omitFieldNames ? '' : 'gameId', $pb.PbFieldType.O3)
     ..hasRequiredFields = false
   ;
 
@@ -429,6 +566,15 @@ class StackRequest extends $pb.GeneratedMessage {
   $core.bool hasToken() => $_has(0);
   @$pb.TagNumber(1)
   void clearToken() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.int get gameId => $_getIZ(1);
+  @$pb.TagNumber(2)
+  set gameId($core.int v) { $_setSignedInt32(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasGameId() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearGameId() => clearField(2);
 }
 
 class Alert extends $pb.GeneratedMessage {
@@ -481,81 +627,17 @@ class Alert extends $pb.GeneratedMessage {
   void clearMessage() => clearField(1);
 }
 
-class Card extends $pb.GeneratedMessage {
-  factory Card({
-    $core.String? cardId,
-    $core.bool? isFaceUp,
-  }) {
-    final $result = create();
-    if (cardId != null) {
-      $result.cardId = cardId;
-    }
-    if (isFaceUp != null) {
-      $result.isFaceUp = isFaceUp;
-    }
-    return $result;
-  }
-  Card._() : super();
-  factory Card.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory Card.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'Card', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'cardId')
-    ..aOB(2, _omitFieldNames ? '' : 'isFaceUp')
-    ..hasRequiredFields = false
-  ;
-
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
-  Card clone() => Card()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  Card copyWith(void Function(Card) updates) => super.copyWith((message) => updates(message as Card)) as Card;
-
-  $pb.BuilderInfo get info_ => _i;
-
-  @$core.pragma('dart2js:noInline')
-  static Card create() => Card._();
-  Card createEmptyInstance() => create();
-  static $pb.PbList<Card> createRepeated() => $pb.PbList<Card>();
-  @$core.pragma('dart2js:noInline')
-  static Card getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Card>(create);
-  static Card? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  $core.String get cardId => $_getSZ(0);
-  @$pb.TagNumber(1)
-  set cardId($core.String v) { $_setString(0, v); }
-  @$pb.TagNumber(1)
-  $core.bool hasCardId() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearCardId() => clearField(1);
-
-  @$pb.TagNumber(2)
-  $core.bool get isFaceUp => $_getBF(1);
-  @$pb.TagNumber(2)
-  set isFaceUp($core.bool v) { $_setBool(1, v); }
-  @$pb.TagNumber(2)
-  $core.bool hasIsFaceUp() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearIsFaceUp() => clearField(2);
-}
-
 class PlaceStackState extends $pb.GeneratedMessage {
   factory PlaceStackState({
     $core.int? amountCards,
-    Card? cardOnTop,
+    $core.String? cardIdOnTop,
   }) {
     final $result = create();
     if (amountCards != null) {
       $result.amountCards = amountCards;
     }
-    if (cardOnTop != null) {
-      $result.cardOnTop = cardOnTop;
+    if (cardIdOnTop != null) {
+      $result.cardIdOnTop = cardIdOnTop;
     }
     return $result;
   }
@@ -565,7 +647,7 @@ class PlaceStackState extends $pb.GeneratedMessage {
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'PlaceStackState', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
     ..a<$core.int>(1, _omitFieldNames ? '' : 'amountCards', $pb.PbFieldType.O3)
-    ..aOM<Card>(2, _omitFieldNames ? '' : 'cardOnTop', subBuilder: Card.create)
+    ..aOS(2, _omitFieldNames ? '' : 'cardIdOnTop')
     ..hasRequiredFields = false
   ;
 
@@ -600,28 +682,26 @@ class PlaceStackState extends $pb.GeneratedMessage {
   void clearAmountCards() => clearField(1);
 
   @$pb.TagNumber(2)
-  Card get cardOnTop => $_getN(1);
+  $core.String get cardIdOnTop => $_getSZ(1);
   @$pb.TagNumber(2)
-  set cardOnTop(Card v) { setField(2, v); }
+  set cardIdOnTop($core.String v) { $_setString(1, v); }
   @$pb.TagNumber(2)
-  $core.bool hasCardOnTop() => $_has(1);
+  $core.bool hasCardIdOnTop() => $_has(1);
   @$pb.TagNumber(2)
-  void clearCardOnTop() => clearField(2);
-  @$pb.TagNumber(2)
-  Card ensureCardOnTop() => $_ensure(1);
+  void clearCardIdOnTop() => clearField(2);
 }
 
 class DrawStackState extends $pb.GeneratedMessage {
   factory DrawStackState({
     $core.int? stackId,
-    $core.Iterable<Card>? cards,
+    $core.Iterable<$core.String>? cardIds,
   }) {
     final $result = create();
     if (stackId != null) {
       $result.stackId = stackId;
     }
-    if (cards != null) {
-      $result.cards.addAll(cards);
+    if (cardIds != null) {
+      $result.cardIds.addAll(cardIds);
     }
     return $result;
   }
@@ -631,7 +711,7 @@ class DrawStackState extends $pb.GeneratedMessage {
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DrawStackState', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
     ..a<$core.int>(1, _omitFieldNames ? '' : 'stackId', $pb.PbFieldType.O3)
-    ..pc<Card>(4, _omitFieldNames ? '' : 'cards', $pb.PbFieldType.PM, subBuilder: Card.create)
+    ..pPS(4, _omitFieldNames ? '' : 'cardIds')
     ..hasRequiredFields = false
   ;
 
@@ -666,7 +746,7 @@ class DrawStackState extends $pb.GeneratedMessage {
   void clearStackId() => clearField(1);
 
   @$pb.TagNumber(4)
-  $core.List<Card> get cards => $_getList(1);
+  $core.List<$core.String> get cardIds => $_getList(1);
 }
 
 

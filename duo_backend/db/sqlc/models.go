@@ -5,6 +5,7 @@
 package db
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -14,6 +15,34 @@ type Duouser struct {
 	Uuid      uuid.UUID `json:"uuid"`
 	Username  string    `json:"username"`
 	PublicKey string    `json:"public_key"`
+}
+
+type GamePlayerRel struct {
+	GameID         int64     `json:"game_id"`
+	PlayerID       uuid.UUID `json:"player_id"`
+	PlayerPosition int32     `json:"player_position"`
+}
+
+type GameStackDrawCardRel struct {
+	GameID        int64  `json:"game_id"`
+	CardID        string `json:"card_id"`
+	StackPosition int32  `json:"stack_position"`
+}
+
+type GameStackPlaceCardRel struct {
+	GameID        int64  `json:"game_id"`
+	CardID        string `json:"card_id"`
+	StackPosition int32  `json:"stack_position"`
+}
+
+type GameState struct {
+	ID               int32          `json:"id"`
+	CurrentPlayerID  uuid.UUID      `json:"current_player_id"`
+	CardOnTopOfStack sql.NullString `json:"card_on_top_of_stack"`
+	OwnerID          uuid.UUID      `json:"owner_id"`
+	StackID          uuid.UUID      `json:"stack_id"`
+	IsClockwise      bool           `json:"is_clockwise"`
+	CreatedAt        time.Time      `json:"created_at"`
 }
 
 type Lobby struct {

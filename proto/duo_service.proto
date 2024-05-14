@@ -19,9 +19,9 @@ service DUOService {
     rpc JoinLobby(JoinLobbyRequest) returns (stream LobbyStatus) {}
     rpc ChangeStackDevice(ChangeStackDeviceRequest) returns (void) {}
     rpc DisconnectLobby(DisconnectLobbyRequest) returns (DisconnectLobbyResponse) {}  
-    
-    rpc StartGame(StartGameRequest) returns (stream GameState) {}
+    rpc StartGame(StartGameRequest) returns (void) {}
+
+    rpc GetGameState(GetGameStateRequest) returns (stream GameState) {}
     rpc GetPlayerStream(stream PlayerAction) returns (stream PlayerState) {}
     rpc GetStackStream(StackRequest) returns (stream StackState) {}
 }
-

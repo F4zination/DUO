@@ -204,17 +204,14 @@ class GrpcServerConnection extends AbstractServerConnection {
   }
 
   @override
-  Future<int> startGame(String token, String gameId) async {
+  Future<int> startGame(String token, int gameId) async {
     try {
-      ResponseStream<GameState> gameStream = client.startGame(StartGameRequest(
+      await client.startGame(StartGameRequest(
         token: token,
         gameId: gameId,
       ));
-
-      await for (GameState gs in gameStream) {
-        gameState = gs;
-        _notifyListeners();
-      }
+      lobbyStream?.cancel();
+      lobbyStatus = null;
     } catch (e) {
       return -1;
     }
@@ -222,7 +219,7 @@ class GrpcServerConnection extends AbstractServerConnection {
   }
 
   @override
-  Future<int> getPlayerStream(String token, String gameId) async {
+  Future<int> getPlayerStream(String token, int gameId) async {
     // try {
     //   ResponseStream<PlayerState> playerStream =
     //       client.getPlayerStream(GetPlayerStateRequest(
@@ -241,7 +238,7 @@ class GrpcServerConnection extends AbstractServerConnection {
   }
 
   @override
-  Future<int> getStackStream(String token, String gameId) async {
+  Future<int> getStackStream(String token, int gameId) async {
     // try {
     //   ResponseStream<StackState> stackStream =
     //       client.getStackStream(GetStackStateRequest(
@@ -267,5 +264,11 @@ class GrpcServerConnection extends AbstractServerConnection {
     //   return -1;
     // }
     return 0;
+  }
+
+  @override
+  Future<int> getGameStateStream(String token, int gameId) {
+    // TODO: implement getGameStateStream
+    throw UnimplementedError();
   }
 }

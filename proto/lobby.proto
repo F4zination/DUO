@@ -17,6 +17,9 @@ message LobbyStatus {
     int32 lobby_id = 3;
     int32 max_players = 4;
     bool isDeleted = 5;
+    //Game Id is set when isStarting is true
+    //Otherwise it is not set
+    int32 game_id = 6;
 }
 
 message CreateLobbyRequest{

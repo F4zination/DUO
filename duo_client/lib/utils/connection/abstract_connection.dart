@@ -17,10 +17,11 @@ abstract class AbstractServerConnection {
   Future<int> createLobby(String token, int maxPlayers);
   Future<int> joinLobby(String token, int lobbyId);
   Future<int> disconnectLobby(String token, int lobbyId);
+  Future<int> startGame(String token, int gameId);
 
   // Game management
-  Future<int> startGame(String token, String gameId);
-  Future<int> getPlayerStream(String token, String gameId);
-  Future<int> getStackStream(String token, String gameId);
+  Future<int> getGameStateStream(String token, int gameId);
+  Future<int> getPlayerStream(String token, int gameId);
+  Future<int> getStackStream(String token, int gameId);
   Future<int> streamPlayerAction(Stream<PlayerAction> action);
 }

@@ -120,3 +120,51 @@ func (server *Server) DisconnectLobby(ctx context.Context, req *pb.DisconnectLob
 
 	return &pb.DisconnectLobbyResponse{Success: true}, nil
 }
+
+func (server *Server) StartGame(context context.Context, req *pb.StartGameRequest) (*pb.Void, error) {
+	payload, tokenErr := server.Maker.VerifyToken(req.Token)
+	if tokenErr != nil {
+		return nil, status.Errorf(codes.Unauthenticated, "invalid token")
+	}
+
+	//Is token lobby owner
+	dbLobby, getErr := server.Store.GetLobbyByOwnerUUID(context, payload.UserID)
+	if getErr != nil {
+		if getErr == sql.ErrNoRows {
+			return nil, status.Errorf(codes.PermissionDenied, "user is not lobby owner")
+		}
+		log.Printf("error getting lobby: %v", getErr)
+		return nil, status.Errorf(codes.Internal, "error getting lobby")
+	}
+
+	lobby, exists := server.LobbyHandler.LobbyStreams[int(dbLobby.ID)]
+	if !exists {
+		return nil, status.Errorf(codes.PermissionDenied, "user is not in lobby")
+	}
+
+	users, userErr := server.LobbyHandler.GetUsersInLobby(int(dbLobby.ID))
+	if userErr != nil {
+		log.Printf("error getting users in session %d: %v", dbLobby.ID, userErr)
+		return nil, status.Errorf(codes.PermissionDenied, "user is not in lobby")
+	}
+
+	//Create Game
+	gameId, createErr := server.GameHandler.CreateGame(lobby, dbLobby.ID)
+	if createErr != nil {
+		log.Printf("error creating game: %v", createErr)
+		return nil, status.Errorf(codes.Internal, "error creating game")
+	}
+
+	server.LobbyHandler.SendMessageToLobby(int(dbLobby.ID), &pb.LobbyStatus{
+		Users:      users,
+		IsStarting: true,
+		GameId:     int32(gameId),
+		LobbyId:    int32(dbLobby.ID),
+		MaxPlayers: dbLobby.MaxPlayers,
+		IsDeleted:  false,
+	})
+
+	server.LobbyHandler.DeleteLobby(int(dbLobby.ID), false)
+
+	return &pb.Void{}, nil
+}

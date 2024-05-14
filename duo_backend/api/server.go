@@ -16,6 +16,7 @@ type Server struct {
 	Maker  token.Maker
 	// SessionHandler SessionManager
 	LobbyHandler LobbyManager
+	GameHandler  GameManager
 }
 
 func NewServer(store db.Store, config util.Config) *Server {
@@ -31,6 +32,7 @@ func NewServer(store db.Store, config util.Config) *Server {
 		Maker:  maker,
 		// SessionHandler: *NewSessionManager(store),
 		LobbyHandler: *NewLobbyManager(store),
+		GameHandler:  *NewGameManager(store),
 	}
 }
 

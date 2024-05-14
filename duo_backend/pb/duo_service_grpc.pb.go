@@ -29,7 +29,8 @@ type DUOServiceClient interface {
 	JoinLobby(ctx context.Context, in *JoinLobbyRequest, opts ...grpc.CallOption) (DUOService_JoinLobbyClient, error)
 	ChangeStackDevice(ctx context.Context, in *ChangeStackDeviceRequest, opts ...grpc.CallOption) (*Void, error)
 	DisconnectLobby(ctx context.Context, in *DisconnectLobbyRequest, opts ...grpc.CallOption) (*DisconnectLobbyResponse, error)
-	StartGame(ctx context.Context, in *StartGameRequest, opts ...grpc.CallOption) (DUOService_StartGameClient, error)
+	StartGame(ctx context.Context, in *StartGameRequest, opts ...grpc.CallOption) (*Void, error)
+	GetGameState(ctx context.Context, in *GetGameStateRequest, opts ...grpc.CallOption) (DUOService_GetGameStateClient, error)
 	GetPlayerStream(ctx context.Context, opts ...grpc.CallOption) (DUOService_GetPlayerStreamClient, error)
 	GetStackStream(ctx context.Context, in *StackRequest, opts ...grpc.CallOption) (DUOService_GetStackStreamClient, error)
 }
@@ -151,12 +152,21 @@ func (c *dUOServiceClient) DisconnectLobby(ctx context.Context, in *DisconnectLo
 	return out, nil
 }
 
-func (c *dUOServiceClient) StartGame(ctx context.Context, in *StartGameRequest, opts ...grpc.CallOption) (DUOService_StartGameClient, error) {
-	stream, err := c.cc.NewStream(ctx, &DUOService_ServiceDesc.Streams[2], "/pb.DUOService/StartGame", opts...)
+func (c *dUOServiceClient) StartGame(ctx context.Context, in *StartGameRequest, opts ...grpc.CallOption) (*Void, error) {
+	out := new(Void)
+	err := c.cc.Invoke(ctx, "/pb.DUOService/StartGame", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &dUOServiceStartGameClient{stream}
+	return out, nil
+}
+
+func (c *dUOServiceClient) GetGameState(ctx context.Context, in *GetGameStateRequest, opts ...grpc.CallOption) (DUOService_GetGameStateClient, error) {
+	stream, err := c.cc.NewStream(ctx, &DUOService_ServiceDesc.Streams[2], "/pb.DUOService/GetGameState", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &dUOServiceGetGameStateClient{stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -166,16 +176,16 @@ func (c *dUOServiceClient) StartGame(ctx context.Context, in *StartGameRequest, 
 	return x, nil
 }
 
-type DUOService_StartGameClient interface {
+type DUOService_GetGameStateClient interface {
 	Recv() (*GameState, error)
 	grpc.ClientStream
 }
 
-type dUOServiceStartGameClient struct {
+type dUOServiceGetGameStateClient struct {
 	grpc.ClientStream
 }
 
-func (x *dUOServiceStartGameClient) Recv() (*GameState, error) {
+func (x *dUOServiceGetGameStateClient) Recv() (*GameState, error) {
 	m := new(GameState)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -257,7 +267,8 @@ type DUOServiceServer interface {
 	JoinLobby(*JoinLobbyRequest, DUOService_JoinLobbyServer) error
 	ChangeStackDevice(context.Context, *ChangeStackDeviceRequest) (*Void, error)
 	DisconnectLobby(context.Context, *DisconnectLobbyRequest) (*DisconnectLobbyResponse, error)
-	StartGame(*StartGameRequest, DUOService_StartGameServer) error
+	StartGame(context.Context, *StartGameRequest) (*Void, error)
+	GetGameState(*GetGameStateRequest, DUOService_GetGameStateServer) error
 	GetPlayerStream(DUOService_GetPlayerStreamServer) error
 	GetStackStream(*StackRequest, DUOService_GetStackStreamServer) error
 	mustEmbedUnimplementedDUOServiceServer()
@@ -288,8 +299,11 @@ func (UnimplementedDUOServiceServer) ChangeStackDevice(context.Context, *ChangeS
 func (UnimplementedDUOServiceServer) DisconnectLobby(context.Context, *DisconnectLobbyRequest) (*DisconnectLobbyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DisconnectLobby not implemented")
 }
-func (UnimplementedDUOServiceServer) StartGame(*StartGameRequest, DUOService_StartGameServer) error {
-	return status.Errorf(codes.Unimplemented, "method StartGame not implemented")
+func (UnimplementedDUOServiceServer) StartGame(context.Context, *StartGameRequest) (*Void, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StartGame not implemented")
+}
+func (UnimplementedDUOServiceServer) GetGameState(*GetGameStateRequest, DUOService_GetGameStateServer) error {
+	return status.Errorf(codes.Unimplemented, "method GetGameState not implemented")
 }
 func (UnimplementedDUOServiceServer) GetPlayerStream(DUOService_GetPlayerStreamServer) error {
 	return status.Errorf(codes.Unimplemented, "method GetPlayerStream not implemented")
@@ -442,24 +456,42 @@ func _DUOService_DisconnectLobby_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
-func _DUOService_StartGame_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(StartGameRequest)
+func _DUOService_StartGame_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StartGameRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DUOServiceServer).StartGame(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.DUOService/StartGame",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DUOServiceServer).StartGame(ctx, req.(*StartGameRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DUOService_GetGameState_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(GetGameStateRequest)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(DUOServiceServer).StartGame(m, &dUOServiceStartGameServer{stream})
+	return srv.(DUOServiceServer).GetGameState(m, &dUOServiceGetGameStateServer{stream})
 }
 
-type DUOService_StartGameServer interface {
+type DUOService_GetGameStateServer interface {
 	Send(*GameState) error
 	grpc.ServerStream
 }
 
-type dUOServiceStartGameServer struct {
+type dUOServiceGetGameStateServer struct {
 	grpc.ServerStream
 }
 
-func (x *dUOServiceStartGameServer) Send(m *GameState) error {
+func (x *dUOServiceGetGameStateServer) Send(m *GameState) error {
 	return x.ServerStream.SendMsg(m)
 }
 
@@ -537,6 +569,10 @@ var DUOService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "DisconnectLobby",
 			Handler:    _DUOService_DisconnectLobby_Handler,
 		},
+		{
+			MethodName: "StartGame",
+			Handler:    _DUOService_StartGame_Handler,
+		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
@@ -550,8 +586,8 @@ var DUOService_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 		{
-			StreamName:    "StartGame",
-			Handler:       _DUOService_StartGame_Handler,
+			StreamName:    "GetGameState",
+			Handler:       _DUOService_GetGameState_Handler,
 			ServerStreams: true,
 		},
 		{

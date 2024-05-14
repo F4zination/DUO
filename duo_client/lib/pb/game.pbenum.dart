@@ -13,19 +13,19 @@ import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
-class StackState_Direction extends $pb.ProtobufEnum {
-  static const StackState_Direction CLOCKWISE = StackState_Direction._(0, _omitEnumNames ? '' : 'CLOCKWISE');
-  static const StackState_Direction COUNTER_CLOCKWISE = StackState_Direction._(1, _omitEnumNames ? '' : 'COUNTER_CLOCKWISE');
+class Direction extends $pb.ProtobufEnum {
+  static const Direction CLOCKWISE = Direction._(0, _omitEnumNames ? '' : 'CLOCKWISE');
+  static const Direction COUNTER_CLOCKWISE = Direction._(1, _omitEnumNames ? '' : 'COUNTER_CLOCKWISE');
 
-  static const $core.List<StackState_Direction> values = <StackState_Direction> [
+  static const $core.List<Direction> values = <Direction> [
     CLOCKWISE,
     COUNTER_CLOCKWISE,
   ];
 
-  static final $core.Map<$core.int, StackState_Direction> _byValue = $pb.ProtobufEnum.initByValue(values);
-  static StackState_Direction? valueOf($core.int value) => _byValue[value];
+  static final $core.Map<$core.int, Direction> _byValue = $pb.ProtobufEnum.initByValue(values);
+  static Direction? valueOf($core.int value) => _byValue[value];
 
-  const StackState_Direction._($core.int v, $core.String n) : super(v, n);
+  const Direction._($core.int v, $core.String n) : super(v, n);
 }
 
 class PlayerAction_ActionType extends $pb.ProtobufEnum {

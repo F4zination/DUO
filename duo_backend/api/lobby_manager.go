@@ -126,7 +126,7 @@ func (sm *LobbyManager) SendMessageToLobby(lobbyId int, message *pb.LobbyStatus)
 	return errs
 }
 
-func (sm *LobbyManager) DeleteLobby(lobbyId int) error {
+func (sm *LobbyManager) DeleteLobby(lobbyId int, sendDeleteMessages bool) error {
 	//Session must exist
 	_, exists := sm.GetLobby(lobbyId)
 	if exists != nil {
@@ -134,28 +134,28 @@ func (sm *LobbyManager) DeleteLobby(lobbyId int) error {
 		return fmt.Errorf("lobby does not exist")
 	}
 
-	dbLobby, getErr := sm.store.GetLobbyByID(context.Background(), int32(lobbyId))
-	if getErr != nil {
-		log.Printf("error getting session %d: %v", lobbyId, getErr)
-		return getErr
-	}
+	if sendDeleteMessages {
+		dbLobby, getErr := sm.store.GetLobbyByID(context.Background(), int32(lobbyId))
+		if getErr != nil {
+			log.Printf("error getting session %d: %v", lobbyId, getErr)
+			return getErr
+		}
 
-	users, userErr := sm.GetUsersInLobby(lobbyId)
-	if userErr != nil {
-		return userErr
+		users, userErr := sm.GetUsersInLobby(lobbyId)
+		if userErr != nil {
+			return userErr
+		}
+		sm.SendMessageToLobby(lobbyId, &pb.LobbyStatus{
+			Users:      users,
+			IsStarting: false,
+			LobbyId:    int32(lobbyId),
+			MaxPlayers: dbLobby.MaxPlayers,
+			IsDeleted:  true,
+		})
 	}
-	sm.SendMessageToLobby(lobbyId, &pb.LobbyStatus{
-		Users:      users,
-		IsStarting: false,
-		LobbyId:    int32(lobbyId),
-		MaxPlayers: dbLobby.MaxPlayers,
-		IsDeleted:  true,
-	})
 
 	fmt.Printf("Deleting lobby %d", lobbyId)
-	sm.Mu.Lock()
 	_, delErr := sm.store.DeleteLobbyByID(context.Background(), int32(lobbyId))
-	sm.Mu.Unlock()
 	if delErr != nil {
 		log.Printf("error deleting session %d: %v", lobbyId, delErr)
 		return delErr
@@ -267,7 +267,7 @@ func (sm *LobbyManager) RemoveStreamFromLobby(lobbyId int, userId uuid.UUID) err
 	lobby.Mu.Unlock()
 
 	if userId == dbLobby.OwnerID {
-		sm.DeleteLobby(lobbyId)
+		sm.DeleteLobby(lobbyId, true)
 		log.Printf("Owner %v disconnected and lobby %d deleted", userId, lobbyId)
 		return nil
 	}

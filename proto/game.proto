@@ -6,29 +6,39 @@ option go_package = "github.com/duo/pb";
 
 
 message StartGameRequest {
-    string game_id = 1;
+    int32 game_id = 1;
     string token = 2;
 }
 
+message GetGameStateRequest {
+    int32 game_id = 1;
+    string token = 2;
+}
+
+enum Direction {
+    CLOCKWISE = 0;
+    COUNTER_CLOCKWISE = 1;
+}
 
 message GameState {
-    string current_player_uuid = 1;
-    string current_player_name = 2;
-    Card card_on_top_of_discard = 3;
+    int32 game_id = 1;
+    string current_player_uuid = 2;
+    string current_player_name = 3;
+    string card_on_top_of_discard = 4;
+    bool is_game_over = 5;
+    string game_over_reason = 6;
+    Direction direction = 7;
+    bool allPlayersReady = 8;
 }
 
 message PlayerState {
-    repeated Card hand = 1;
+    repeated string hand = 1;
     Alert alert = 2;
 }
 
 message StackState {
     PlaceStackState place_stack = 1;
     DrawStackState draw_stack = 2;
-    enum Direction {
-        CLOCKWISE = 0;
-        COUNTER_CLOCKWISE = 1;
-    }
     Direction direction = 3;
 }
 
@@ -45,23 +55,19 @@ message PlayerAction {
 
 message StackRequest {
     string token = 1;
+    int32 game_id = 2;
 }
 
 message Alert {
     string message = 1;
 }
 
-message Card {
-    string card_id = 1;
-    bool is_face_up = 2;
-}
-
 message PlaceStackState {
     int32 amount_cards = 1;
-    Card card_on_top = 2;
+    string card_id_on_top = 2;
 }
 
 message DrawStackState {
     int32 stack_id = 1;
-    repeated Card cards = 4;
+    repeated string card_ids = 4;
 }
