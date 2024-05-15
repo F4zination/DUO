@@ -16,6 +16,8 @@ enum ServerConnectionType {
 class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
   AbstractServerConnection? _serverConnection;
   final StorageProvider _storageProvider;
+  int gameId = -1;
+  bool isStack = false;
 
   @override
   LobbyStatus? get lobbyStatus => _serverConnection?.lobbyStatus;
@@ -80,8 +82,8 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
   }
 
   @override
-  Future<int> startGame(String token, int gameId) {
-    return _serverConnection!.startGame(token, gameId);
+  Future<int> startGame(String token) {
+    return _serverConnection!.startGame(token);
   }
 
   @override

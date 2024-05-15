@@ -6,8 +6,7 @@ option go_package = "github.com/duo/pb";
 
 
 message StartGameRequest {
-    int32 game_id = 1;
-    string token = 2;
+    string token = 1;
 }
 
 message GetGameStateRequest {

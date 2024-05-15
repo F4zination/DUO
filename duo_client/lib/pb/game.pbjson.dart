@@ -30,15 +30,13 @@ final $typed_data.Uint8List directionDescriptor = $convert.base64Decode(
 const StartGameRequest$json = {
   '1': 'StartGameRequest',
   '2': [
-    {'1': 'game_id', '3': 1, '4': 1, '5': 5, '10': 'gameId'},
-    {'1': 'token', '3': 2, '4': 1, '5': 9, '10': 'token'},
+    {'1': 'token', '3': 1, '4': 1, '5': 9, '10': 'token'},
   ],
 };
 
 /// Descriptor for `StartGameRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List startGameRequestDescriptor = $convert.base64Decode(
-    'ChBTdGFydEdhbWVSZXF1ZXN0EhcKB2dhbWVfaWQYASABKAVSBmdhbWVJZBIUCgV0b2tlbhgCIA'
-    'EoCVIFdG9rZW4=');
+    'ChBTdGFydEdhbWVSZXF1ZXN0EhQKBXRva2VuGAEgASgJUgV0b2tlbg==');
 
 @$core.Deprecated('Use getGameStateRequestDescriptor instead')
 const GetGameStateRequest$json = {

@@ -19,13 +19,9 @@ export 'game.pbenum.dart';
 
 class StartGameRequest extends $pb.GeneratedMessage {
   factory StartGameRequest({
-    $core.int? gameId,
     $core.String? token,
   }) {
     final $result = create();
-    if (gameId != null) {
-      $result.gameId = gameId;
-    }
     if (token != null) {
       $result.token = token;
     }
@@ -36,8 +32,7 @@ class StartGameRequest extends $pb.GeneratedMessage {
   factory StartGameRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'StartGameRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
-    ..a<$core.int>(1, _omitFieldNames ? '' : 'gameId', $pb.PbFieldType.O3)
-    ..aOS(2, _omitFieldNames ? '' : 'token')
+    ..aOS(1, _omitFieldNames ? '' : 'token')
     ..hasRequiredFields = false
   ;
 
@@ -63,22 +58,13 @@ class StartGameRequest extends $pb.GeneratedMessage {
   static StartGameRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.int get gameId => $_getIZ(0);
+  $core.String get token => $_getSZ(0);
   @$pb.TagNumber(1)
-  set gameId($core.int v) { $_setSignedInt32(0, v); }
+  set token($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
-  $core.bool hasGameId() => $_has(0);
+  $core.bool hasToken() => $_has(0);
   @$pb.TagNumber(1)
-  void clearGameId() => clearField(1);
-
-  @$pb.TagNumber(2)
-  $core.String get token => $_getSZ(1);
-  @$pb.TagNumber(2)
-  set token($core.String v) { $_setString(1, v); }
-  @$pb.TagNumber(2)
-  $core.bool hasToken() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearToken() => clearField(2);
+  void clearToken() => clearField(1);
 }
 
 class GetGameStateRequest extends $pb.GeneratedMessage {

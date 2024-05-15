@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:duo_client/pb/lobby.pb.dart';
 import 'package:duo_client/provider/storage_provider.dart';
-import 'package:duo_client/utils/game/player.dart';
 
 import '../../pb/auth_messages.pb.dart';
 import 'abstract_connection.dart';
@@ -208,11 +207,10 @@ class GrpcServerConnection extends AbstractServerConnection {
   }
 
   @override
-  Future<int> startGame(String token, int gameId) async {
+  Future<int> startGame(String token) async {
     try {
       await client.startGame(StartGameRequest(
         token: token,
-        gameId: gameId,
       ));
       lobbyStream?.cancel();
       lobbyStatus = null;

@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:duo_client/provider/api_provider.dart';
-import 'package:duo_client/provider/game_state_provider.dart';
 import 'package:duo_client/provider/storage_provider.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:duo_client/utils/helpers.dart';
@@ -25,7 +24,6 @@ class GameScreen extends ConsumerStatefulWidget {
 class _GameScreenState extends ConsumerState<GameScreen> {
   bool isLoading = false;
   late ApiProvider _apiProvider;
-  int gameId = int.parse(Helpers.fillPrefixWithZeros(Random().nextInt(1000)));
 
   @override
   void initState() {
@@ -37,7 +35,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       ref.read(apiProvider).getGameStateStream(
             ref.read(storageProvider).accessToken,
-            gameId,
+            _apiProvider.gameId,
           );
     });
     super.initState();
@@ -54,7 +52,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
   @override
   Widget build(BuildContext context) {
-    bool isStack = ModalRoute.of(context)!.settings.arguments as bool;
+    // TODO: implement isStack
+    bool isStack = true;
     return Scaffold(
       body: isLoading
           ? const Column(
@@ -78,10 +77,10 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                 color: Constants.bgColor,
                 child: isStack
                     ? GameStacks(
-                        gameId: gameId,
+                        gameId: _apiProvider.gameId,
                       )
                     : CardScrollView(
-                        gameId: gameId,
+                        gameId: _apiProvider.gameId,
                       ),
               ),
               Positioned(

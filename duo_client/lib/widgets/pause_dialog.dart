@@ -50,6 +50,7 @@ class _PauseDialogState extends ConsumerState<PauseDialog> {
                   onPressed: () {
                     Navigator.of(context).pop();
                     Navigator.of(context).pop();
+                    Navigator.of(context).pop();
                   },
                   child: const Text('Exit'),
                 ),

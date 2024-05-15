@@ -17,7 +17,7 @@ abstract class AbstractServerConnection {
   Future<int> createLobby(String token, int maxPlayers);
   Future<int> joinLobby(String token, int lobbyId);
   Future<int> disconnectLobby(String token, int lobbyId);
-  Future<int> startGame(String token, int gameId);
+  Future<int> startGame(String token);
 
   // Game management
   Future<int> getGameStateStream(String token, int gameId);

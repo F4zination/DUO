@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:duo_client/provider/api_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:duo_client/widgets/playingcard.dart' as duo;
 import 'package:flutter_riverpod/flutter_riverpod.dart';

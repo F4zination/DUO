@@ -33,8 +33,16 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
           ref.read(storageProvider).accessToken, lobbyId);
       Navigator.of(context).pop();
     }
-    User testuser = getStackUser(_apiProvider.lobbyStatus?.users ?? []);
-    print('testuser: ${testuser.name} ${testuser.isStack}');
+    if (_apiProvider.lobbyStatus?.isStarting == true) {
+      _apiProvider.isStack = _apiProvider.lobbyStatus!.users
+              .where((element) => element.isStack)
+              .first
+              .uuid ==
+          ref.read(storageProvider).userId;
+      _apiProvider.gameId = _apiProvider.lobbyStatus!.gameId;
+      // TODO setState() or markNeedsBuild() called during build.
+      Navigator.of(context).pushNamed(GameScreen.route);
+    }
 
     return Scaffold(
       backgroundColor: Constants.bgColor,
@@ -112,12 +120,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                             return Padding(
                               padding: const EdgeInsets.all(
                                   Constants.defaultPadding / 2),
-                              child: user.uuid ==
-                                      ref
-                                          .watch(apiProvider)
-                                          .lobbyStatus!
-                                          .users[0]
-                                          .uuid
+                              child: _apiProvider.isStack
                                   ? UserTile(user: user, isStack: true)
                                   : UserTile(user: user, isStack: false),
                             );
@@ -179,7 +182,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                           child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                   backgroundColor: Constants.successColor),
-                              onPressed: () {
+                              onPressed: () async {
                                 if (ref.read(storageProvider).userId ==
                                     ref
                                         .read(apiProvider)
@@ -188,19 +191,11 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                                         .where((element) => element.isAdmin)
                                         .first
                                         .uuid) {
-                                  ref.read(apiProvider).disconnectLobby(
+                                  await ref.read(apiProvider).startGame(
+                                      ref.read(storageProvider).accessToken);
+                                  await ref.read(apiProvider).disconnectLobby(
                                       ref.read(storageProvider).accessToken,
                                       lobbyId);
-                                  ref.read(apiProvider).startGame(
-                                      ref.read(storageProvider).accessToken,
-                                      lobbyId);
-                                  Navigator.of(context).pushNamed(
-                                      GameScreen.route,
-                                      arguments: ref
-                                          .watch(apiProvider)
-                                          .lobbyStatus!
-                                          .users[0]
-                                          .isStack);
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
