@@ -119,7 +119,14 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                             return Padding(
                               padding: const EdgeInsets.all(
                                   Constants.defaultPadding / 2),
-                              child: _apiProvider.isStack
+                              child: ref
+                                          .watch(apiProvider)
+                                          .lobbyStatus!
+                                          .users
+                                          .where((element) => element.isStack)
+                                          .first
+                                          .uuid ==
+                                      user.uuid
                                   ? UserTile(user: user, isStack: true)
                                   : UserTile(user: user, isStack: false),
                             );
