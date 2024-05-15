@@ -23,7 +23,6 @@ class GameScreen extends ConsumerStatefulWidget {
 
 class _GameScreenState extends ConsumerState<GameScreen> {
   bool isLoading = false;
-  late ApiProvider _apiProvider;
 
   @override
   void initState() {
@@ -32,10 +31,11 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
+
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       ref.read(apiProvider).getGameStateStream(
             ref.read(storageProvider).accessToken,
-            _apiProvider.gameId,
+            ref.read(apiProvider).gameId,
           );
     });
     super.initState();
@@ -53,7 +53,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement isStack
-    bool isStack = true;
+    bool isStack = ref.read(apiProvider).isStack;
     return Scaffold(
       body: isLoading
           ? const Column(
@@ -77,10 +77,10 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                 color: Constants.bgColor,
                 child: isStack
                     ? GameStacks(
-                        gameId: _apiProvider.gameId,
+                        gameId: ref.watch(apiProvider).gameId,
                       )
                     : CardScrollView(
-                        gameId: _apiProvider.gameId,
+                        gameId: ref.watch(apiProvider).gameId,
                       ),
               ),
               Positioned(

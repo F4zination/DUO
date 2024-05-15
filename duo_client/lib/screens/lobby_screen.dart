@@ -40,7 +40,6 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
               .uuid ==
           ref.read(storageProvider).userId;
       _apiProvider.gameId = _apiProvider.lobbyStatus!.gameId;
-      // TODO setState() or markNeedsBuild() called during build.
       Navigator.of(context).pushNamed(GameScreen.route);
     }
 
@@ -196,6 +195,8 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                                   await ref.read(apiProvider).disconnectLobby(
                                       ref.read(storageProvider).accessToken,
                                       lobbyId);
+                                  Navigator.of(context)
+                                      .pushReplacementNamed(GameScreen.route);
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
