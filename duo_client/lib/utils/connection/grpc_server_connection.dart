@@ -127,6 +127,27 @@ class GrpcServerConnection extends AbstractServerConnection {
       lobbyStream?.listen(
         (value) {
           lobbyStatus = value;
+          //if is starting
+          if (lobbyStatus?.isStarting == true) {
+            debugPrint('received lobby status is starting');
+            gameId = lobbyStatus?.gameId;
+            isStackOwner = lobbyStatus?.users
+                    .firstWhere((element) => element.isStack)
+                    .uuid ==
+                _storage.userId;
+            lobbyStatus = null;
+            lobbyStream?.cancel();
+            _notifyListeners();
+            return;
+          }
+          //if is deleted
+          if (lobbyStatus?.isDeleted == true) {
+            debugPrint('received lobby status is deleted');
+            lobbyStatus = null;
+            lobbyStream?.cancel();
+            _notifyListeners();
+            return;
+          }
           _notifyListeners();
         },
         cancelOnError: true,
@@ -161,6 +182,24 @@ class GrpcServerConnection extends AbstractServerConnection {
       lobbyStream?.listen(
         (value) {
           lobbyStatus = value;
+          //if is starting
+          if (lobbyStatus?.isStarting == true) {
+            gameId = lobbyStatus?.gameId;
+            isStackOwner = lobbyStatus?.users
+                    .firstWhere((element) => element.isStack)
+                    .uuid ==
+                _storage.userId;
+            lobbyStatus = null;
+            lobbyStream?.cancel();
+            _notifyListeners();
+          }
+          //if is deleted
+          if (lobbyStatus?.isDeleted == true) {
+            lobbyStatus = null;
+            lobbyStream?.cancel();
+            lobbyStream = null;
+            _notifyListeners();
+          }
           _notifyListeners();
         },
         cancelOnError: true,
@@ -209,14 +248,15 @@ class GrpcServerConnection extends AbstractServerConnection {
   @override
   Future<int> startGame(String token) async {
     try {
+      debugPrint('Starting game...');
       await client.startGame(StartGameRequest(
         token: token,
       ));
-      lobbyStream?.cancel();
-      lobbyStatus = null;
     } catch (e) {
+      debugPrint('Error: $e');
       return -1;
     }
+    debugPrint('Game started');
     return 0;
   }
 
@@ -318,4 +358,16 @@ class GrpcServerConnection extends AbstractServerConnection {
     }
     return Future(() => 0);
   }
+
+  @override
+  bool get hasGameStream => gameStream != null;
+
+  @override
+  bool get hasLobbyStream => lobbyStream != null;
+
+  @override
+  bool get hasPlayerStream => playerStream != null;
+
+  @override
+  bool get hasStackStream => stackStream != null;
 }

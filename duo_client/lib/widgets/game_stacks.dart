@@ -7,9 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class GameStacks extends ConsumerStatefulWidget {
-  const GameStacks({super.key, required this.gameId});
-
-  final int gameId;
+  const GameStacks({super.key});
 
   @override
   ConsumerState<GameStacks> createState() => _GameStacksState();
@@ -18,9 +16,11 @@ class GameStacks extends ConsumerStatefulWidget {
 class _GameStacksState extends ConsumerState<GameStacks> {
   @override
   void initState() {
-    ref
-        .read(apiProvider)
-        .getStackStream(ref.read(storageProvider).accessToken, widget.gameId);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      //init the stack stream
+      ref.read(apiProvider).getStackStream(
+          ref.read(storageProvider).accessToken, ref.read(apiProvider).gameId!);
+    });
     super.initState();
   }
 

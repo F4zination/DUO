@@ -54,7 +54,7 @@ func (gm *GameManager) CreateGame(lobby *Lobby, lobbyId int32) (int, error) {
 
 	//Create game in db as a transaction
 	var dbGame db.GameState
-	txErr := gm.store.ExecTx(context.Background(), func(q *db.Queries) error {
+	txErr := gm.store.ExecTx(context.Background(), sql.LevelReadUncommitted, func(q *db.Queries) error {
 
 		dbGame, createErr := q.CreateGameState(context.Background(), db.CreateGameStateParams{
 			CurrentPlayerID:  dbLobby.OwnerID,

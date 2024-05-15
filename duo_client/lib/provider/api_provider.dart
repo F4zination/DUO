@@ -16,8 +16,6 @@ enum ServerConnectionType {
 class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
   AbstractServerConnection? _serverConnection;
   final StorageProvider _storageProvider;
-  int gameId = -1;
-  bool isStack = false;
 
   @override
   LobbyStatus? get lobbyStatus => _serverConnection?.lobbyStatus;
@@ -122,6 +120,27 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
 
   @override
   set gameState(GameState? _gameState) {}
+
+  @override
+  int? gameId;
+
+  @override
+  bool? isStackOwner;
+
+  @override
+  bool get hasGameStream => _serverConnection?.hasGameStream ?? false;
+
+  @override
+  bool get hasLobbyStream {
+    debugPrint('Has Lobby Stream: ${_serverConnection?.hasLobbyStream}');
+    return _serverConnection?.hasLobbyStream ?? false;
+  }
+
+  @override
+  bool get hasPlayerStream => _serverConnection?.hasPlayerStream ?? false;
+
+  @override
+  bool get hasStackStream => _serverConnection?.hasStackStream ?? false;
 }
 
 final apiProvider = ChangeNotifierProvider<ApiProvider>((ref) {

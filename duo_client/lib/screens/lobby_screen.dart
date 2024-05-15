@@ -26,20 +26,15 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
   @override
   Widget build(BuildContext context) {
     ApiProvider _apiProvider = ref.watch(apiProvider);
-    bool creatingLobby = _apiProvider.lobbyStatus == null;
+    bool creatingLobby =
+        _apiProvider.lobbyStatus == null && _apiProvider.gameId == null;
     int lobbyId = _apiProvider.lobbyStatus?.lobbyId ?? 0;
-    if (_apiProvider.lobbyStatus?.isDeleted == true) {
-      _apiProvider.disconnectLobby(
-          ref.read(storageProvider).accessToken, lobbyId);
+    if (!_apiProvider.hasLobbyStream && _apiProvider.gameId == null) {
+      debugPrint('Lobby Stream: ${_apiProvider.lobbyStatus?.lobbyId}');
+      //Case if lobby is deleted
       Navigator.of(context).pop();
     }
-    if (_apiProvider.lobbyStatus?.isStarting == true) {
-      _apiProvider.isStack = _apiProvider.lobbyStatus!.users
-              .where((element) => element.isStack)
-              .first
-              .uuid ==
-          ref.read(storageProvider).userId;
-      _apiProvider.gameId = _apiProvider.lobbyStatus!.gameId;
+    if (_apiProvider.gameId != null) {
       Navigator.of(context).pushNamed(GameScreen.route);
     }
 
@@ -199,11 +194,6 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                                         .uuid) {
                                   await ref.read(apiProvider).startGame(
                                       ref.read(storageProvider).accessToken);
-                                  await ref.read(apiProvider).disconnectLobby(
-                                      ref.read(storageProvider).accessToken,
-                                      lobbyId);
-                                  Navigator.of(context)
-                                      .pushReplacementNamed(GameScreen.route);
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(

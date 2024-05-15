@@ -6,6 +6,8 @@ abstract class AbstractServerConnection {
   GameState? gameState;
   StackState? stackState;
   PlayerState? playerState;
+  bool? isStackOwner;
+  int? gameId;
 
   AbstractServerConnection();
 
@@ -25,4 +27,9 @@ abstract class AbstractServerConnection {
   Future<int> getStackStream(String token, int gameId);
   Future<int> changeStackDevice(String token, String deviceId);
   Future<int> streamPlayerAction(PlayerAction action);
+
+  bool get hasLobbyStream;
+  bool get hasGameStream;
+  bool get hasPlayerStream;
+  bool get hasStackStream;
 }

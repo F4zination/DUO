@@ -10,9 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class CardScrollView extends ConsumerStatefulWidget {
-  const CardScrollView({super.key, required this.gameId});
-
-  final int gameId;
+  const CardScrollView({super.key});
 
   final Duration _waitDuration = const Duration(milliseconds: 100);
 
@@ -30,10 +28,9 @@ class _CardScrollViewState extends ConsumerState<CardScrollView> {
 
   @override
   void initState() {
-    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
-      final _apiProvider = ref.watch(apiProvider);
-      _apiProvider.getPlayerStream(
-          ref.read(storageProvider).accessToken, widget.gameId);
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      ref.read(apiProvider).getPlayerStream(
+          ref.read(storageProvider).accessToken, ref.read(apiProvider).gameId!);
     });
 
     super.initState();
@@ -45,6 +42,7 @@ class _CardScrollViewState extends ConsumerState<CardScrollView> {
     final _storageProvider = ref.watch(storageProvider);
     cards = _apiProvider.playerState == null
         ? [
+            //TODO delete
             const duo.PlayingCard.fromCard(cardName: 'green_3'),
             const duo.PlayingCard.fromCard(cardName: 'purple_draw_2'),
             const duo.PlayingCard.fromCard(cardName: 'red_change_directions'),

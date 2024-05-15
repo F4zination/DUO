@@ -32,12 +32,6 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       DeviceOrientation.landscapeRight,
     ]);
 
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      ref.read(apiProvider).getGameStateStream(
-            ref.read(storageProvider).accessToken,
-            ref.read(apiProvider).gameId,
-          );
-    });
     super.initState();
   }
 
@@ -53,7 +47,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement isStack
-    bool isStack = ref.read(apiProvider).isStack;
+    bool isStack = ref.read(apiProvider).isStackOwner ?? false;
     return Scaffold(
       body: isLoading
           ? const Column(
@@ -75,13 +69,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               // Main game screen either card scroll view or game stacks
               Container(
                 color: Constants.bgColor,
-                child: isStack
-                    ? GameStacks(
-                        gameId: ref.watch(apiProvider).gameId,
-                      )
-                    : CardScrollView(
-                        gameId: ref.watch(apiProvider).gameId,
-                      ),
+                child: isStack ? GameStacks() : CardScrollView(),
               ),
               Positioned(
                 top: 10,

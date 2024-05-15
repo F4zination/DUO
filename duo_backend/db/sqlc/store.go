@@ -8,7 +8,7 @@ import (
 
 type Store interface {
 	Querier
-	ExecTx(context.Context, func(*Queries) error) error
+	ExecTx(context.Context, sql.IsolationLevel, func(*Queries) error) error
 }
 
 type SQLStore struct {
@@ -23,8 +23,10 @@ func NewStore(db *sql.DB) Store {
 	}
 }
 
-func (store *SQLStore) ExecTx(ctx context.Context, fn func(*Queries) error) error {
-	tx, err := store.db.BeginTx(ctx, nil)
+func (store *SQLStore) ExecTx(ctx context.Context, isolation sql.IsolationLevel, fn func(*Queries) error) error {
+	tx, err := store.db.BeginTx(ctx, &sql.TxOptions{
+		Isolation: isolation,
+	})
 	if err != nil {
 		log.Fatalf("Error creating transaction: %s", err)
 		return err
