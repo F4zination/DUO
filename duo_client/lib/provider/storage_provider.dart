@@ -90,6 +90,8 @@ class StorageProvider extends ChangeNotifier {
     return _username;
   }
 
+  ///WARNING
+  ///DO NOT FETCH THE TOKEN FROM HERE, USE API PROVIDER getToken() INSTEAD
   String get accessToken {
     return _accessToken;
   }

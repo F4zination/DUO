@@ -18,7 +18,7 @@ type Duouser struct {
 }
 
 type GamePlayerRel struct {
-	GameID         int64     `json:"game_id"`
+	GameID         int32     `json:"game_id"`
 	PlayerID       uuid.UUID `json:"player_id"`
 	PlayerPosition int32     `json:"player_position"`
 }

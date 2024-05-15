@@ -63,7 +63,7 @@ RETURNING game_id, player_id, player_position
 `
 
 type AddPlayerToGameParams struct {
-	GameID         int64     `json:"game_id"`
+	GameID         int32     `json:"game_id"`
 	PlayerID       uuid.UUID `json:"player_id"`
 	PlayerPosition int32     `json:"player_position"`
 }
@@ -219,7 +219,7 @@ const getPlayersInGame = `-- name: GetPlayersInGame :many
 SELECT game_id, player_id, player_position FROM game_player_rel WHERE game_id = $1
 `
 
-func (q *Queries) GetPlayersInGame(ctx context.Context, gameID int64) ([]GamePlayerRel, error) {
+func (q *Queries) GetPlayersInGame(ctx context.Context, gameID int32) ([]GamePlayerRel, error) {
 	rows, err := q.db.QueryContext(ctx, getPlayersInGame, gameID)
 	if err != nil {
 		return nil, err
@@ -281,7 +281,7 @@ DELETE FROM game_player_rel WHERE game_id = $1 AND player_id = $2 RETURNING game
 `
 
 type RemovePlayerFromGameParams struct {
-	GameID   int64     `json:"game_id"`
+	GameID   int32     `json:"game_id"`
 	PlayerID uuid.UUID `json:"player_id"`
 }
 

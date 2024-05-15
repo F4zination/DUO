@@ -52,25 +52,24 @@ func (gm *GameManager) CreateGame(lobby *Lobby, lobbyId int32) (int, error) {
 		return 0, getErr
 	}
 
+	dbGame, createErr := gm.store.CreateGameState(context.Background(), db.CreateGameStateParams{
+		CurrentPlayerID:  dbLobby.OwnerID,
+		OwnerID:          dbLobby.OwnerID,
+		StackID:          dbLobby.StackID,
+		CardOnTopOfStack: sql.NullString{Valid: false},
+	})
+	if createErr != nil {
+		log.Printf("error creating game: %v", createErr)
+		return 0, fmt.Errorf("error creating game: %v", createErr)
+	}
+
 	//Create game in db as a transaction
-	var dbGame db.GameState
-	txErr := gm.store.ExecTx(context.Background(), sql.LevelReadUncommitted, func(q *db.Queries) error {
-
-		dbGame, createErr := q.CreateGameState(context.Background(), db.CreateGameStateParams{
-			CurrentPlayerID:  dbLobby.OwnerID,
-			OwnerID:          dbLobby.OwnerID,
-			StackID:          dbLobby.StackID,
-			CardOnTopOfStack: sql.NullString{Valid: false},
-		})
-		if createErr != nil {
-			log.Printf("error creating game: %v", createErr)
-			return createErr
-		}
-
+	// var dbGame db.GameState
+	txErr := gm.store.ExecTx(context.Background(), sql.LevelDefault, func(q *db.Queries) error {
 		//Add all expected users to db
 		for i, user := range lobby.UserStreams {
 			_, addErr := gm.store.AddPlayerToGame(context.Background(), db.AddPlayerToGameParams{
-				GameID:         int64(dbGame.ID),
+				GameID:         int32(dbGame.ID),
 				PlayerID:       user.UserId,
 				PlayerPosition: int32(i),
 			})
@@ -109,7 +108,7 @@ func (gm *GameManager) HasEveryoneJoined(gameId int) (bool, error) {
 		return false, fmt.Errorf("game does not exist")
 	}
 
-	dbUsers, getErr := gm.store.GetPlayersInGame(context.Background(), int64(gameId))
+	dbUsers, getErr := gm.store.GetPlayersInGame(context.Background(), int32(gameId))
 	if getErr != nil {
 		log.Printf("error getting players in game: %v", getErr)
 		return false, getErr

@@ -27,7 +27,7 @@ type Querier interface {
 	GetLobbyByID(ctx context.Context, id int32) (Lobby, error)
 	GetLobbyByOwnerUUID(ctx context.Context, ownerID uuid.UUID) (Lobby, error)
 	GetPlayersGameId(ctx context.Context, playerID uuid.UUID) (GamePlayerRel, error)
-	GetPlayersInGame(ctx context.Context, gameID int64) ([]GamePlayerRel, error)
+	GetPlayersInGame(ctx context.Context, gameID int32) ([]GamePlayerRel, error)
 	GetUserByUUID(ctx context.Context, uuid uuid.UUID) (Duouser, error)
 	GetUserLoginByUUID(ctx context.Context, userUuid uuid.UUID) (UserLogin, error)
 	RemoveGameDrawStack(ctx context.Context, arg RemoveGameDrawStackParams) (GameStackDrawCardRel, error)

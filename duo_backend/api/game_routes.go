@@ -17,7 +17,7 @@ func (server *Server) GetGameState(req *pb.GetGameStateRequest, stream pb.DUOSer
 	}
 
 	// Check if user is in game
-	userIds, userGetErr := server.Store.GetPlayersInGame(context.Background(), int64(req.GameId))
+	userIds, userGetErr := server.Store.GetPlayersInGame(context.Background(), int32(req.GameId))
 	if userGetErr != nil {
 		log.Printf("error getting players in game: %v", userGetErr)
 		return status.Errorf(codes.Internal, "error getting players in game")
