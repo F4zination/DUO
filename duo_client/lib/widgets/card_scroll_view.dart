@@ -22,23 +22,21 @@ class CardScrollView extends ConsumerStatefulWidget {
 class _CardScrollViewState extends ConsumerState<CardScrollView> {
   bool _isReordering = false;
   bool isTurn = false;
-  List<duo.PlayingCard> cards = [];
-  final StreamController<PlayerAction> _playerActionController =
-      StreamController<PlayerAction>();
+
+  List<duo.PlayingCard> cards = [
+    duo.PlayingCard.fromCard(cardName: 'green_3'),
+    duo.PlayingCard.fromCard(cardName: 'green_draw_2'),
+    duo.PlayingCard.fromCard(cardName: 'draw_4'),
+    duo.PlayingCard.fromCard(cardName: 'purple_change_directions'),
+    duo.PlayingCard.fromCard(cardName: 'red_5'),
+    duo.PlayingCard.fromCard(cardName: 'yellow_7'),
+    duo.PlayingCard.fromCard(cardName: 'yellow_suspend'),
+    duo.PlayingCard.fromCard(cardName: 'select_color'),
+  ];
   //ToDo: BUG if the cards are removed before the animation is done it will crash or before on Reorder is done
 
   @override
   Widget build(BuildContext context) {
-    cards = [
-      duo.PlayingCard.fromCard(cardName: 'green_3'),
-      duo.PlayingCard.fromCard(cardName: 'green_draw_2'),
-      duo.PlayingCard.fromCard(cardName: 'draw_4'),
-      duo.PlayingCard.fromCard(cardName: 'purple_change_directions'),
-      duo.PlayingCard.fromCard(cardName: 'red_5'),
-      duo.PlayingCard.fromCard(cardName: 'yellow_7'),
-      duo.PlayingCard.fromCard(cardName: 'yellow_suspend'),
-      duo.PlayingCard.fromCard(cardName: 'select_color'),
-    ];
     isTurn = true;
     return Padding(
       padding: const EdgeInsets.only(bottom: Constants.defaultPadding, top: 70),
@@ -73,7 +71,7 @@ class _CardScrollViewState extends ConsumerState<CardScrollView> {
                   _isReordering = true;
                   // ref.read(gameStateProvider).removeCard(index);
                   cards.removeAt(index);
-                  playCard(index);
+
                   print('Removing card with value ${cards[index].cardName}');
                 });
               } else {
@@ -93,22 +91,5 @@ class _CardScrollViewState extends ConsumerState<CardScrollView> {
         },
       ),
     );
-  }
-
-  void playCard(int index) {
-    _playerActionController.add(PlayerAction()
-      ..action = PlayerAction_ActionType.PLACE
-      ..cardId = cards[index].cardName);
-  }
-
-  void drawCard() {
-    _playerActionController
-        .add(PlayerAction()..action = PlayerAction_ActionType.DRAW);
-  }
-
-  @override
-  void dispose() {
-    _playerActionController.close();
-    super.dispose();
   }
 }

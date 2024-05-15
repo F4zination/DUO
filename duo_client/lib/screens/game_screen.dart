@@ -3,6 +3,7 @@ import 'package:duo_client/provider/game_state_provider.dart';
 import 'package:duo_client/provider/storage_provider.dart';
 import 'package:duo_client/screens/home_screen.dart';
 import 'package:duo_client/utils/constants.dart';
+import 'package:duo_client/widgets/game_stacks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:duo_client/widgets/playingcard.dart' as duo;
@@ -20,10 +21,13 @@ class GameScreen extends ConsumerStatefulWidget {
 
 class _GameScreenState extends ConsumerState<GameScreen> {
   late bool is_turn;
+  late bool is_stack;
 
   @override
   void initState() {
     super.initState();
+    is_turn = false;
+    is_stack = false;
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
@@ -47,7 +51,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       body: Stack(children: [
         Container(
           color: Constants.bgColor,
-          child: CardScrollView(),
+          child: is_stack ? const GameStacks() : CardScrollView(),
         ),
         Positioned(
           top: 10,
@@ -61,8 +65,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               ),
             ),
             onPressed: () {
-              Navigator.of(context)
-                  .pushNamedAndRemoveUntil(HomeScreen.route, (route) => false);
+              setState(() {
+                is_stack = !is_stack;
+              });
             },
           ),
         ),
