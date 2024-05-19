@@ -32,7 +32,7 @@ Welcome to **DUO**, a groundbreaking mobile card game app developed as part of a
 ## Getting Started
 
 To start using DUO, follow these simple steps:
-1. **Download the App**: Get DUO from the iOS App Store or Google Play Store.
+1. **Download the App**: Get DUO soon from the iOS App Store or Google Play Store.
 2. **Create an Account**: Sign up with our one-time login feature.
 3. **Add Friends**: Use the friend system to connect with your pals.
 4. **Set Up the Stack**: Designate an additional device as the Stack.
