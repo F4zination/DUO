@@ -44,13 +44,8 @@ Your security is our top priority. DUO uses advanced encryption protocols to ens
 
 ## Support
 
-Experiencing issues? Have suggestions or feedback? Our support team is here to help! Contact us at [support@duoapp.com](mailto:support@duoapp.com) for assistance.
+Experiencing issues? Have suggestions or feedback? Our support team is here to help! Contact us at [support@duoapp.com](mailto:support@duoapp.de) for assistance.
 
-## Stay Connected
 
-Follow us on social media to stay updated with the latest news, updates, and events:
-- [Instagram](#)
-- [Twitter](#)
-- [Facebook](#)
 
 Thank you for choosing DUO – where friends connect, compete, and celebrate the love for card games. Enjoy playing!
