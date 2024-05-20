@@ -1,9 +1,5 @@
-import 'dart:math';
-
 import 'package:duo_client/provider/api_provider.dart';
-import 'package:duo_client/provider/storage_provider.dart';
 import 'package:duo_client/utils/constants.dart';
-import 'package:duo_client/utils/helpers.dart';
 import 'package:duo_client/widgets/game_stacks.dart';
 import 'package:duo_client/widgets/pause_dialog.dart';
 import 'package:flutter/material.dart';
