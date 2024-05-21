@@ -125,7 +125,7 @@ func (server *Server) StartGame(context context.Context, req *pb.StartGameReques
 	payload, tokenErr := server.Maker.VerifyToken(req.Token)
 	if tokenErr != nil {
 		log.Printf("error verifying token: %v", tokenErr)
-		return nil, status.Errorf(codes.Unauthenticated, "invalid token")
+		return nil, status.Errorf(codes.Unauthenticated, "invalid token %v", tokenErr)
 	}
 
 	//Is token lobby owner
