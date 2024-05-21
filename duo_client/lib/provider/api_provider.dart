@@ -50,6 +50,7 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
   Future<String> getToken() async {
     if (_storageProvider.expireDate?.isBefore(DateTime.now()) ?? false) {
       await _serverConnection!.loginUser(_storageProvider.userId);
+      return _storageProvider.accessToken;
     }
     return _storageProvider.accessToken;
   }
