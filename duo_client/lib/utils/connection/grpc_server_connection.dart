@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:async';
+import 'dart:developer';
 import 'package:duo_client/pb/lobby.pb.dart';
 import 'package:duo_client/provider/storage_provider.dart';
 
@@ -106,6 +107,7 @@ class GrpcServerConnection extends AbstractServerConnection {
 
       await _storage.setExpireDate(lr.expiresAt.toDateTime());
       await _storage.setAccessToken(lr.token);
+      debugPrint('created token and expire date');
     } catch (e) {
       return -1;
     }
@@ -127,14 +129,15 @@ class GrpcServerConnection extends AbstractServerConnection {
       lobbyStream?.listen(
         (value) {
           lobbyStatus = value;
-          //if is starting
+          //if game is starting
           if (lobbyStatus?.isStarting == true) {
-            debugPrint('received lobby status is starting');
+            debugPrint('received lobby status is starting == true');
             gameId = lobbyStatus?.gameId;
             isStackOwner = lobbyStatus?.users
                     .firstWhere((element) => element.isStack)
                     .uuid ==
                 _storage.userId;
+            _notifyListeners();
             lobbyStatus = null;
             lobbyStream?.cancel();
             _notifyListeners();
@@ -185,16 +188,19 @@ class GrpcServerConnection extends AbstractServerConnection {
           //if is starting
           if (lobbyStatus?.isStarting == true) {
             gameId = lobbyStatus?.gameId;
+            _notifyListeners();
             isStackOwner = lobbyStatus?.users
                     .firstWhere((element) => element.isStack)
                     .uuid ==
                 _storage.userId;
+            _notifyListeners();
             lobbyStatus = null;
             lobbyStream?.cancel();
             _notifyListeners();
           }
           //if is deleted
           if (lobbyStatus?.isDeleted == true) {
+            debugPrint('received lobby status is deleted');
             lobbyStatus = null;
             lobbyStream?.cancel();
             lobbyStream = null;

@@ -44,7 +44,7 @@ Your security is our top priority. DUO uses advanced encryption protocols to ens
 
 ## Support
 
-Experiencing issues? Have suggestions or feedback? Our support team is here to help! Contact us at [support@duoapp.com](mailto:support@duoapp.de) for assistance.
+Experiencing issues? Have suggestions or feedback? Our support team is here to help! Contact us at [support@duoapp.de](mailto:support@duoapp.de) for assistance.
 
 
 
