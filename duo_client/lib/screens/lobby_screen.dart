@@ -1,14 +1,18 @@
+import 'dart:math';
+
 import 'package:animated_background/animated_background.dart';
 import 'package:duo_client/pb/user.pb.dart';
 import 'package:duo_client/provider/api_provider.dart';
 import 'package:duo_client/provider/storage_provider.dart';
 import 'package:duo_client/screens/game_screen.dart';
+import 'package:duo_client/screens/home_screen.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:duo_client/utils/helpers.dart';
 import 'package:duo_client/widgets/add_tile.dart';
 import 'package:duo_client/widgets/invite_dialog.dart';
 import 'package:duo_client/widgets/user_tile.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
@@ -23,19 +27,40 @@ class LobbyScreen extends ConsumerStatefulWidget {
 
 class _LobbyScreenState extends ConsumerState<LobbyScreen>
     with TickerProviderStateMixin {
+  bool joiningGame = false;
+
+  @override
+  void initState() {
+    super.initState();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  }
+
   @override
   Widget build(BuildContext context) {
     ApiProvider _apiProvider = ref.watch(apiProvider);
     bool creatingLobby =
-        _apiProvider.lobbyStatus == null && _apiProvider.gameId == null;
+        _apiProvider.lobbyStatus == null && _apiProvider.gameId == -1;
     int lobbyId = _apiProvider.lobbyStatus?.lobbyId ?? 0;
-    if (!_apiProvider.hasLobbyStream && _apiProvider.gameId == null) {
-      debugPrint('Lobby Stream: ${_apiProvider.lobbyStatus?.lobbyId}');
-      //Case if lobby is deleted
-      Navigator.of(context).pop();
+    if (_apiProvider.gameId != -1) {
+      setState(() {
+        joiningGame = true;
+        debugPrint('Game Id: ${_apiProvider.gameId}');
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Navigator.of(context).pushReplacementNamed(GameScreen.route);
+        });
+      });
     }
-    if (_apiProvider.gameId != null) {
-      Navigator.of(context).pushNamed(GameScreen.route);
+    if (!_apiProvider.hasLobbyStream && _apiProvider.gameId == null) {
+      setState(() {
+        debugPrint('Lobby Stream: ${_apiProvider.lobbyStatus?.lobbyId}');
+        //Case if lobby is deleted by the Host
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Navigator.of(context).pop();
+        });
+      });
     }
 
     return Scaffold(
@@ -62,17 +87,28 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                 const SizedBox(
                   height: 20,
                 ),
-                const Text(
-                  'Creating Lobby...',
-                  style: TextStyle(fontSize: 20, color: Colors.white70),
+                Text(
+                  joiningGame ? 'Joining Game...' : 'Joining Lobby...',
+                  style: const TextStyle(fontSize: 20, color: Colors.white70),
                 ),
-                lobbyId == -1
-                    ? IconButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        icon: const Icon(Icons.exit_to_app_outlined))
-                    : const SizedBox(),
+                const SizedBox(
+                  height: 20,
+                ),
+                IconButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    icon: const Icon(
+                      Icons.exit_to_app_outlined,
+                      color: Colors.white,
+                    )),
+                const SizedBox(
+                  width: 20,
+                ),
+                const Text(
+                  'Cancel',
+                  style: TextStyle(color: Colors.white),
+                ),
               ],
             )
           : AnimatedBackground(
@@ -111,6 +147,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                         children: [
                           ...(ref.watch(apiProvider).lobbyStatus?.users ?? [])
                               .map((user) {
+                            // TODO: the user.isStack is not working but is in Database correctly
                             return Padding(
                               padding: const EdgeInsets.all(
                                   Constants.defaultPadding / 2),
@@ -166,7 +203,8 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                                             0);
                                 if (status == 0) {
                                   print('Disconnected sucessfully from lobby');
-                                  Navigator.of(context).pop();
+                                  Navigator.of(context)
+                                      .pushReplacementNamed(HomeScreen.route);
                                 } else {
                                   print('Error leaving lobby');
                                 }
@@ -192,13 +230,26 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                                         .where((element) => element.isAdmin)
                                         .first
                                         .uuid) {
-                                  await ref.read(apiProvider).startGame(
-                                      ref.read(storageProvider).accessToken);
+                                  // TODO: change back to 3 players for a game but for testing purposes 2
+                                  if (_apiProvider.lobbyStatus!.users.length <
+                                      2) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                            'You need at least 3 players to start the game'),
+                                      ),
+                                    );
+                                    return;
+                                  }
+                                  String token =
+                                      await ref.read(apiProvider).getToken();
+                                  ref.read(apiProvider).startGame(token);
+                                  joiningGame = true;
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                       content: Text(
-                                          'Only the admin can start the game'),
+                                          'Only the Host can start the game'),
                                     ),
                                   );
                                 }

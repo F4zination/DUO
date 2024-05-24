@@ -123,10 +123,10 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
   set gameState(GameState? _gameState) {}
 
   @override
-  int? gameId;
+  int get gameId => _serverConnection?.gameId ?? -1;
 
   @override
-  bool? isStackOwner;
+  bool get isStackOwner => _serverConnection?.isStackOwner ?? false;
 
   @override
   bool get hasGameStream => _serverConnection?.hasGameStream ?? false;
@@ -142,6 +142,12 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
 
   @override
   bool get hasStackStream => _serverConnection?.hasStackStream ?? false;
+
+  @override
+  set gameId(int? _gameId) {}
+
+  @override
+  set isStackOwner(bool? _isStackOwner) {}
 }
 
 final apiProvider = ChangeNotifierProvider<ApiProvider>((ref) {

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:duo_client/provider/api_provider.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:duo_client/widgets/game_stacks.dart';
@@ -27,7 +29,17 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
-
+    isLoading = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      int status = await ref.read(apiProvider).getGameStateStream(
+          await ref.read(apiProvider).getToken(), ref.read(apiProvider).gameId);
+      if (status != 0) {
+        debugPrint('Error getting game state stream');
+      }
+      setState(() {
+        isLoading = false;
+      });
+    });
     super.initState();
   }
 
@@ -42,8 +54,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement isStack
-    bool isStack = ref.read(apiProvider).isStackOwner ?? false;
+    bool isStack = ref.read(apiProvider).isStackOwner;
     return Scaffold(
       body: isLoading
           ? const Column(

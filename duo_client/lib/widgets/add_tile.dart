@@ -41,18 +41,19 @@ class _AddTileState extends State<AddTile> {
               builder: (context) => widget.Dialog,
             ).then((value) {
               if (value == null) {
-                setState(() {
-                  isLoading = false;
-                });
+                debugPrint('Dialog closed');
                 return;
               }
-              setState(() {
-                watingForPlayer = true;
-                player = Friend()
-                  ..name = value.name
-                  ..uuid = value.uuid
-                  ..state = FriendState.online;
-              });
+              if (value is Friend) {
+                debugPrint('Friend: $value');
+                setState(() {
+                  watingForPlayer = true;
+                  player = Friend()
+                    ..name = value.name
+                    ..uuid = value.uuid
+                    ..state = FriendState.online;
+                });
+              }
             });
           },
           child: Padding(
