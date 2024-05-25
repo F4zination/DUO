@@ -58,6 +58,8 @@ class _DuoAppState extends ConsumerState<DuoApp> {
                 print(
                     'trying to connect to ${ref.read(storageProvider).grpcHost}');
                 ref.read(apiProvider).init(ServerConnectionType.grpc);
+                // wait for 1 seconds to connect to the server
+                await Future.delayed(const Duration(seconds: 30));
                 return await ref
                     .read(apiProvider)
                     .loginUser(ref.read(storageProvider).userId);
