@@ -81,6 +81,7 @@ class _JoinDialogState extends ConsumerState<JoinDialog> {
                         const SizedBox(width: Constants.defaultPadding / 2),
                         IconButton(
                             onPressed: () async {
+                              //Just here pushNamed and not pushReplacementNamed
                               dynamic id = await Navigator.of(context)
                                   .pushNamed(QrCodeScanner.route);
                               if (id != null) {

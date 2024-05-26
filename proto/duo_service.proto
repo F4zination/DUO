@@ -6,21 +6,36 @@ import "game.proto";
 import  "void.proto";
 import "auth_messages.proto";
 import "lobby.proto";
+import "user_state.proto";
+import "friend.proto";
 
 option go_package = "github.com/duo/pb";
 
 
 service DUOService {
+    //Authentication
     rpc Register (RegisterRequest) returns (RegisterResponse) {}
     rpc RequestLoginChallenge(LoginRequest) returns (LoginChallengeRequest) {}
     rpc SubmitLoginChallenge(LoginChallengeResponse) returns (LoginResponse) {}
-    
-    rpc CreateLobby(CreateLobbyRequest) returns (stream LobbyStatus) {}
-    rpc JoinLobby(JoinLobbyRequest) returns (stream LobbyStatus) {}
-    rpc ChangeStackDevice(ChangeStackDeviceRequest) returns (void) {}
-    rpc DisconnectLobby(DisconnectLobbyRequest) returns (DisconnectLobbyResponse) {}  
-    rpc StartGame(StartGameRequest) returns (void) {}
 
+    //Friends and Friend Requests
+    rpc SendFriendRequest(FriendRequestRequest) returns (void) {}
+    rpc SendFriendRequestResponse(FriendRequestResponse) returns (void) {}
+    rpc GetFriendRequests(TokenOnlyRequest) returns (FriendRequestList) {}
+    rpc GetFriendList(TokenOnlyRequest) returns (FriendList) {}
+    rpc DeleteFriend(DeleteFriendRequest) returns (void) {}
+
+    //User State
+    rpc StatusChangeStream(stream StatusChangeRequest) returns (stream void) {}
+    
+    //Lobby
+    rpc CreateLobby(CreateLobbyRequest) returns (stream LobbyStatus) {}
+    rpc ChangeStackDevice(ChangeStackDeviceRequest) returns (void) {}
+    rpc JoinLobby(JoinLobbyRequest) returns (stream LobbyStatus) {}
+    rpc DisconnectLobby(DisconnectLobbyRequest) returns (DisconnectLobbyResponse) {}  
+    rpc StartGame(TokenOnlyRequest) returns (void) {}
+
+    //Game
     rpc GetGameState(GetGameStateRequest) returns (stream GameState) {}
     rpc GetPlayerStream(stream PlayerAction) returns (stream PlayerState) {}
     rpc GetStackStream(StackRequest) returns (stream StackState) {}

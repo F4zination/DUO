@@ -12,23 +12,25 @@ import (
 )
 
 const addFriendRequest = `-- name: AddFriendRequest :one
-INSERT INTO friend_requests (requester_id, requestee_id, status)
-VALUES ($1, $2, 'pending')
+INSERT INTO friend_requests (requester_id, requestee_id, requester_name, status)
+VALUES ($1, $2, $3, 'pending')
 ON CONFLICT (requester_id, requestee_id) DO NOTHING
-RETURNING requester_id, requestee_id, status, created_at
+RETURNING requester_id, requestee_id, requester_name, status, created_at
 `
 
 type AddFriendRequestParams struct {
-	RequesterID uuid.UUID `json:"requester_id"`
-	RequesteeID uuid.UUID `json:"requestee_id"`
+	RequesterID   uuid.UUID `json:"requester_id"`
+	RequesteeID   uuid.UUID `json:"requestee_id"`
+	RequesterName string    `json:"requester_name"`
 }
 
 func (q *Queries) AddFriendRequest(ctx context.Context, arg AddFriendRequestParams) (FriendRequest, error) {
-	row := q.db.QueryRowContext(ctx, addFriendRequest, arg.RequesterID, arg.RequesteeID)
+	row := q.db.QueryRowContext(ctx, addFriendRequest, arg.RequesterID, arg.RequesteeID, arg.RequesterName)
 	var i FriendRequest
 	err := row.Scan(
 		&i.RequesterID,
 		&i.RequesteeID,
+		&i.RequesterName,
 		&i.Status,
 		&i.CreatedAt,
 	)
@@ -60,7 +62,7 @@ func (q *Queries) AddFriendship(ctx context.Context, arg AddFriendshipParams) (F
 const deleteFriendRequest = `-- name: DeleteFriendRequest :one
 DELETE FROM friend_requests
 WHERE requester_id = $1 AND requestee_id = $2
-RETURNING requester_id, requestee_id, status, created_at
+RETURNING requester_id, requestee_id, requester_name, status, created_at
 `
 
 type DeleteFriendRequestParams struct {
@@ -74,6 +76,7 @@ func (q *Queries) DeleteFriendRequest(ctx context.Context, arg DeleteFriendReque
 	err := row.Scan(
 		&i.RequesterID,
 		&i.RequesteeID,
+		&i.RequesterName,
 		&i.Status,
 		&i.CreatedAt,
 	)
@@ -100,20 +103,42 @@ func (q *Queries) DeleteFriendship(ctx context.Context, arg DeleteFriendshipPara
 }
 
 const getFriendsByUserId = `-- name: GetFriendsByUserId :many
-SELECT user1_id, user2_id FROM friendships
+SELECT user1_id, user2_id, uuid, username, user_status, score, public_key FROM friendships JOIN duouser ON (
+    (friendships.user1_id = duouser.id AND friendships.user2_id = $1)
+    OR
+    (friendships.user2_id = duouser.id AND friendships.user1_id = $1)
+)
 WHERE user1_id = $1 OR user2_id = $1
 `
 
-func (q *Queries) GetFriendsByUserId(ctx context.Context, user1ID uuid.UUID) ([]Friendship, error) {
-	rows, err := q.db.QueryContext(ctx, getFriendsByUserId, user1ID)
+type GetFriendsByUserIdRow struct {
+	User1ID    uuid.UUID  `json:"user1_id"`
+	User2ID    uuid.UUID  `json:"user2_id"`
+	Uuid       uuid.UUID  `json:"uuid"`
+	Username   string     `json:"username"`
+	UserStatus Userstatus `json:"user_status"`
+	Score      int32      `json:"score"`
+	PublicKey  string     `json:"public_key"`
+}
+
+func (q *Queries) GetFriendsByUserId(ctx context.Context, user2ID uuid.UUID) ([]GetFriendsByUserIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, getFriendsByUserId, user2ID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Friendship{}
+	items := []GetFriendsByUserIdRow{}
 	for rows.Next() {
-		var i Friendship
-		if err := rows.Scan(&i.User1ID, &i.User2ID); err != nil {
+		var i GetFriendsByUserIdRow
+		if err := rows.Scan(
+			&i.User1ID,
+			&i.User2ID,
+			&i.Uuid,
+			&i.Username,
+			&i.UserStatus,
+			&i.Score,
+			&i.PublicKey,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -128,7 +153,7 @@ func (q *Queries) GetFriendsByUserId(ctx context.Context, user1ID uuid.UUID) ([]
 }
 
 const getOpenFriendRequestByRequesteeId = `-- name: GetOpenFriendRequestByRequesteeId :many
-SELECT requester_id, requestee_id, status, created_at FROM friend_requests
+SELECT requester_id, requestee_id, requester_name, status, created_at FROM friend_requests
 WHERE requestee_id = $1
 AND status = 'pending'
 `
@@ -145,6 +170,7 @@ func (q *Queries) GetOpenFriendRequestByRequesteeId(ctx context.Context, request
 		if err := rows.Scan(
 			&i.RequesterID,
 			&i.RequesteeID,
+			&i.RequesterName,
 			&i.Status,
 			&i.CreatedAt,
 		); err != nil {
@@ -165,7 +191,7 @@ const updateFriendRequestStatus = `-- name: UpdateFriendRequestStatus :one
 UPDATE friend_requests
 SET status = $3
 WHERE requester_id = $1 AND requestee_id = $2
-RETURNING requester_id, requestee_id, status, created_at
+RETURNING requester_id, requestee_id, requester_name, status, created_at
 `
 
 type UpdateFriendRequestStatusParams struct {
@@ -180,6 +206,7 @@ func (q *Queries) UpdateFriendRequestStatus(ctx context.Context, arg UpdateFrien
 	err := row.Scan(
 		&i.RequesterID,
 		&i.RequesteeID,
+		&i.RequesterName,
 		&i.Status,
 		&i.CreatedAt,
 	)

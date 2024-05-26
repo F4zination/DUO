@@ -25,7 +25,7 @@ type Querier interface {
 	DeleteGameState(ctx context.Context, id int32) (GameState, error)
 	DeleteLobbyByID(ctx context.Context, id int32) (Lobby, error)
 	DeleteUserLoginByUUID(ctx context.Context, userUuid uuid.UUID) (UserLogin, error)
-	GetFriendsByUserId(ctx context.Context, user1ID uuid.UUID) ([]Friendship, error)
+	GetFriendsByUserId(ctx context.Context, user2ID uuid.UUID) ([]GetFriendsByUserIdRow, error)
 	GetGameDrawStack(ctx context.Context, gameID int64) ([]GameStackDrawCardRel, error)
 	GetGamePlaceStack(ctx context.Context, gameID int64) ([]GameStackPlaceCardRel, error)
 	GetGameStateById(ctx context.Context, id int32) (GameState, error)
@@ -42,6 +42,7 @@ type Querier interface {
 	UpdateFriendRequestStatus(ctx context.Context, arg UpdateFriendRequestStatusParams) (FriendRequest, error)
 	UpdateGameState(ctx context.Context, arg UpdateGameStateParams) (GameState, error)
 	UpdateStackUUID(ctx context.Context, arg UpdateStackUUIDParams) (Lobby, error)
+	UpdateUserStatus(ctx context.Context, arg UpdateUserStatusParams) (Duouser, error)
 }
 
 var _ Querier = (*Queries)(nil)

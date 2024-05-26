@@ -17,8 +17,8 @@ import 'game.pbenum.dart';
 
 export 'game.pbenum.dart';
 
-class StartGameRequest extends $pb.GeneratedMessage {
-  factory StartGameRequest({
+class TokenOnlyRequest extends $pb.GeneratedMessage {
+  factory TokenOnlyRequest({
     $core.String? token,
   }) {
     final $result = create();
@@ -27,11 +27,11 @@ class StartGameRequest extends $pb.GeneratedMessage {
     }
     return $result;
   }
-  StartGameRequest._() : super();
-  factory StartGameRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory StartGameRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  TokenOnlyRequest._() : super();
+  factory TokenOnlyRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory TokenOnlyRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'StartGameRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'TokenOnlyRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'token')
     ..hasRequiredFields = false
   ;
@@ -40,22 +40,22 @@ class StartGameRequest extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  StartGameRequest clone() => StartGameRequest()..mergeFromMessage(this);
+  TokenOnlyRequest clone() => TokenOnlyRequest()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  StartGameRequest copyWith(void Function(StartGameRequest) updates) => super.copyWith((message) => updates(message as StartGameRequest)) as StartGameRequest;
+  TokenOnlyRequest copyWith(void Function(TokenOnlyRequest) updates) => super.copyWith((message) => updates(message as TokenOnlyRequest)) as TokenOnlyRequest;
 
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  static StartGameRequest create() => StartGameRequest._();
-  StartGameRequest createEmptyInstance() => create();
-  static $pb.PbList<StartGameRequest> createRepeated() => $pb.PbList<StartGameRequest>();
+  static TokenOnlyRequest create() => TokenOnlyRequest._();
+  TokenOnlyRequest createEmptyInstance() => create();
+  static $pb.PbList<TokenOnlyRequest> createRepeated() => $pb.PbList<TokenOnlyRequest>();
   @$core.pragma('dart2js:noInline')
-  static StartGameRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<StartGameRequest>(create);
-  static StartGameRequest? _defaultInstance;
+  static TokenOnlyRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<TokenOnlyRequest>(create);
+  static TokenOnlyRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get token => $_getSZ(0);

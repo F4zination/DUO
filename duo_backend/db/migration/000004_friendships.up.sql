@@ -1,6 +1,7 @@
 CREATE TABLE friend_requests (
     requester_id UUID NOT NULL,
     requestee_id UUID NOT NULL,
+    requester_name VARCHAR(255) NOT NULL, -- for faster lookup
     status VARCHAR(255) NOT NULL, --pending, accepted, rejected
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

@@ -1,3 +1,4 @@
+import 'package:duo_client/pb/friend.pb.dart';
 import 'package:duo_client/provider/api_provider.dart';
 import 'package:duo_client/provider/storage_provider.dart';
 import 'package:duo_client/screens/game_screen.dart';
@@ -55,9 +56,13 @@ class _DuoAppState extends ConsumerState<DuoApp> {
         SplashScreen.route: (context) => SplashScreen(
               onLoading: () async {
                 await ref.read(storageProvider).init();
-                print(
+                debugPrint(
                     'trying to connect to ${ref.read(storageProvider).grpcHost}');
                 ref.read(apiProvider).init(ServerConnectionType.grpc);
+
+                await ref.read(apiProvider).initUserStatusStream();
+                ref.read(apiProvider).sendUserstatusUpdate(
+                    await ref.read(apiProvider).getToken(), FriendState.online);
                 return await ref
                     .read(apiProvider)
                     .loginUser(ref.read(storageProvider).userId);
@@ -66,7 +71,7 @@ class _DuoAppState extends ConsumerState<DuoApp> {
                 if (status == 0) {
                   Navigator.of(context).pushReplacementNamed(HomeScreen.route);
                 } else {
-                  print('User not found');
+                  debugPrint('User not found');
                   showDialog(
                     context: context,
                     builder: (context) => const GetUserDialog(),

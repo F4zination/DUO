@@ -1,3 +1,5 @@
+import 'package:duo_client/pb/friend.pb.dart';
+import 'package:duo_client/pb/friend.pbenum.dart';
 import 'package:duo_client/pb/lobby.pb.dart';
 import 'package:duo_client/pb/game.pb.dart';
 import 'package:flutter/widgets.dart';
@@ -48,7 +50,9 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
   }
 
   Future<String> getToken() async {
-    if (_storageProvider.expireDate?.isBefore(DateTime.now()) ?? false) {
+    if (_storageProvider.expireDate
+            ?.isBefore(DateTime.now().subtract(const Duration(minutes: 2))) ??
+        false) {
       await _serverConnection!.loginUser(_storageProvider.userId);
       return _storageProvider.accessToken;
     }
@@ -111,6 +115,50 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
   }
 
   @override
+  Future<int> initUserStatusStream() async {
+    debugPrint('Init User Status Stream');
+    final response = await _serverConnection!.initUserStatusStream();
+    debugPrint('User Status Stream: $hasUserStatusStream');
+    // notifyListeners();
+    return response;
+  }
+
+  @override
+  void sendUserstatusUpdate(String token, FriendState state) async {
+    if (hasUserStatusStream == false) {
+      debugPrint('No User Status Stream');
+      await initUserStatusStream();
+    }
+    _serverConnection!.sendUserstatusUpdate(token, state);
+  }
+
+  @override
+  Future<int> answerFriendRequest(
+      String token, String requesterId, bool accept) {
+    return _serverConnection!.answerFriendRequest(token, requesterId, accept);
+  }
+
+  @override
+  Future<int> deleteFriend(String token, String friendId) {
+    return _serverConnection!.deleteFriend(token, friendId);
+  }
+
+  @override
+  Future<List<FriendRequest>> getFriendRequests(String token) {
+    return _serverConnection!.getFriendRequests(token);
+  }
+
+  @override
+  Future<List<Friend>> getFriends(String token) {
+    return _serverConnection!.getFriends(token);
+  }
+
+  @override
+  Future<int> sendFriendRequest(String token, String friendId) {
+    return _serverConnection!.sendFriendRequest(token, friendId);
+  }
+
+  @override
   set playerState(PlayerState? _playerState) {}
 
   @override
@@ -136,6 +184,10 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
     debugPrint('Has Lobby Stream: ${_serverConnection?.hasLobbyStream}');
     return _serverConnection?.hasLobbyStream ?? false;
   }
+
+  @override
+  bool get hasUserStatusStream =>
+      _serverConnection?.hasUserStatusStream ?? false;
 
   @override
   bool get hasPlayerStream => _serverConnection?.hasPlayerStream ?? false;

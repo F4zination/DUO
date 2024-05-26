@@ -1,2 +1,2 @@
-DROP TABLE friend_requests;
-DROP TABLE friendships;
+DROP TABLE IF EXISTS friend_requests;
+DROP TABLE IF EXISTS friendships;

@@ -1,3 +1,4 @@
+import 'package:duo_client/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -47,9 +48,13 @@ class _PauseDialogState extends ConsumerState<PauseDialog> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pop();
+                    //TODO: [finn]. wtf is this. why are we popping 3 times
+                    //either use Navigator.of(context).popUntil() or in this case pushReplacementNamed()
+                    // Navigator.of(context).pop();
+                    // Navigator.of(context).pop();
+                    // Navigator.of(context).pop();
+                    Navigator.of(context)
+                        .pushReplacementNamed(HomeScreen.route);
                   },
                   child: const Text('Exit'),
                 ),

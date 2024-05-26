@@ -12,7 +12,7 @@ import (
 )
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO duouser (username, public_key) VALUES ($1, $2) RETURNING uuid, username, public_key
+INSERT INTO duouser (username, public_key) VALUES ($1, $2) RETURNING uuid, username, user_status, score, public_key
 `
 
 type CreateUserParams struct {
@@ -23,7 +23,13 @@ type CreateUserParams struct {
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (Duouser, error) {
 	row := q.db.QueryRowContext(ctx, createUser, arg.Username, arg.PublicKey)
 	var i Duouser
-	err := row.Scan(&i.Uuid, &i.Username, &i.PublicKey)
+	err := row.Scan(
+		&i.Uuid,
+		&i.Username,
+		&i.UserStatus,
+		&i.Score,
+		&i.PublicKey,
+	)
 	return i, err
 }
 
@@ -55,13 +61,19 @@ func (q *Queries) DeleteUserLoginByUUID(ctx context.Context, userUuid uuid.UUID)
 }
 
 const getUserByUUID = `-- name: GetUserByUUID :one
-SELECT uuid, username, public_key FROM duouser WHERE uuid = $1
+SELECT uuid, username, user_status, score, public_key FROM duouser WHERE uuid = $1
 `
 
 func (q *Queries) GetUserByUUID(ctx context.Context, argUuid uuid.UUID) (Duouser, error) {
 	row := q.db.QueryRowContext(ctx, getUserByUUID, argUuid)
 	var i Duouser
-	err := row.Scan(&i.Uuid, &i.Username, &i.PublicKey)
+	err := row.Scan(
+		&i.Uuid,
+		&i.Username,
+		&i.UserStatus,
+		&i.Score,
+		&i.PublicKey,
+	)
 	return i, err
 }
 
@@ -73,5 +85,27 @@ func (q *Queries) GetUserLoginByUUID(ctx context.Context, userUuid uuid.UUID) (U
 	row := q.db.QueryRowContext(ctx, getUserLoginByUUID, userUuid)
 	var i UserLogin
 	err := row.Scan(&i.UserUuid, &i.Challenge, &i.LoginTime)
+	return i, err
+}
+
+const updateUserStatus = `-- name: UpdateUserStatus :one
+UPDATE duouser SET user_status = $2 WHERE uuid = $1 RETURNING uuid, username, user_status, score, public_key
+`
+
+type UpdateUserStatusParams struct {
+	Uuid       uuid.UUID  `json:"uuid"`
+	UserStatus Userstatus `json:"user_status"`
+}
+
+func (q *Queries) UpdateUserStatus(ctx context.Context, arg UpdateUserStatusParams) (Duouser, error) {
+	row := q.db.QueryRowContext(ctx, updateUserStatus, arg.Uuid, arg.UserStatus)
+	var i Duouser
+	err := row.Scan(
+		&i.Uuid,
+		&i.Username,
+		&i.UserStatus,
+		&i.Score,
+		&i.PublicKey,
+	)
 	return i, err
 }

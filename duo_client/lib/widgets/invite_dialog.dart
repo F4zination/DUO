@@ -4,16 +4,17 @@ import 'package:duo_client/utils/constants.dart';
 import 'package:duo_client/widgets/friend_list_tile.dart';
 import 'package:duo_client/widgets/qr_join_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
-class InviteDialog extends StatelessWidget {
+class InviteDialog extends ConsumerWidget {
   InviteDialog({super.key, required this.invideCode});
 
   late final Friend friendInvited;
   final String invideCode;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Dialog(
       backgroundColor: Constants.secondaryColorDark,
       insetPadding: const EdgeInsets.all(20),
@@ -33,7 +34,7 @@ class InviteDialog extends StatelessWidget {
               const SizedBox(height: 20),
               Expanded(
                   child: ListView(
-                children: FriendProvider().friends.map((friend) {
+                children: ref.watch(friendProvider).friends.map((friend) {
                   return FriendListTile(
                     showIcons: false,
                     friend: friend,

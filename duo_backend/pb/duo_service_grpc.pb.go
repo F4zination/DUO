@@ -22,14 +22,25 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DUOServiceClient interface {
+	//Authentication
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	RequestLoginChallenge(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginChallengeRequest, error)
 	SubmitLoginChallenge(ctx context.Context, in *LoginChallengeResponse, opts ...grpc.CallOption) (*LoginResponse, error)
+	//Friends and Friend Requests
+	SendFriendRequest(ctx context.Context, in *FriendRequestRequest, opts ...grpc.CallOption) (*Void, error)
+	SendFriendRequestResponse(ctx context.Context, in *FriendRequestResponse, opts ...grpc.CallOption) (*Void, error)
+	GetFriendRequests(ctx context.Context, in *TokenOnlyRequest, opts ...grpc.CallOption) (*FriendRequestList, error)
+	GetFriendList(ctx context.Context, in *TokenOnlyRequest, opts ...grpc.CallOption) (*FriendList, error)
+	DeleteFriend(ctx context.Context, in *DeleteFriendRequest, opts ...grpc.CallOption) (*Void, error)
+	//User State
+	StatusChangeStream(ctx context.Context, opts ...grpc.CallOption) (DUOService_StatusChangeStreamClient, error)
+	//Lobby
 	CreateLobby(ctx context.Context, in *CreateLobbyRequest, opts ...grpc.CallOption) (DUOService_CreateLobbyClient, error)
-	JoinLobby(ctx context.Context, in *JoinLobbyRequest, opts ...grpc.CallOption) (DUOService_JoinLobbyClient, error)
 	ChangeStackDevice(ctx context.Context, in *ChangeStackDeviceRequest, opts ...grpc.CallOption) (*Void, error)
+	JoinLobby(ctx context.Context, in *JoinLobbyRequest, opts ...grpc.CallOption) (DUOService_JoinLobbyClient, error)
 	DisconnectLobby(ctx context.Context, in *DisconnectLobbyRequest, opts ...grpc.CallOption) (*DisconnectLobbyResponse, error)
-	StartGame(ctx context.Context, in *StartGameRequest, opts ...grpc.CallOption) (*Void, error)
+	StartGame(ctx context.Context, in *TokenOnlyRequest, opts ...grpc.CallOption) (*Void, error)
+	//Game
 	GetGameState(ctx context.Context, in *GetGameStateRequest, opts ...grpc.CallOption) (DUOService_GetGameStateClient, error)
 	GetPlayerStream(ctx context.Context, opts ...grpc.CallOption) (DUOService_GetPlayerStreamClient, error)
 	GetStackStream(ctx context.Context, in *StackRequest, opts ...grpc.CallOption) (DUOService_GetStackStreamClient, error)
@@ -70,8 +81,84 @@ func (c *dUOServiceClient) SubmitLoginChallenge(ctx context.Context, in *LoginCh
 	return out, nil
 }
 
+func (c *dUOServiceClient) SendFriendRequest(ctx context.Context, in *FriendRequestRequest, opts ...grpc.CallOption) (*Void, error) {
+	out := new(Void)
+	err := c.cc.Invoke(ctx, "/pb.DUOService/SendFriendRequest", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dUOServiceClient) SendFriendRequestResponse(ctx context.Context, in *FriendRequestResponse, opts ...grpc.CallOption) (*Void, error) {
+	out := new(Void)
+	err := c.cc.Invoke(ctx, "/pb.DUOService/SendFriendRequestResponse", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dUOServiceClient) GetFriendRequests(ctx context.Context, in *TokenOnlyRequest, opts ...grpc.CallOption) (*FriendRequestList, error) {
+	out := new(FriendRequestList)
+	err := c.cc.Invoke(ctx, "/pb.DUOService/GetFriendRequests", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dUOServiceClient) GetFriendList(ctx context.Context, in *TokenOnlyRequest, opts ...grpc.CallOption) (*FriendList, error) {
+	out := new(FriendList)
+	err := c.cc.Invoke(ctx, "/pb.DUOService/GetFriendList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dUOServiceClient) DeleteFriend(ctx context.Context, in *DeleteFriendRequest, opts ...grpc.CallOption) (*Void, error) {
+	out := new(Void)
+	err := c.cc.Invoke(ctx, "/pb.DUOService/DeleteFriend", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dUOServiceClient) StatusChangeStream(ctx context.Context, opts ...grpc.CallOption) (DUOService_StatusChangeStreamClient, error) {
+	stream, err := c.cc.NewStream(ctx, &DUOService_ServiceDesc.Streams[0], "/pb.DUOService/StatusChangeStream", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &dUOServiceStatusChangeStreamClient{stream}
+	return x, nil
+}
+
+type DUOService_StatusChangeStreamClient interface {
+	Send(*StatusChangeRequest) error
+	Recv() (*Void, error)
+	grpc.ClientStream
+}
+
+type dUOServiceStatusChangeStreamClient struct {
+	grpc.ClientStream
+}
+
+func (x *dUOServiceStatusChangeStreamClient) Send(m *StatusChangeRequest) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *dUOServiceStatusChangeStreamClient) Recv() (*Void, error) {
+	m := new(Void)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 func (c *dUOServiceClient) CreateLobby(ctx context.Context, in *CreateLobbyRequest, opts ...grpc.CallOption) (DUOService_CreateLobbyClient, error) {
-	stream, err := c.cc.NewStream(ctx, &DUOService_ServiceDesc.Streams[0], "/pb.DUOService/CreateLobby", opts...)
+	stream, err := c.cc.NewStream(ctx, &DUOService_ServiceDesc.Streams[1], "/pb.DUOService/CreateLobby", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -102,8 +189,17 @@ func (x *dUOServiceCreateLobbyClient) Recv() (*LobbyStatus, error) {
 	return m, nil
 }
 
+func (c *dUOServiceClient) ChangeStackDevice(ctx context.Context, in *ChangeStackDeviceRequest, opts ...grpc.CallOption) (*Void, error) {
+	out := new(Void)
+	err := c.cc.Invoke(ctx, "/pb.DUOService/ChangeStackDevice", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *dUOServiceClient) JoinLobby(ctx context.Context, in *JoinLobbyRequest, opts ...grpc.CallOption) (DUOService_JoinLobbyClient, error) {
-	stream, err := c.cc.NewStream(ctx, &DUOService_ServiceDesc.Streams[1], "/pb.DUOService/JoinLobby", opts...)
+	stream, err := c.cc.NewStream(ctx, &DUOService_ServiceDesc.Streams[2], "/pb.DUOService/JoinLobby", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -134,15 +230,6 @@ func (x *dUOServiceJoinLobbyClient) Recv() (*LobbyStatus, error) {
 	return m, nil
 }
 
-func (c *dUOServiceClient) ChangeStackDevice(ctx context.Context, in *ChangeStackDeviceRequest, opts ...grpc.CallOption) (*Void, error) {
-	out := new(Void)
-	err := c.cc.Invoke(ctx, "/pb.DUOService/ChangeStackDevice", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *dUOServiceClient) DisconnectLobby(ctx context.Context, in *DisconnectLobbyRequest, opts ...grpc.CallOption) (*DisconnectLobbyResponse, error) {
 	out := new(DisconnectLobbyResponse)
 	err := c.cc.Invoke(ctx, "/pb.DUOService/DisconnectLobby", in, out, opts...)
@@ -152,7 +239,7 @@ func (c *dUOServiceClient) DisconnectLobby(ctx context.Context, in *DisconnectLo
 	return out, nil
 }
 
-func (c *dUOServiceClient) StartGame(ctx context.Context, in *StartGameRequest, opts ...grpc.CallOption) (*Void, error) {
+func (c *dUOServiceClient) StartGame(ctx context.Context, in *TokenOnlyRequest, opts ...grpc.CallOption) (*Void, error) {
 	out := new(Void)
 	err := c.cc.Invoke(ctx, "/pb.DUOService/StartGame", in, out, opts...)
 	if err != nil {
@@ -162,7 +249,7 @@ func (c *dUOServiceClient) StartGame(ctx context.Context, in *StartGameRequest, 
 }
 
 func (c *dUOServiceClient) GetGameState(ctx context.Context, in *GetGameStateRequest, opts ...grpc.CallOption) (DUOService_GetGameStateClient, error) {
-	stream, err := c.cc.NewStream(ctx, &DUOService_ServiceDesc.Streams[2], "/pb.DUOService/GetGameState", opts...)
+	stream, err := c.cc.NewStream(ctx, &DUOService_ServiceDesc.Streams[3], "/pb.DUOService/GetGameState", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -194,7 +281,7 @@ func (x *dUOServiceGetGameStateClient) Recv() (*GameState, error) {
 }
 
 func (c *dUOServiceClient) GetPlayerStream(ctx context.Context, opts ...grpc.CallOption) (DUOService_GetPlayerStreamClient, error) {
-	stream, err := c.cc.NewStream(ctx, &DUOService_ServiceDesc.Streams[3], "/pb.DUOService/GetPlayerStream", opts...)
+	stream, err := c.cc.NewStream(ctx, &DUOService_ServiceDesc.Streams[4], "/pb.DUOService/GetPlayerStream", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -225,7 +312,7 @@ func (x *dUOServiceGetPlayerStreamClient) Recv() (*PlayerState, error) {
 }
 
 func (c *dUOServiceClient) GetStackStream(ctx context.Context, in *StackRequest, opts ...grpc.CallOption) (DUOService_GetStackStreamClient, error) {
-	stream, err := c.cc.NewStream(ctx, &DUOService_ServiceDesc.Streams[4], "/pb.DUOService/GetStackStream", opts...)
+	stream, err := c.cc.NewStream(ctx, &DUOService_ServiceDesc.Streams[5], "/pb.DUOService/GetStackStream", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -260,14 +347,25 @@ func (x *dUOServiceGetStackStreamClient) Recv() (*StackState, error) {
 // All implementations must embed UnimplementedDUOServiceServer
 // for forward compatibility
 type DUOServiceServer interface {
+	//Authentication
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	RequestLoginChallenge(context.Context, *LoginRequest) (*LoginChallengeRequest, error)
 	SubmitLoginChallenge(context.Context, *LoginChallengeResponse) (*LoginResponse, error)
+	//Friends and Friend Requests
+	SendFriendRequest(context.Context, *FriendRequestRequest) (*Void, error)
+	SendFriendRequestResponse(context.Context, *FriendRequestResponse) (*Void, error)
+	GetFriendRequests(context.Context, *TokenOnlyRequest) (*FriendRequestList, error)
+	GetFriendList(context.Context, *TokenOnlyRequest) (*FriendList, error)
+	DeleteFriend(context.Context, *DeleteFriendRequest) (*Void, error)
+	//User State
+	StatusChangeStream(DUOService_StatusChangeStreamServer) error
+	//Lobby
 	CreateLobby(*CreateLobbyRequest, DUOService_CreateLobbyServer) error
-	JoinLobby(*JoinLobbyRequest, DUOService_JoinLobbyServer) error
 	ChangeStackDevice(context.Context, *ChangeStackDeviceRequest) (*Void, error)
+	JoinLobby(*JoinLobbyRequest, DUOService_JoinLobbyServer) error
 	DisconnectLobby(context.Context, *DisconnectLobbyRequest) (*DisconnectLobbyResponse, error)
-	StartGame(context.Context, *StartGameRequest) (*Void, error)
+	StartGame(context.Context, *TokenOnlyRequest) (*Void, error)
+	//Game
 	GetGameState(*GetGameStateRequest, DUOService_GetGameStateServer) error
 	GetPlayerStream(DUOService_GetPlayerStreamServer) error
 	GetStackStream(*StackRequest, DUOService_GetStackStreamServer) error
@@ -287,19 +385,37 @@ func (UnimplementedDUOServiceServer) RequestLoginChallenge(context.Context, *Log
 func (UnimplementedDUOServiceServer) SubmitLoginChallenge(context.Context, *LoginChallengeResponse) (*LoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SubmitLoginChallenge not implemented")
 }
+func (UnimplementedDUOServiceServer) SendFriendRequest(context.Context, *FriendRequestRequest) (*Void, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendFriendRequest not implemented")
+}
+func (UnimplementedDUOServiceServer) SendFriendRequestResponse(context.Context, *FriendRequestResponse) (*Void, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendFriendRequestResponse not implemented")
+}
+func (UnimplementedDUOServiceServer) GetFriendRequests(context.Context, *TokenOnlyRequest) (*FriendRequestList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFriendRequests not implemented")
+}
+func (UnimplementedDUOServiceServer) GetFriendList(context.Context, *TokenOnlyRequest) (*FriendList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFriendList not implemented")
+}
+func (UnimplementedDUOServiceServer) DeleteFriend(context.Context, *DeleteFriendRequest) (*Void, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteFriend not implemented")
+}
+func (UnimplementedDUOServiceServer) StatusChangeStream(DUOService_StatusChangeStreamServer) error {
+	return status.Errorf(codes.Unimplemented, "method StatusChangeStream not implemented")
+}
 func (UnimplementedDUOServiceServer) CreateLobby(*CreateLobbyRequest, DUOService_CreateLobbyServer) error {
 	return status.Errorf(codes.Unimplemented, "method CreateLobby not implemented")
-}
-func (UnimplementedDUOServiceServer) JoinLobby(*JoinLobbyRequest, DUOService_JoinLobbyServer) error {
-	return status.Errorf(codes.Unimplemented, "method JoinLobby not implemented")
 }
 func (UnimplementedDUOServiceServer) ChangeStackDevice(context.Context, *ChangeStackDeviceRequest) (*Void, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ChangeStackDevice not implemented")
 }
+func (UnimplementedDUOServiceServer) JoinLobby(*JoinLobbyRequest, DUOService_JoinLobbyServer) error {
+	return status.Errorf(codes.Unimplemented, "method JoinLobby not implemented")
+}
 func (UnimplementedDUOServiceServer) DisconnectLobby(context.Context, *DisconnectLobbyRequest) (*DisconnectLobbyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DisconnectLobby not implemented")
 }
-func (UnimplementedDUOServiceServer) StartGame(context.Context, *StartGameRequest) (*Void, error) {
+func (UnimplementedDUOServiceServer) StartGame(context.Context, *TokenOnlyRequest) (*Void, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method StartGame not implemented")
 }
 func (UnimplementedDUOServiceServer) GetGameState(*GetGameStateRequest, DUOService_GetGameStateServer) error {
@@ -378,6 +494,122 @@ func _DUOService_SubmitLoginChallenge_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _DUOService_SendFriendRequest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FriendRequestRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DUOServiceServer).SendFriendRequest(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.DUOService/SendFriendRequest",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DUOServiceServer).SendFriendRequest(ctx, req.(*FriendRequestRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DUOService_SendFriendRequestResponse_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FriendRequestResponse)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DUOServiceServer).SendFriendRequestResponse(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.DUOService/SendFriendRequestResponse",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DUOServiceServer).SendFriendRequestResponse(ctx, req.(*FriendRequestResponse))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DUOService_GetFriendRequests_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TokenOnlyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DUOServiceServer).GetFriendRequests(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.DUOService/GetFriendRequests",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DUOServiceServer).GetFriendRequests(ctx, req.(*TokenOnlyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DUOService_GetFriendList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TokenOnlyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DUOServiceServer).GetFriendList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.DUOService/GetFriendList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DUOServiceServer).GetFriendList(ctx, req.(*TokenOnlyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DUOService_DeleteFriend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteFriendRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DUOServiceServer).DeleteFriend(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.DUOService/DeleteFriend",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DUOServiceServer).DeleteFriend(ctx, req.(*DeleteFriendRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DUOService_StatusChangeStream_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(DUOServiceServer).StatusChangeStream(&dUOServiceStatusChangeStreamServer{stream})
+}
+
+type DUOService_StatusChangeStreamServer interface {
+	Send(*Void) error
+	Recv() (*StatusChangeRequest, error)
+	grpc.ServerStream
+}
+
+type dUOServiceStatusChangeStreamServer struct {
+	grpc.ServerStream
+}
+
+func (x *dUOServiceStatusChangeStreamServer) Send(m *Void) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *dUOServiceStatusChangeStreamServer) Recv() (*StatusChangeRequest, error) {
+	m := new(StatusChangeRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 func _DUOService_CreateLobby_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(CreateLobbyRequest)
 	if err := stream.RecvMsg(m); err != nil {
@@ -397,6 +629,24 @@ type dUOServiceCreateLobbyServer struct {
 
 func (x *dUOServiceCreateLobbyServer) Send(m *LobbyStatus) error {
 	return x.ServerStream.SendMsg(m)
+}
+
+func _DUOService_ChangeStackDevice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ChangeStackDeviceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DUOServiceServer).ChangeStackDevice(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.DUOService/ChangeStackDevice",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DUOServiceServer).ChangeStackDevice(ctx, req.(*ChangeStackDeviceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _DUOService_JoinLobby_Handler(srv interface{}, stream grpc.ServerStream) error {
@@ -420,24 +670,6 @@ func (x *dUOServiceJoinLobbyServer) Send(m *LobbyStatus) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func _DUOService_ChangeStackDevice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ChangeStackDeviceRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(DUOServiceServer).ChangeStackDevice(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/pb.DUOService/ChangeStackDevice",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DUOServiceServer).ChangeStackDevice(ctx, req.(*ChangeStackDeviceRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _DUOService_DisconnectLobby_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DisconnectLobbyRequest)
 	if err := dec(in); err != nil {
@@ -457,7 +689,7 @@ func _DUOService_DisconnectLobby_Handler(srv interface{}, ctx context.Context, d
 }
 
 func _DUOService_StartGame_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(StartGameRequest)
+	in := new(TokenOnlyRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -469,7 +701,7 @@ func _DUOService_StartGame_Handler(srv interface{}, ctx context.Context, dec fun
 		FullMethod: "/pb.DUOService/StartGame",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DUOServiceServer).StartGame(ctx, req.(*StartGameRequest))
+		return srv.(DUOServiceServer).StartGame(ctx, req.(*TokenOnlyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -562,6 +794,26 @@ var DUOService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _DUOService_SubmitLoginChallenge_Handler,
 		},
 		{
+			MethodName: "SendFriendRequest",
+			Handler:    _DUOService_SendFriendRequest_Handler,
+		},
+		{
+			MethodName: "SendFriendRequestResponse",
+			Handler:    _DUOService_SendFriendRequestResponse_Handler,
+		},
+		{
+			MethodName: "GetFriendRequests",
+			Handler:    _DUOService_GetFriendRequests_Handler,
+		},
+		{
+			MethodName: "GetFriendList",
+			Handler:    _DUOService_GetFriendList_Handler,
+		},
+		{
+			MethodName: "DeleteFriend",
+			Handler:    _DUOService_DeleteFriend_Handler,
+		},
+		{
 			MethodName: "ChangeStackDevice",
 			Handler:    _DUOService_ChangeStackDevice_Handler,
 		},
@@ -575,6 +827,12 @@ var DUOService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "StatusChangeStream",
+			Handler:       _DUOService_StatusChangeStream_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
 		{
 			StreamName:    "CreateLobby",
 			Handler:       _DUOService_CreateLobby_Handler,

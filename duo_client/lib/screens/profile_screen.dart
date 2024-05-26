@@ -39,7 +39,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
             ),
             onPressed: () {
-              Navigator.of(context).pushNamed(GameScreen.route);
+              Navigator.of(context).pushReplacementNamed(GameScreen.route);
             },
           ),
           const SizedBox(width: Constants.defaultPadding / 2),

@@ -6,22 +6,71 @@ package db
 
 import (
 	"database/sql"
+	"database/sql/driver"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
 )
 
+type Userstatus string
+
+const (
+	UserstatusOnline  Userstatus = "online"
+	UserstatusInLobby Userstatus = "inLobby"
+	UserstatusInGame  Userstatus = "inGame"
+	UserstatusOffline Userstatus = "offline"
+)
+
+func (e *Userstatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = Userstatus(s)
+	case string:
+		*e = Userstatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for Userstatus: %T", src)
+	}
+	return nil
+}
+
+type NullUserstatus struct {
+	Userstatus Userstatus `json:"userstatus"`
+	Valid      bool       `json:"valid"` // Valid is true if Userstatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullUserstatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.Userstatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.Userstatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullUserstatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.Userstatus), nil
+}
+
 type Duouser struct {
-	Uuid      uuid.UUID `json:"uuid"`
-	Username  string    `json:"username"`
-	PublicKey string    `json:"public_key"`
+	Uuid       uuid.UUID  `json:"uuid"`
+	Username   string     `json:"username"`
+	UserStatus Userstatus `json:"user_status"`
+	Score      int32      `json:"score"`
+	PublicKey  string     `json:"public_key"`
 }
 
 type FriendRequest struct {
-	RequesterID uuid.UUID `json:"requester_id"`
-	RequesteeID uuid.UUID `json:"requestee_id"`
-	Status      string    `json:"status"`
-	CreatedAt   time.Time `json:"created_at"`
+	RequesterID   uuid.UUID `json:"requester_id"`
+	RequesteeID   uuid.UUID `json:"requestee_id"`
+	RequesterName string    `json:"requester_name"`
+	Status        string    `json:"status"`
+	CreatedAt     time.Time `json:"created_at"`
 }
 
 type Friendship struct {

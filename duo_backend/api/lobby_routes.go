@@ -121,7 +121,7 @@ func (server *Server) DisconnectLobby(ctx context.Context, req *pb.DisconnectLob
 	return &pb.DisconnectLobbyResponse{Success: true}, nil
 }
 
-func (server *Server) StartGame(context context.Context, req *pb.StartGameRequest) (*pb.Void, error) {
+func (server *Server) StartGame(context context.Context, req *pb.TokenOnlyRequest) (*pb.Void, error) {
 	payload, tokenErr := server.Maker.VerifyToken(req.Token)
 	if tokenErr != nil {
 		log.Printf("error verifying token: %v", tokenErr)

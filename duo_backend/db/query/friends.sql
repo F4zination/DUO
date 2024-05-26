@@ -1,6 +1,6 @@
 -- name: AddFriendRequest :one
-INSERT INTO friend_requests (requester_id, requestee_id, status)
-VALUES ($1, $2, 'pending')
+INSERT INTO friend_requests (requester_id, requestee_id, requester_name, status)
+VALUES ($1, $2, $3, 'pending')
 ON CONFLICT (requester_id, requestee_id) DO NOTHING
 RETURNING *;
 
@@ -21,7 +21,11 @@ WHERE requestee_id = $1
 AND status = 'pending';
 
 -- name: GetFriendsByUserId :many
-SELECT * FROM friendships
+SELECT * FROM friendships JOIN duouser ON (
+    (friendships.user1_id = duouser.id AND friendships.user2_id = $1)
+    OR
+    (friendships.user2_id = duouser.id AND friendships.user1_id = $1)
+)
 WHERE user1_id = $1 OR user2_id = $1;
 
 -- name: AddFriendship :one

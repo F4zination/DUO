@@ -26,17 +26,17 @@ const Direction$json = {
 final $typed_data.Uint8List directionDescriptor = $convert.base64Decode(
     'CglEaXJlY3Rpb24SDQoJQ0xPQ0tXSVNFEAASFQoRQ09VTlRFUl9DTE9DS1dJU0UQAQ==');
 
-@$core.Deprecated('Use startGameRequestDescriptor instead')
-const StartGameRequest$json = {
-  '1': 'StartGameRequest',
+@$core.Deprecated('Use tokenOnlyRequestDescriptor instead')
+const TokenOnlyRequest$json = {
+  '1': 'TokenOnlyRequest',
   '2': [
     {'1': 'token', '3': 1, '4': 1, '5': 9, '10': 'token'},
   ],
 };
 
-/// Descriptor for `StartGameRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List startGameRequestDescriptor = $convert.base64Decode(
-    'ChBTdGFydEdhbWVSZXF1ZXN0EhQKBXRva2VuGAEgASgJUgV0b2tlbg==');
+/// Descriptor for `TokenOnlyRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List tokenOnlyRequestDescriptor = $convert.base64Decode(
+    'ChBUb2tlbk9ubHlSZXF1ZXN0EhQKBXRva2VuGAEgASgJUgV0b2tlbg==');
 
 @$core.Deprecated('Use getGameStateRequestDescriptor instead')
 const GetGameStateRequest$json = {

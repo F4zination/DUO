@@ -8,9 +8,13 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO duo_user;
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
+CREATE TYPE USERSTATUS AS ENUM ('online', 'inLobby', 'inGame', 'offline');
+
 CREATE TABLE IF NOT EXISTS duouser (
     uuid UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     username VARCHAR(255) NOT NULL,
+    user_status USERSTATUS NOT NULL DEFAULT 'offline',
+    score INT NOT NULL DEFAULT 0,
     public_key TEXT NOT NULL
 );
 
@@ -22,3 +26,4 @@ CREATE TABLE IF NOT EXISTS user_login (
 
 ALTER TABLE user_login ADD CONSTRAINT fk_user_id FOREIGN KEY (user_uuid) REFERENCES duouser(uuid) ON DELETE CASCADE;
 CREATE INDEX IF NOT EXISTS user_login_time_idx ON user_login (login_time);
+

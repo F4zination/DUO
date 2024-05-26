@@ -1,6 +1,5 @@
-import 'dart:math';
-
 import 'package:animated_background/animated_background.dart';
+import 'package:duo_client/pb/friend.pb.dart';
 import 'package:duo_client/pb/user.pb.dart';
 import 'package:duo_client/provider/api_provider.dart';
 import 'package:duo_client/provider/storage_provider.dart';
@@ -32,6 +31,10 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      ref.read(apiProvider).sendUserstatusUpdate(
+          await ref.read(apiProvider).getToken(), FriendState.inLobby);
+    });
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
@@ -53,12 +56,12 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
         });
       });
     }
-    if (!_apiProvider.hasLobbyStream && _apiProvider.gameId == null) {
+    if (_apiProvider.gameId == null && !_apiProvider.hasLobbyStream) {
       setState(() {
         debugPrint('Lobby Stream: ${_apiProvider.lobbyStatus?.lobbyId}');
         //Case if lobby is deleted by the Host
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          Navigator.of(context).pop();
+          Navigator.of(context).pushReplacementNamed(HomeScreen.route);
         });
       });
     }
@@ -96,7 +99,8 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                 ),
                 IconButton(
                     onPressed: () {
-                      Navigator.of(context).pop();
+                      Navigator.of(context)
+                          .pushReplacementNamed(HomeScreen.route);
                     },
                     icon: const Icon(
                       Icons.exit_to_app_outlined,
@@ -232,7 +236,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                                         .uuid) {
                                   // TODO: change back to 3 players for a game but for testing purposes 2
                                   if (_apiProvider.lobbyStatus!.users.length <
-                                      2) {
+                                      0) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                         content: Text(

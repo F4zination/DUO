@@ -48,7 +48,8 @@ class _GameDialogState extends ConsumerState<GameDialog> {
                       ref.read(apiProvider).createLobby(
                           ref.read(storageProvider).accessToken,
                           Constants.maxPlayers);
-                      Navigator.of(context).pushNamed(LobbyScreen.route);
+                      Navigator.of(context)
+                          .pushReplacementNamed(LobbyScreen.route);
                     },
                     backgroundColor: Constants.primaryColor,
                     icon: 'res/icons/wifi_house.svg',

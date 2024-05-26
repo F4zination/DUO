@@ -1,5 +1,4 @@
-import 'dart:developer';
-
+import 'package:duo_client/pb/friend.pb.dart';
 import 'package:duo_client/provider/api_provider.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:duo_client/widgets/game_stacks.dart';
@@ -33,6 +32,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       int status = await ref.read(apiProvider).getGameStateStream(
           await ref.read(apiProvider).getToken(), ref.read(apiProvider).gameId);
+      ref.read(apiProvider).sendUserstatusUpdate(
+          await ref.read(apiProvider).getToken(), FriendState.inGame);
       if (status != 0) {
         debugPrint('Error getting game state stream');
       }

@@ -11,6 +11,7 @@ services:
       - app.env
     depends_on:
       - "duo_db"
+    restart: "always"
   duo_db:
     container_name: "duo_db"
     image: "postgres"

@@ -5,7 +5,7 @@ package pb;
 option go_package = "github.com/duo/pb";
 
 
-message StartGameRequest {
+message TokenOnlyRequest {
     string token = 1;
 }
 

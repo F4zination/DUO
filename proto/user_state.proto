@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+import "friend.proto";
+
+package pb;
+
+option go_package = "github.com/duo/pb";
+
+message StatusChangeRequest {
+    string token = 1;
+    FriendState status = 2;
+}

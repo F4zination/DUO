@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package friend;
+package pb;
 
 option go_package = "github.com/duo/pb";
 
@@ -12,8 +12,40 @@ enum FriendState {
 }
 
 message Friend {
-    string uuid = 1;
+    string uuid = 1; //user uuid
     string name = 2;
     int32 score = 3;
     FriendState state = 4;
+}
+
+message FriendList {
+    // string token = 1;
+    repeated Friend friends = 2;
+}
+
+message FriendRequestRequest {
+    string token = 1; //token of requester
+    string target_id = 2;
+    string requester_name = 3;
+}
+
+message FriendRequest {
+    string requester_uuid = 1;
+    string requester_name = 2;
+    string target_uuid = 3;
+}
+
+message FriendRequestList {
+    repeated FriendRequest requests = 2;
+}
+
+message FriendRequestResponse {
+    string token = 1; //token of target
+    string requester_id = 2;
+    bool accept = 3;
+}
+
+message DeleteFriendRequest {
+    string token = 1;
+    string target_id = 2;
 }

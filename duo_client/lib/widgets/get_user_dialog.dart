@@ -88,7 +88,7 @@ class _GetUserDialogState extends ConsumerState<GetUserDialog> {
                             Navigator.of(context)
                                 .pushReplacementNamed(HomeScreen.route);
                           } else {
-                            print('Username not available');
+                            debugPrint('Username not available');
                             setState(() {
                               wrongUsername = true;
                               hintText = 'User not found';

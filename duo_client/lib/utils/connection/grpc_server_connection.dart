@@ -1,7 +1,10 @@
 import 'dart:convert';
 import 'dart:async';
-import 'dart:developer';
+import 'dart:ffi';
+import 'package:duo_client/pb/friend.pb.dart';
 import 'package:duo_client/pb/lobby.pb.dart';
+import 'package:duo_client/pb/user_state.pb.dart';
+import 'package:duo_client/pb/void.pb.dart';
 import 'package:duo_client/provider/storage_provider.dart';
 
 import '../../pb/auth_messages.pb.dart';
@@ -25,7 +28,10 @@ class GrpcServerConnection extends AbstractServerConnection {
   ResponseStream<GameState>? gameStream;
   ResponseStream<PlayerState>? playerStream;
   ResponseStream<StackState>? stackStream;
-  Stream<PlayerAction> playerActionStream = Stream.empty();
+  StreamController<StatusChangeRequest>? userStatusStreamController;
+  ResponseStream<void_>? userStatusAckStream;
+  // Stream<StatusChangeRequest>? userStatusStream;
+  Stream<PlayerAction> playerActionStream = const Stream.empty();
   StreamController<PlayerAction> playerActionStreamController =
       StreamController<PlayerAction>.broadcast();
 
@@ -155,7 +161,7 @@ class GrpcServerConnection extends AbstractServerConnection {
         },
         cancelOnError: true,
         onError: (e) {
-          debugPrint('Error: $e');
+          debugPrint('Error in Lobby Stream: $e');
         },
         onDone: () {
           lobbyStatus = null;
@@ -165,7 +171,7 @@ class GrpcServerConnection extends AbstractServerConnection {
         },
       );
     } catch (e) {
-      print('Error: $e');
+      print('Error in Lobby Stream: $e');
       return -1;
     }
     return 0;
@@ -210,7 +216,7 @@ class GrpcServerConnection extends AbstractServerConnection {
         },
         cancelOnError: true,
         onError: (e) {
-          debugPrint('Error: $e');
+          debugPrint('Error in Lobby Stream: $e');
           return -1;
         },
         onDone: () {
@@ -255,7 +261,7 @@ class GrpcServerConnection extends AbstractServerConnection {
   Future<int> startGame(String token) async {
     try {
       debugPrint('Starting game...');
-      await client.startGame(StartGameRequest(
+      await client.startGame(TokenOnlyRequest(
         token: token,
       ));
     } catch (e) {
@@ -366,6 +372,144 @@ class GrpcServerConnection extends AbstractServerConnection {
   }
 
   @override
+  Future<int> initUserStatusStream() async {
+    debugPrint('Has User Status Stream: $hasUserStatusStream');
+    try {
+      final streamEstablishedCompleter = Completer<void>();
+      if (!hasUserStatusStream) {
+        userStatusStreamController =
+            StreamController<StatusChangeRequest>.broadcast(
+          onCancel: () =>
+              debugPrint('Stream controller for user status update cancelled'),
+        );
+        _notifyListeners();
+      }
+      final responseStream =
+          client.statusChangeStream(userStatusStreamController!.stream,
+              options: CallOptions(
+                timeout: const Duration(days: 1),
+              ));
+      userStatusAckStream = responseStream;
+      userStatusAckStream?.listen(
+        (_) {
+          if (!streamEstablishedCompleter.isCompleted) {
+            if (!streamEstablishedCompleter.isCompleted) {
+              streamEstablishedCompleter.complete();
+            }
+            debugPrint('User status stream acknowledge received');
+          }
+        },
+        onError: (error) {
+          if (!streamEstablishedCompleter.isCompleted) {
+            streamEstablishedCompleter.completeError(error);
+            userStatusAckStream?.cancel();
+            userStatusAckStream = null;
+            _notifyListeners();
+          }
+          debugPrint('Error establishing user status stream: $error');
+        },
+        onDone: () {
+          debugPrint('User status stream done');
+          userStatusAckStream = null;
+          _notifyListeners();
+        },
+        cancelOnError: true,
+      );
+
+      await streamEstablishedCompleter.future;
+      _notifyListeners();
+      return 0;
+    } catch (e) {
+      debugPrint('Error sending userstatus update: $e');
+      return -1;
+    }
+  }
+
+  @override
+  void sendUserstatusUpdate(String token, FriendState state) {
+    if (!hasUserStatusStream) {
+      debugPrint('User status stream not established');
+      return;
+    }
+    userStatusStreamController!.add(StatusChangeRequest(
+      token: token,
+      status: state,
+    ));
+  }
+
+  @override
+  Future<int> answerFriendRequest(
+      String token, String requesterId, bool accept) async {
+    try {
+      await client.sendFriendRequestResponse(FriendRequestResponse(
+        token: token,
+        requesterId: requesterId,
+        accept: accept,
+      ));
+      return 0;
+    } catch (e) {
+      debugPrint('Error answering friend request: $e');
+      return -1;
+    }
+  }
+
+  @override
+  Future<int> deleteFriend(String token, String friendId) async {
+    try {
+      client.deleteFriend(DeleteFriendRequest(
+        token: token,
+        targetId: friendId,
+      ));
+      return 0;
+    } catch (e) {
+      debugPrint('Error deleting friend: $e');
+      return -1;
+    }
+  }
+
+  @override
+  Future<List<FriendRequest>> getFriendRequests(String token) async {
+    try {
+      FriendRequestList response =
+          await client.getFriendRequests(TokenOnlyRequest(
+        token: token,
+      ));
+      return response.requests;
+    } catch (e) {
+      debugPrint('Error fetching friend requests: $e');
+      return [];
+    }
+  }
+
+  @override
+  Future<List<Friend>> getFriends(String token) async {
+    try {
+      FriendList response = await client.getFriendList(TokenOnlyRequest(
+        token: token,
+      ));
+      return response.friends;
+    } catch (e) {
+      debugPrint('Error fetching friends: $e');
+      return [];
+    }
+  }
+
+  @override
+  Future<int> sendFriendRequest(String token, String friendId) async {
+    try {
+      await client.sendFriendRequest(FriendRequestRequest(
+        requesterName: _storage.username,
+        token: token,
+        targetId: friendId,
+      ));
+      return 0;
+    } catch (e) {
+      debugPrint('Error sending friend request: $e');
+      return -1;
+    }
+  }
+
+  @override
   bool get hasGameStream => gameStream != null;
 
   @override
@@ -376,4 +520,8 @@ class GrpcServerConnection extends AbstractServerConnection {
 
   @override
   bool get hasStackStream => stackStream != null;
+
+  @override
+  bool get hasUserStatusStream =>
+      userStatusAckStream != null && userStatusStreamController != null;
 }

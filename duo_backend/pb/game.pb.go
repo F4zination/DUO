@@ -115,7 +115,7 @@ func (PlayerAction_ActionType) EnumDescriptor() ([]byte, []int) {
 	return file_game_proto_rawDescGZIP(), []int{5, 0}
 }
 
-type StartGameRequest struct {
+type TokenOnlyRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -123,8 +123,8 @@ type StartGameRequest struct {
 	Token string `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
 }
 
-func (x *StartGameRequest) Reset() {
-	*x = StartGameRequest{}
+func (x *TokenOnlyRequest) Reset() {
+	*x = TokenOnlyRequest{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_game_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -132,13 +132,13 @@ func (x *StartGameRequest) Reset() {
 	}
 }
 
-func (x *StartGameRequest) String() string {
+func (x *TokenOnlyRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*StartGameRequest) ProtoMessage() {}
+func (*TokenOnlyRequest) ProtoMessage() {}
 
-func (x *StartGameRequest) ProtoReflect() protoreflect.Message {
+func (x *TokenOnlyRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_game_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -150,12 +150,12 @@ func (x *StartGameRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use StartGameRequest.ProtoReflect.Descriptor instead.
-func (*StartGameRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use TokenOnlyRequest.ProtoReflect.Descriptor instead.
+func (*TokenOnlyRequest) Descriptor() ([]byte, []int) {
 	return file_game_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *StartGameRequest) GetToken() string {
+func (x *TokenOnlyRequest) GetToken() string {
 	if x != nil {
 		return x.Token
 	}
@@ -717,7 +717,7 @@ var File_game_proto protoreflect.FileDescriptor
 
 var file_game_proto_rawDesc = []byte{
 	0x0a, 0x0a, 0x67, 0x61, 0x6d, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x02, 0x70, 0x62,
-	0x22, 0x28, 0x0a, 0x10, 0x53, 0x74, 0x61, 0x72, 0x74, 0x47, 0x61, 0x6d, 0x65, 0x52, 0x65, 0x71,
+	0x22, 0x28, 0x0a, 0x10, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x4f, 0x6e, 0x6c, 0x79, 0x52, 0x65, 0x71,
 	0x75, 0x65, 0x73, 0x74, 0x12, 0x14, 0x0a, 0x05, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x18, 0x01, 0x20,
 	0x01, 0x28, 0x09, 0x52, 0x05, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x22, 0x44, 0x0a, 0x13, 0x47, 0x65,
 	0x74, 0x47, 0x61, 0x6d, 0x65, 0x53, 0x74, 0x61, 0x74, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
@@ -811,7 +811,7 @@ var file_game_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_game_proto_goTypes = []interface{}{
 	(Direction)(0),               // 0: pb.Direction
 	(PlayerAction_ActionType)(0), // 1: pb.PlayerAction.ActionType
-	(*StartGameRequest)(nil),     // 2: pb.StartGameRequest
+	(*TokenOnlyRequest)(nil),     // 2: pb.TokenOnlyRequest
 	(*GetGameStateRequest)(nil),  // 3: pb.GetGameStateRequest
 	(*GameState)(nil),            // 4: pb.GameState
 	(*PlayerState)(nil),          // 5: pb.PlayerState
@@ -843,7 +843,7 @@ func file_game_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_game_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*StartGameRequest); i {
+			switch v := v.(*TokenOnlyRequest); i {
 			case 0:
 				return &v.state
 			case 1:

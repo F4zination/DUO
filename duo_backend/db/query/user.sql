@@ -12,3 +12,6 @@ SELECT * FROM user_login WHERE user_uuid = $1 LIMIT 1;
 
 -- name: DeleteUserLoginByUUID :one
 DELETE FROM user_login WHERE user_uuid = $1 RETURNING *;
+
+-- name: UpdateUserStatus :one
+UPDATE duouser SET user_status = $2 WHERE uuid = $1 RETURNING *;
