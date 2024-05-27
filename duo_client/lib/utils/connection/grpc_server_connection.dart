@@ -6,6 +6,7 @@ import 'package:duo_client/pb/lobby.pb.dart';
 import 'package:duo_client/pb/notification.pb.dart' as notification;
 import 'package:duo_client/pb/user_state.pb.dart';
 import 'package:duo_client/pb/void.pb.dart';
+import 'package:duo_client/provider/notification_provider.dart';
 import 'package:duo_client/provider/storage_provider.dart';
 
 import '../../pb/auth_messages.pb.dart';
@@ -24,11 +25,13 @@ class GrpcServerConnection extends AbstractServerConnection {
   late final DUOServiceClient client;
   late final VoidCallback _notifyListeners;
   final StorageProvider _storage;
+  final NotificationProvider _notificationProvider;
 
   ResponseStream<LobbyStatus>? lobbyStream;
   ResponseStream<GameState>? gameStream;
   ResponseStream<PlayerState>? playerStream;
   ResponseStream<StackState>? stackStream;
+  ResponseStream<notification.Notification>? notificationStream;
   StreamController<StatusChangeRequest>? userStatusStreamController;
   ResponseStream<void_>? userStatusAckStream;
   // Stream<StatusChangeRequest>? userStatusStream;
@@ -36,7 +39,9 @@ class GrpcServerConnection extends AbstractServerConnection {
   StreamController<PlayerAction> playerActionStreamController =
       StreamController<PlayerAction>.broadcast();
 
-  GrpcServerConnection(this._storage, this._notifyListeners) : super() {
+  GrpcServerConnection(
+      this._storage, this._notificationProvider, this._notifyListeners)
+      : super() {
     channel = ClientChannel(
       _storage.grpcHost,
       port: Constants.port,
@@ -513,14 +518,15 @@ class GrpcServerConnection extends AbstractServerConnection {
   @override
   Future<int> getNotificationStream(String token) async {
     try {
-      ResponseStream<notification.Notification> notificationStream =
+      ResponseStream<notification.Notification> stream =
           client.getNotificationStream(TokenOnlyRequest(
         token: token,
       ));
-
-      notificationStream.listen(
+      notificationStream = stream;
+      notificationStream!.listen(
         (value) {
-          debugPrint('Notification: $value');
+          _notificationProvider.addNotification(value);
+          _notifyListeners();
         },
         cancelOnError: true,
         onError: (e) {
@@ -530,6 +536,7 @@ class GrpcServerConnection extends AbstractServerConnection {
           debugPrint('Notification Stream Done');
         },
       );
+      _notifyListeners();
     } catch (e) {
       return -1;
     }
@@ -558,4 +565,7 @@ class GrpcServerConnection extends AbstractServerConnection {
   @override
   bool get hasUserStatusStream =>
       userStatusAckStream != null && userStatusStreamController != null;
+
+  @override
+  bool get hasNotificationStream => notificationStream != null;
 }

@@ -47,4 +47,5 @@ abstract class AbstractServerConnection {
   bool get hasPlayerStream;
   bool get hasStackStream;
   bool get hasUserStatusStream;
+  bool get hasNotificationStream;
 }

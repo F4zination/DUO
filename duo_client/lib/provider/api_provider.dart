@@ -2,6 +2,7 @@ import 'package:duo_client/pb/friend.pb.dart';
 import 'package:duo_client/pb/friend.pbenum.dart';
 import 'package:duo_client/pb/lobby.pb.dart';
 import 'package:duo_client/pb/game.pb.dart';
+import 'package:duo_client/provider/notification_provider.dart';
 import 'package:flutter/widgets.dart';
 
 import 'storage_provider.dart';
@@ -18,6 +19,7 @@ enum ServerConnectionType {
 class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
   AbstractServerConnection? _serverConnection;
   final StorageProvider _storageProvider;
+  final NotificationProvider _notificationProvider;
 
   @override
   LobbyStatus? get lobbyStatus => _serverConnection?.lobbyStatus;
@@ -31,7 +33,7 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
   @override
   GameState? get gameState => _serverConnection?.gameState;
 
-  ApiProvider(this._storageProvider) {
+  ApiProvider(this._storageProvider, this._notificationProvider) {
     init(_storageProvider.lastSelectedConnectionType); //Defaults to grpc
   }
 
@@ -39,8 +41,8 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
     _storageProvider.setLastSelectedConnectionType(type);
     switch (type) {
       case ServerConnectionType.grpc:
-        _serverConnection =
-            GrpcServerConnection(_storageProvider, notifyListeners);
+        _serverConnection = GrpcServerConnection(
+            _storageProvider, _notificationProvider, notifyListeners);
         break;
       case ServerConnectionType.bluetooth:
         //maybe implement bluetooth connection
@@ -206,6 +208,10 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
   bool get hasStackStream => _serverConnection?.hasStackStream ?? false;
 
   @override
+  bool get hasNotificationStream =>
+      _serverConnection?.hasNotificationStream ?? false;
+
+  @override
   set gameId(int? _gameId) {}
 
   @override
@@ -213,5 +219,6 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
 }
 
 final apiProvider = ChangeNotifierProvider<ApiProvider>((ref) {
-  return ApiProvider(ref.watch(storageProvider));
+  return ApiProvider(
+      ref.watch(storageProvider), ref.watch(notificationProvider));
 });
