@@ -6,6 +6,7 @@ import 'package:duo_client/utils/constants.dart';
 import 'package:duo_client/widgets/add_friend_dialog.dart';
 import 'package:duo_client/widgets/duo_header.dart';
 import 'package:duo_client/widgets/friend_list_tile.dart';
+import 'package:duo_client/widgets/notification_dialog.dart';
 import 'package:duo_client/widgets/recent_game_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -42,7 +43,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 BlendMode.srcIn,
               ),
             ),
-            onPressed: () {},
+            onPressed: () {
+              showDialog(
+                  context: context,
+                  builder: (context) => const NotificationDialog());
+            },
           ),
           const SizedBox(width: Constants.defaultPadding / 2),
         ],
