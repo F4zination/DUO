@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class QrJoinDialog extends StatelessWidget {
-  final String id;
-  const QrJoinDialog({required this.id, super.key});
+  final String data;
+  final String title;
+  const QrJoinDialog({required this.data, required this.title, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -15,14 +16,13 @@ class QrJoinDialog extends StatelessWidget {
           children: [
             SizedBox(
               width: MediaQuery.of(context).size.width * 0.5,
-              child: const Text(
-                  'Scan this QR code with the DUO app to join the group:',
-                  style: TextStyle(fontSize: 18, color: Colors.white70),
+              child: Text(title,
+                  style: const TextStyle(fontSize: 18, color: Colors.white70),
                   textAlign: TextAlign.center),
             ),
             const SizedBox(height: 10),
             QrImageView(
-              data: 'id:$id',
+              data: 'id:$data',
               version: QrVersions.auto,
               foregroundColor: Colors.white54,
               size: 200,

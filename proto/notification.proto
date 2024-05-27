@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "github.com/duo/pb";
+
+enum NotificationType {
+    FRIEND_REQUEST = 0;
+    SIMPLE_MESSAGE = 1;
+}
+
+message Notification {
+    NotificationType type = 1;
+    string data = 2;
+}

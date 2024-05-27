@@ -49,6 +49,16 @@ class _DuoAppState extends ConsumerState<DuoApp> {
             ),
           ),
         ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(
+              Constants.primaryColor,
+            ),
+            overlayColor: MaterialStateProperty.all(
+              Constants.primaryColorAccent,
+            ),
+          ),
+        ),
         textTheme: GoogleFonts.aDLaMDisplayTextTheme(),
       ),
       initialRoute: SplashScreen.route,

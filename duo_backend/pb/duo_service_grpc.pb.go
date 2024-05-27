@@ -34,6 +34,8 @@ type DUOServiceClient interface {
 	DeleteFriend(ctx context.Context, in *DeleteFriendRequest, opts ...grpc.CallOption) (*Void, error)
 	//User State
 	StatusChangeStream(ctx context.Context, opts ...grpc.CallOption) (DUOService_StatusChangeStreamClient, error)
+	//Notification
+	GetNotificationStream(ctx context.Context, in *TokenOnlyRequest, opts ...grpc.CallOption) (DUOService_GetNotificationStreamClient, error)
 	//Lobby
 	CreateLobby(ctx context.Context, in *CreateLobbyRequest, opts ...grpc.CallOption) (DUOService_CreateLobbyClient, error)
 	ChangeStackDevice(ctx context.Context, in *ChangeStackDeviceRequest, opts ...grpc.CallOption) (*Void, error)
@@ -157,8 +159,40 @@ func (x *dUOServiceStatusChangeStreamClient) Recv() (*Void, error) {
 	return m, nil
 }
 
+func (c *dUOServiceClient) GetNotificationStream(ctx context.Context, in *TokenOnlyRequest, opts ...grpc.CallOption) (DUOService_GetNotificationStreamClient, error) {
+	stream, err := c.cc.NewStream(ctx, &DUOService_ServiceDesc.Streams[1], "/pb.DUOService/GetNotificationStream", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &dUOServiceGetNotificationStreamClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type DUOService_GetNotificationStreamClient interface {
+	Recv() (*Notification, error)
+	grpc.ClientStream
+}
+
+type dUOServiceGetNotificationStreamClient struct {
+	grpc.ClientStream
+}
+
+func (x *dUOServiceGetNotificationStreamClient) Recv() (*Notification, error) {
+	m := new(Notification)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 func (c *dUOServiceClient) CreateLobby(ctx context.Context, in *CreateLobbyRequest, opts ...grpc.CallOption) (DUOService_CreateLobbyClient, error) {
-	stream, err := c.cc.NewStream(ctx, &DUOService_ServiceDesc.Streams[1], "/pb.DUOService/CreateLobby", opts...)
+	stream, err := c.cc.NewStream(ctx, &DUOService_ServiceDesc.Streams[2], "/pb.DUOService/CreateLobby", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -199,7 +233,7 @@ func (c *dUOServiceClient) ChangeStackDevice(ctx context.Context, in *ChangeStac
 }
 
 func (c *dUOServiceClient) JoinLobby(ctx context.Context, in *JoinLobbyRequest, opts ...grpc.CallOption) (DUOService_JoinLobbyClient, error) {
-	stream, err := c.cc.NewStream(ctx, &DUOService_ServiceDesc.Streams[2], "/pb.DUOService/JoinLobby", opts...)
+	stream, err := c.cc.NewStream(ctx, &DUOService_ServiceDesc.Streams[3], "/pb.DUOService/JoinLobby", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -249,7 +283,7 @@ func (c *dUOServiceClient) StartGame(ctx context.Context, in *TokenOnlyRequest, 
 }
 
 func (c *dUOServiceClient) GetGameState(ctx context.Context, in *GetGameStateRequest, opts ...grpc.CallOption) (DUOService_GetGameStateClient, error) {
-	stream, err := c.cc.NewStream(ctx, &DUOService_ServiceDesc.Streams[3], "/pb.DUOService/GetGameState", opts...)
+	stream, err := c.cc.NewStream(ctx, &DUOService_ServiceDesc.Streams[4], "/pb.DUOService/GetGameState", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -281,7 +315,7 @@ func (x *dUOServiceGetGameStateClient) Recv() (*GameState, error) {
 }
 
 func (c *dUOServiceClient) GetPlayerStream(ctx context.Context, opts ...grpc.CallOption) (DUOService_GetPlayerStreamClient, error) {
-	stream, err := c.cc.NewStream(ctx, &DUOService_ServiceDesc.Streams[4], "/pb.DUOService/GetPlayerStream", opts...)
+	stream, err := c.cc.NewStream(ctx, &DUOService_ServiceDesc.Streams[5], "/pb.DUOService/GetPlayerStream", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -312,7 +346,7 @@ func (x *dUOServiceGetPlayerStreamClient) Recv() (*PlayerState, error) {
 }
 
 func (c *dUOServiceClient) GetStackStream(ctx context.Context, in *StackRequest, opts ...grpc.CallOption) (DUOService_GetStackStreamClient, error) {
-	stream, err := c.cc.NewStream(ctx, &DUOService_ServiceDesc.Streams[5], "/pb.DUOService/GetStackStream", opts...)
+	stream, err := c.cc.NewStream(ctx, &DUOService_ServiceDesc.Streams[6], "/pb.DUOService/GetStackStream", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -359,6 +393,8 @@ type DUOServiceServer interface {
 	DeleteFriend(context.Context, *DeleteFriendRequest) (*Void, error)
 	//User State
 	StatusChangeStream(DUOService_StatusChangeStreamServer) error
+	//Notification
+	GetNotificationStream(*TokenOnlyRequest, DUOService_GetNotificationStreamServer) error
 	//Lobby
 	CreateLobby(*CreateLobbyRequest, DUOService_CreateLobbyServer) error
 	ChangeStackDevice(context.Context, *ChangeStackDeviceRequest) (*Void, error)
@@ -402,6 +438,9 @@ func (UnimplementedDUOServiceServer) DeleteFriend(context.Context, *DeleteFriend
 }
 func (UnimplementedDUOServiceServer) StatusChangeStream(DUOService_StatusChangeStreamServer) error {
 	return status.Errorf(codes.Unimplemented, "method StatusChangeStream not implemented")
+}
+func (UnimplementedDUOServiceServer) GetNotificationStream(*TokenOnlyRequest, DUOService_GetNotificationStreamServer) error {
+	return status.Errorf(codes.Unimplemented, "method GetNotificationStream not implemented")
 }
 func (UnimplementedDUOServiceServer) CreateLobby(*CreateLobbyRequest, DUOService_CreateLobbyServer) error {
 	return status.Errorf(codes.Unimplemented, "method CreateLobby not implemented")
@@ -608,6 +647,27 @@ func (x *dUOServiceStatusChangeStreamServer) Recv() (*StatusChangeRequest, error
 		return nil, err
 	}
 	return m, nil
+}
+
+func _DUOService_GetNotificationStream_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(TokenOnlyRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(DUOServiceServer).GetNotificationStream(m, &dUOServiceGetNotificationStreamServer{stream})
+}
+
+type DUOService_GetNotificationStreamServer interface {
+	Send(*Notification) error
+	grpc.ServerStream
+}
+
+type dUOServiceGetNotificationStreamServer struct {
+	grpc.ServerStream
+}
+
+func (x *dUOServiceGetNotificationStreamServer) Send(m *Notification) error {
+	return x.ServerStream.SendMsg(m)
 }
 
 func _DUOService_CreateLobby_Handler(srv interface{}, stream grpc.ServerStream) error {
@@ -832,6 +892,11 @@ var DUOService_ServiceDesc = grpc.ServiceDesc{
 			Handler:       _DUOService_StatusChangeStream_Handler,
 			ServerStreams: true,
 			ClientStreams: true,
+		},
+		{
+			StreamName:    "GetNotificationStream",
+			Handler:       _DUOService_GetNotificationStream_Handler,
+			ServerStreams: true,
 		},
 		{
 			StreamName:    "CreateLobby",

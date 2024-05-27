@@ -18,7 +18,8 @@ import 'package:protobuf/protobuf.dart' as $pb;
 import 'auth_messages.pb.dart' as $0;
 import 'friend.pb.dart' as $1;
 import 'game.pb.dart' as $3;
-import 'lobby.pb.dart' as $5;
+import 'lobby.pb.dart' as $6;
+import 'notification.pb.dart' as $5;
 import 'user_state.pb.dart' as $4;
 import 'void.pb.dart' as $2;
 
@@ -62,22 +63,26 @@ class DUOServiceClient extends $grpc.Client {
       '/pb.DUOService/StatusChangeStream',
       ($4.StatusChangeRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $2.void_.fromBuffer(value));
-  static final _$createLobby = $grpc.ClientMethod<$5.CreateLobbyRequest, $5.LobbyStatus>(
+  static final _$getNotificationStream = $grpc.ClientMethod<$3.TokenOnlyRequest, $5.Notification>(
+      '/pb.DUOService/GetNotificationStream',
+      ($3.TokenOnlyRequest value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $5.Notification.fromBuffer(value));
+  static final _$createLobby = $grpc.ClientMethod<$6.CreateLobbyRequest, $6.LobbyStatus>(
       '/pb.DUOService/CreateLobby',
-      ($5.CreateLobbyRequest value) => value.writeToBuffer(),
-      ($core.List<$core.int> value) => $5.LobbyStatus.fromBuffer(value));
-  static final _$changeStackDevice = $grpc.ClientMethod<$5.ChangeStackDeviceRequest, $2.void_>(
+      ($6.CreateLobbyRequest value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $6.LobbyStatus.fromBuffer(value));
+  static final _$changeStackDevice = $grpc.ClientMethod<$6.ChangeStackDeviceRequest, $2.void_>(
       '/pb.DUOService/ChangeStackDevice',
-      ($5.ChangeStackDeviceRequest value) => value.writeToBuffer(),
+      ($6.ChangeStackDeviceRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $2.void_.fromBuffer(value));
-  static final _$joinLobby = $grpc.ClientMethod<$5.JoinLobbyRequest, $5.LobbyStatus>(
+  static final _$joinLobby = $grpc.ClientMethod<$6.JoinLobbyRequest, $6.LobbyStatus>(
       '/pb.DUOService/JoinLobby',
-      ($5.JoinLobbyRequest value) => value.writeToBuffer(),
-      ($core.List<$core.int> value) => $5.LobbyStatus.fromBuffer(value));
-  static final _$disconnectLobby = $grpc.ClientMethod<$5.DisconnectLobbyRequest, $5.DisconnectLobbyResponse>(
+      ($6.JoinLobbyRequest value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $6.LobbyStatus.fromBuffer(value));
+  static final _$disconnectLobby = $grpc.ClientMethod<$6.DisconnectLobbyRequest, $6.DisconnectLobbyResponse>(
       '/pb.DUOService/DisconnectLobby',
-      ($5.DisconnectLobbyRequest value) => value.writeToBuffer(),
-      ($core.List<$core.int> value) => $5.DisconnectLobbyResponse.fromBuffer(value));
+      ($6.DisconnectLobbyRequest value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $6.DisconnectLobbyResponse.fromBuffer(value));
   static final _$startGame = $grpc.ClientMethod<$3.TokenOnlyRequest, $2.void_>(
       '/pb.DUOService/StartGame',
       ($3.TokenOnlyRequest value) => value.writeToBuffer(),
@@ -137,19 +142,23 @@ class DUOServiceClient extends $grpc.Client {
     return $createStreamingCall(_$statusChangeStream, request, options: options);
   }
 
-  $grpc.ResponseStream<$5.LobbyStatus> createLobby($5.CreateLobbyRequest request, {$grpc.CallOptions? options}) {
+  $grpc.ResponseStream<$5.Notification> getNotificationStream($3.TokenOnlyRequest request, {$grpc.CallOptions? options}) {
+    return $createStreamingCall(_$getNotificationStream, $async.Stream.fromIterable([request]), options: options);
+  }
+
+  $grpc.ResponseStream<$6.LobbyStatus> createLobby($6.CreateLobbyRequest request, {$grpc.CallOptions? options}) {
     return $createStreamingCall(_$createLobby, $async.Stream.fromIterable([request]), options: options);
   }
 
-  $grpc.ResponseFuture<$2.void_> changeStackDevice($5.ChangeStackDeviceRequest request, {$grpc.CallOptions? options}) {
+  $grpc.ResponseFuture<$2.void_> changeStackDevice($6.ChangeStackDeviceRequest request, {$grpc.CallOptions? options}) {
     return $createUnaryCall(_$changeStackDevice, request, options: options);
   }
 
-  $grpc.ResponseStream<$5.LobbyStatus> joinLobby($5.JoinLobbyRequest request, {$grpc.CallOptions? options}) {
+  $grpc.ResponseStream<$6.LobbyStatus> joinLobby($6.JoinLobbyRequest request, {$grpc.CallOptions? options}) {
     return $createStreamingCall(_$joinLobby, $async.Stream.fromIterable([request]), options: options);
   }
 
-  $grpc.ResponseFuture<$5.DisconnectLobbyResponse> disconnectLobby($5.DisconnectLobbyRequest request, {$grpc.CallOptions? options}) {
+  $grpc.ResponseFuture<$6.DisconnectLobbyResponse> disconnectLobby($6.DisconnectLobbyRequest request, {$grpc.CallOptions? options}) {
     return $createUnaryCall(_$disconnectLobby, request, options: options);
   }
 
@@ -238,34 +247,41 @@ abstract class DUOServiceBase extends $grpc.Service {
         true,
         ($core.List<$core.int> value) => $4.StatusChangeRequest.fromBuffer(value),
         ($2.void_ value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$5.CreateLobbyRequest, $5.LobbyStatus>(
+    $addMethod($grpc.ServiceMethod<$3.TokenOnlyRequest, $5.Notification>(
+        'GetNotificationStream',
+        getNotificationStream_Pre,
+        false,
+        true,
+        ($core.List<$core.int> value) => $3.TokenOnlyRequest.fromBuffer(value),
+        ($5.Notification value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$6.CreateLobbyRequest, $6.LobbyStatus>(
         'CreateLobby',
         createLobby_Pre,
         false,
         true,
-        ($core.List<$core.int> value) => $5.CreateLobbyRequest.fromBuffer(value),
-        ($5.LobbyStatus value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$5.ChangeStackDeviceRequest, $2.void_>(
+        ($core.List<$core.int> value) => $6.CreateLobbyRequest.fromBuffer(value),
+        ($6.LobbyStatus value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$6.ChangeStackDeviceRequest, $2.void_>(
         'ChangeStackDevice',
         changeStackDevice_Pre,
         false,
         false,
-        ($core.List<$core.int> value) => $5.ChangeStackDeviceRequest.fromBuffer(value),
+        ($core.List<$core.int> value) => $6.ChangeStackDeviceRequest.fromBuffer(value),
         ($2.void_ value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$5.JoinLobbyRequest, $5.LobbyStatus>(
+    $addMethod($grpc.ServiceMethod<$6.JoinLobbyRequest, $6.LobbyStatus>(
         'JoinLobby',
         joinLobby_Pre,
         false,
         true,
-        ($core.List<$core.int> value) => $5.JoinLobbyRequest.fromBuffer(value),
-        ($5.LobbyStatus value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$5.DisconnectLobbyRequest, $5.DisconnectLobbyResponse>(
+        ($core.List<$core.int> value) => $6.JoinLobbyRequest.fromBuffer(value),
+        ($6.LobbyStatus value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$6.DisconnectLobbyRequest, $6.DisconnectLobbyResponse>(
         'DisconnectLobby',
         disconnectLobby_Pre,
         false,
         false,
-        ($core.List<$core.int> value) => $5.DisconnectLobbyRequest.fromBuffer(value),
-        ($5.DisconnectLobbyResponse value) => value.writeToBuffer()));
+        ($core.List<$core.int> value) => $6.DisconnectLobbyRequest.fromBuffer(value),
+        ($6.DisconnectLobbyResponse value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$3.TokenOnlyRequest, $2.void_>(
         'StartGame',
         startGame_Pre,
@@ -328,19 +344,23 @@ abstract class DUOServiceBase extends $grpc.Service {
     return deleteFriend(call, await request);
   }
 
-  $async.Stream<$5.LobbyStatus> createLobby_Pre($grpc.ServiceCall call, $async.Future<$5.CreateLobbyRequest> request) async* {
+  $async.Stream<$5.Notification> getNotificationStream_Pre($grpc.ServiceCall call, $async.Future<$3.TokenOnlyRequest> request) async* {
+    yield* getNotificationStream(call, await request);
+  }
+
+  $async.Stream<$6.LobbyStatus> createLobby_Pre($grpc.ServiceCall call, $async.Future<$6.CreateLobbyRequest> request) async* {
     yield* createLobby(call, await request);
   }
 
-  $async.Future<$2.void_> changeStackDevice_Pre($grpc.ServiceCall call, $async.Future<$5.ChangeStackDeviceRequest> request) async {
+  $async.Future<$2.void_> changeStackDevice_Pre($grpc.ServiceCall call, $async.Future<$6.ChangeStackDeviceRequest> request) async {
     return changeStackDevice(call, await request);
   }
 
-  $async.Stream<$5.LobbyStatus> joinLobby_Pre($grpc.ServiceCall call, $async.Future<$5.JoinLobbyRequest> request) async* {
+  $async.Stream<$6.LobbyStatus> joinLobby_Pre($grpc.ServiceCall call, $async.Future<$6.JoinLobbyRequest> request) async* {
     yield* joinLobby(call, await request);
   }
 
-  $async.Future<$5.DisconnectLobbyResponse> disconnectLobby_Pre($grpc.ServiceCall call, $async.Future<$5.DisconnectLobbyRequest> request) async {
+  $async.Future<$6.DisconnectLobbyResponse> disconnectLobby_Pre($grpc.ServiceCall call, $async.Future<$6.DisconnectLobbyRequest> request) async {
     return disconnectLobby(call, await request);
   }
 
@@ -365,10 +385,11 @@ abstract class DUOServiceBase extends $grpc.Service {
   $async.Future<$1.FriendList> getFriendList($grpc.ServiceCall call, $3.TokenOnlyRequest request);
   $async.Future<$2.void_> deleteFriend($grpc.ServiceCall call, $1.DeleteFriendRequest request);
   $async.Stream<$2.void_> statusChangeStream($grpc.ServiceCall call, $async.Stream<$4.StatusChangeRequest> request);
-  $async.Stream<$5.LobbyStatus> createLobby($grpc.ServiceCall call, $5.CreateLobbyRequest request);
-  $async.Future<$2.void_> changeStackDevice($grpc.ServiceCall call, $5.ChangeStackDeviceRequest request);
-  $async.Stream<$5.LobbyStatus> joinLobby($grpc.ServiceCall call, $5.JoinLobbyRequest request);
-  $async.Future<$5.DisconnectLobbyResponse> disconnectLobby($grpc.ServiceCall call, $5.DisconnectLobbyRequest request);
+  $async.Stream<$5.Notification> getNotificationStream($grpc.ServiceCall call, $3.TokenOnlyRequest request);
+  $async.Stream<$6.LobbyStatus> createLobby($grpc.ServiceCall call, $6.CreateLobbyRequest request);
+  $async.Future<$2.void_> changeStackDevice($grpc.ServiceCall call, $6.ChangeStackDeviceRequest request);
+  $async.Stream<$6.LobbyStatus> joinLobby($grpc.ServiceCall call, $6.JoinLobbyRequest request);
+  $async.Future<$6.DisconnectLobbyResponse> disconnectLobby($grpc.ServiceCall call, $6.DisconnectLobbyRequest request);
   $async.Future<$2.void_> startGame($grpc.ServiceCall call, $3.TokenOnlyRequest request);
   $async.Stream<$3.GameState> getGameState($grpc.ServiceCall call, $3.GetGameStateRequest request);
   $async.Stream<$3.PlayerState> getPlayerStream($grpc.ServiceCall call, $async.Stream<$3.PlayerAction> request);

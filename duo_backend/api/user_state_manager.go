@@ -11,16 +11,16 @@ import (
 	"github.com/google/uuid"
 )
 
-// UserStateManager is a struct that holds the state of all users, who are currently online
+// UserNotificationManager is a struct that holds the state of all users, who are currently online
 // and in what state they are in
-type UserStateManager struct {
+type UserNotificationManager struct {
 	UserStates map[string]UserStateStream
 	store      db.Store
 	Mu         sync.RWMutex
 }
 
-func NewUserStateManager(store db.Store) *UserStateManager {
-	return &UserStateManager{
+func NewUserNotificationManager(store db.Store) *UserNotificationManager {
+	return &UserNotificationManager{
 		UserStates: make(map[string]UserStateStream),
 		store:      store,
 		Mu:         sync.RWMutex{},
@@ -39,7 +39,7 @@ func NewUserStateStream(stream pb.DUOService_StatusChangeStreamServer, userID st
 	}
 }
 
-func (usm *UserStateManager) AddUserStream(userID string, stream pb.DUOService_StatusChangeStreamServer) error {
+func (usm *UserNotificationManager) AddUserStream(userID string, stream pb.DUOService_StatusChangeStreamServer) error {
 	usm.Mu.Lock()
 	usm.UserStates[userID] = *NewUserStateStream(stream, userID)
 	usm.Mu.Unlock()
@@ -75,7 +75,7 @@ func (usm *UserStateManager) AddUserStream(userID string, stream pb.DUOService_S
 	}
 }
 
-func (usm *UserStateManager) RemoveUserStream(userID string) error {
+func (usm *UserNotificationManager) RemoveUserStream(userID string) error {
 	usm.Mu.Lock()
 	delete(usm.UserStates, userID)
 	usm.Mu.Unlock()
@@ -98,13 +98,13 @@ func (usm *UserStateManager) RemoveUserStream(userID string) error {
 	return nil
 }
 
-func (usm *UserStateManager) GetUserStream(userID string) UserStateStream {
+func (usm *UserNotificationManager) GetUserStream(userID string) UserStateStream {
 	usm.Mu.RLock()
 	defer usm.Mu.RUnlock()
 	return usm.UserStates[userID]
 }
 
-func (usm *UserStateManager) UpdateUserStatus(userID string, userStatus db.Userstatus) error {
+func (usm *UserNotificationManager) UpdateUserStatus(userID string, userStatus db.Userstatus) error {
 	userUuid, uuidErr := uuid.Parse(userID)
 	if uuidErr != nil {
 		log.Printf("error parsing uuid: %v", uuidErr)

@@ -8,6 +8,7 @@ import "auth_messages.proto";
 import "lobby.proto";
 import "user_state.proto";
 import "friend.proto";
+import "notification.proto";
 
 option go_package = "github.com/duo/pb";
 
@@ -27,6 +28,9 @@ service DUOService {
 
     //User State
     rpc StatusChangeStream(stream StatusChangeRequest) returns (stream void) {}
+
+    //Notification
+    rpc GetNotificationStream(TokenOnlyRequest) returns (stream Notification) {}
     
     //Lobby
     rpc CreateLobby(CreateLobbyRequest) returns (stream LobbyStatus) {}

@@ -17,7 +17,7 @@ type Server struct {
 	// SessionHandler SessionManager
 	LobbyHandler     LobbyManager
 	GameHandler      GameManager
-	UserStateHandler UserStateManager
+	UserStateHandler UserNotificationManager
 }
 
 func NewServer(store db.Store, config util.Config) *Server {
@@ -34,7 +34,7 @@ func NewServer(store db.Store, config util.Config) *Server {
 		// SessionHandler: *NewSessionManager(store),
 		LobbyHandler:     *NewLobbyManager(store),
 		GameHandler:      *NewGameManager(store),
-		UserStateHandler: *NewUserStateManager(store),
+		UserStateHandler: *NewUserNotificationManager(store),
 	}
 }
 
