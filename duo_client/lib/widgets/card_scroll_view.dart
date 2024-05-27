@@ -30,7 +30,7 @@ class _CardScrollViewState extends ConsumerState<CardScrollView> {
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       ref.read(apiProvider).getPlayerStream(
-          ref.read(storageProvider).accessToken, ref.read(apiProvider).gameId!);
+          ref.read(storageProvider).accessToken, ref.read(apiProvider).gameId);
     });
 
     super.initState();

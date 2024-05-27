@@ -19,7 +19,7 @@ class _GameStacksState extends ConsumerState<GameStacks> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       //init the stack stream
       ref.read(apiProvider).getStackStream(
-          ref.read(storageProvider).accessToken, ref.read(apiProvider).gameId!);
+          ref.read(storageProvider).accessToken, ref.read(apiProvider).gameId);
     });
     super.initState();
   }
