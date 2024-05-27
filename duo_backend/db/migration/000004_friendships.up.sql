@@ -21,3 +21,11 @@ ALTER TABLE friendships ADD CONSTRAINT friendships_check CHECK (user1_id < user2
 
 ALTER TABLE friendships ADD CONSTRAINT friendships_user1_id_fk FOREIGN KEY (user1_id) REFERENCES duouser (uuid) ON DELETE CASCADE;
 ALTER TABLE friendships ADD CONSTRAINT friendships_user2_id_fk FOREIGN KEY (user2_id) REFERENCES duouser (uuid) ON DELETE CASCADE;
+
+CREATE TABLE notifications (
+    user_id UUID NOT NULL,
+    message VARCHAR(255) NOT NULL,
+    message_type VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+

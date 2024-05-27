@@ -113,6 +113,13 @@ type Lobby struct {
 	MaxPlayers int32     `json:"max_players"`
 }
 
+type Notification struct {
+	UserID      uuid.UUID `json:"user_id"`
+	Message     string    `json:"message"`
+	MessageType string    `json:"message_type"`
+	CreatedAt   time.Time `json:"created_at"`
+}
+
 type UserLogin struct {
 	UserUuid  uuid.UUID `json:"user_uuid"`
 	Challenge string    `json:"challenge"`

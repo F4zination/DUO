@@ -6,6 +6,7 @@ package db
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/google/uuid"
 )
@@ -16,8 +17,10 @@ type Querier interface {
 	AddGameDrawStack(ctx context.Context, arg AddGameDrawStackParams) (GameStackDrawCardRel, error)
 	AddGamePlaceStack(ctx context.Context, arg AddGamePlaceStackParams) (GameStackPlaceCardRel, error)
 	AddPlayerToGame(ctx context.Context, arg AddPlayerToGameParams) (GamePlayerRel, error)
+	ClearNotificationsByUserId(ctx context.Context, userID uuid.UUID) (sql.Result, error)
 	CreateGameState(ctx context.Context, arg CreateGameStateParams) (GameState, error)
 	CreateLobby(ctx context.Context, arg CreateLobbyParams) (Lobby, error)
+	CreateNotification(ctx context.Context, arg CreateNotificationParams) (Notification, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (Duouser, error)
 	CreateUserLogin(ctx context.Context, arg CreateUserLoginParams) (UserLogin, error)
 	DeleteFriendRequest(ctx context.Context, arg DeleteFriendRequestParams) (FriendRequest, error)
@@ -31,6 +34,7 @@ type Querier interface {
 	GetGameStateById(ctx context.Context, id int32) (GameState, error)
 	GetLobbyByID(ctx context.Context, id int32) (Lobby, error)
 	GetLobbyByOwnerUUID(ctx context.Context, ownerID uuid.UUID) (Lobby, error)
+	GetNotificationsByUserId(ctx context.Context, userID uuid.UUID) ([]Notification, error)
 	GetOpenFriendRequestByRequesteeId(ctx context.Context, requesteeID uuid.UUID) ([]FriendRequest, error)
 	GetPlayersGameId(ctx context.Context, playerID uuid.UUID) (GamePlayerRel, error)
 	GetPlayersInGame(ctx context.Context, gameID int32) ([]GamePlayerRel, error)
