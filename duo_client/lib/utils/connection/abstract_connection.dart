@@ -31,10 +31,14 @@ abstract class AbstractServerConnection {
   Future<int> disconnectLobby(String token, int lobbyId);
   Future<int> startGame(String token);
 
+  // Notification management
+  Future<int> getNotificationStream(String token);
+
   // Game management
   Future<int> getGameStateStream(String token, int gameId);
   Future<int> getPlayerStream(String token, int gameId);
   Future<int> getStackStream(String token, int gameId);
+  Future<int> requestCard(String token, int gameId);
   Future<int> changeStackDevice(String token, String deviceId);
   Future<int> streamPlayerAction(PlayerAction action);
 

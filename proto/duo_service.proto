@@ -42,5 +42,5 @@ service DUOService {
     //Game
     rpc GetGameState(GetGameStateRequest) returns (stream GameState) {}
     rpc GetPlayerStream(stream PlayerAction) returns (stream PlayerState) {}
-    rpc GetStackStream(StackRequest) returns (stream StackState) {}
+    rpc GetStackStream(stream StackRequest) returns (stream StackState) {}
 }

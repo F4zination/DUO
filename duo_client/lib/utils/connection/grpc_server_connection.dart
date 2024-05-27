@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:ffi';
 import 'package:duo_client/pb/friend.pb.dart';
 import 'package:duo_client/pb/lobby.pb.dart';
+import 'package:duo_client/pb/notification.pb.dart' as notification;
 import 'package:duo_client/pb/user_state.pb.dart';
 import 'package:duo_client/pb/void.pb.dart';
 import 'package:duo_client/provider/storage_provider.dart';
@@ -507,6 +508,39 @@ class GrpcServerConnection extends AbstractServerConnection {
       debugPrint('Error sending friend request: $e');
       return -1;
     }
+  }
+
+  @override
+  Future<int> getNotificationStream(String token) async {
+    try {
+      ResponseStream<notification.Notification> notificationStream =
+          client.getNotificationStream(TokenOnlyRequest(
+        token: token,
+      ));
+
+      notificationStream.listen(
+        (value) {
+          debugPrint('Notification: $value');
+        },
+        cancelOnError: true,
+        onError: (e) {
+          debugPrint('Error: $e');
+        },
+        onDone: () {
+          debugPrint('Notification Stream Done');
+        },
+      );
+    } catch (e) {
+      return -1;
+    }
+
+    return 0;
+  }
+
+  @override
+  Future<int> requestCard(String token, int gameId) async {
+    // TODO: implement requestCard
+    return 0;
   }
 
   @override

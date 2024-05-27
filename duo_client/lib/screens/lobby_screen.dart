@@ -56,7 +56,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
         });
       });
     }
-    if (_apiProvider.gameId == null && !_apiProvider.hasLobbyStream) {
+    if (_apiProvider.gameId == -1 && !_apiProvider.hasLobbyStream) {
       setState(() {
         debugPrint('Lobby Stream: ${_apiProvider.lobbyStatus?.lobbyId}');
         //Case if lobby is deleted by the Host
@@ -153,19 +153,12 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                               .map((user) {
                             // TODO: the user.isStack is not working but is in Database correctly
                             return Padding(
-                              padding: const EdgeInsets.all(
-                                  Constants.defaultPadding / 2),
-                              child: ref
-                                          .watch(apiProvider)
-                                          .lobbyStatus!
-                                          .users
-                                          .where((element) => element.isStack)
-                                          .first
-                                          .uuid ==
-                                      user.uuid
-                                  ? UserTile(user: user, isStack: true)
-                                  : UserTile(user: user, isStack: false),
-                            );
+                                padding: const EdgeInsets.all(
+                                    Constants.defaultPadding / 2),
+                                child: UserTile(
+                                  user: user,
+                                  isStack: user.isStack,
+                                ));
                           }),
                           ...List.generate(
                               (ref.watch(apiProvider).lobbyStatus?.maxPlayers ??

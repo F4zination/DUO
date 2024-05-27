@@ -55,6 +55,7 @@ message PlayerAction {
 message StackRequest {
     string token = 1;
     int32 game_id = 2;
+    bool drawing_card = 3;
 }
 
 message Alert {
@@ -68,5 +69,5 @@ message PlaceStackState {
 
 message DrawStackState {
     int32 stack_id = 1;
-    repeated string card_ids = 4;
+    repeated string card_ids = 2;
 }

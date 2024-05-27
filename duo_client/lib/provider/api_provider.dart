@@ -43,7 +43,7 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
             GrpcServerConnection(_storageProvider, notifyListeners);
         break;
       case ServerConnectionType.bluetooth:
-        //TODO implement bluetooth connection
+        //maybe implement bluetooth connection
         break;
     }
     notifyListeners();
@@ -156,6 +156,16 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
   @override
   Future<int> sendFriendRequest(String token, String friendId) {
     return _serverConnection!.sendFriendRequest(token, friendId);
+  }
+
+  @override
+  Future<int> getNotificationStream(String token) {
+    return _serverConnection!.getNotificationStream(token);
+  }
+
+  @override
+  Future<int> requestCard(String token, int gameId) {
+    return _serverConnection!.requestCard(token, gameId);
   }
 
   @override

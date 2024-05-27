@@ -77,7 +77,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               // Main game screen either card scroll view or game stacks
               Container(
                 color: Constants.bgColor,
-                child: isStack ? GameStacks() : CardScrollView(),
+                child: isStack ? const GameStacks() : const CardScrollView(),
               ),
               Positioned(
                 top: 10,
