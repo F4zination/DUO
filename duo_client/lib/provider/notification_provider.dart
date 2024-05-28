@@ -4,12 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:duo_client/pb/notification.pb.dart' as notification;
 
 class NotificationProvider extends ChangeNotifier {
-  List<notification.Notification> _notifications = [
-    // 'Friend request from Joe Mama',
-    // 'Friend request from ZinsiBinsi',
-    // 'Friend request from Rehnertli',
-    // 'Friend request from Hillibilli',
-  ];
+  List<notification.Notification> _notifications = [];
 
   void addNotification(notification.Notification notification) {
     _notifications.add(notification);

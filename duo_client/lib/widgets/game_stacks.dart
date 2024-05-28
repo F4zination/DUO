@@ -30,36 +30,47 @@ class _GameStacksState extends ConsumerState<GameStacks> {
     StackState stackState = _apiProvider.stackState ??
         StackState(
           drawStack: DrawStackState(cardIds: ['green_3']),
-          placeStack: PlaceStackState(cardIdOnTop: 'green_3'),
+          placeStack: PlaceStackState(cardIdOnTop: 'green_4'),
         );
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        // Draw stack
-        DUOCardStack(
-          cards: [
-            PlayingCard(
-              cardName: stackState.drawStack.cardIds.first,
-              isFaceUp: false,
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          // Draw stack
+          SizedBox(
+            height: 300,
+            child: DUOCardStack(
+              cards: [
+                PlayingCard(
+                  cardName: stackState.drawStack.cardIds.first,
+                  isFaceUp: false,
+                ),
+              ],
+              randomAngles: false,
+              onTap: (PlayingCard card) async {
+                debugPrint('requesting Card for player');
+                String token = await ref.read(apiProvider).getToken();
+                ref
+                    .watch(apiProvider)
+                    .requestCard(token, ref.read(apiProvider).gameId);
+              },
             ),
-          ],
-          randomAngles: false,
-          onTap: (PlayingCard card) {
-            // maybe implement later
-          },
-        ),
-        // Place stack
-        DUOCardStack(
-          cards: [
-            PlayingCard(
-              cardName: stackState.placeStack.cardIdOnTop,
-              isFaceUp: true,
+          ),
+          // Place stack
+          SizedBox(
+            height: 300,
+            child: DUOCardStack(
+              cards: [
+                PlayingCard(
+                  cardName: stackState.placeStack.cardIdOnTop,
+                  isFaceUp: true,
+                ),
+              ],
+              randomAngles: true,
             ),
-          ],
-          randomAngles: true,
-        ),
-      ],
+          ),
+        ],
+      ),
     );
   }
 }

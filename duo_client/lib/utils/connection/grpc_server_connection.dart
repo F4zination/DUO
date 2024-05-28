@@ -39,6 +39,10 @@ class GrpcServerConnection extends AbstractServerConnection {
   StreamController<PlayerAction> playerActionStreamController =
       StreamController<PlayerAction>.broadcast();
 
+  Stream<StackRequest> stackRequestStream = const Stream.empty();
+  StreamController<StackRequest> stackRequestStreamController =
+      StreamController<StackRequest>.broadcast();
+
   GrpcServerConnection(
       this._storage, this._notificationProvider, this._notifyListeners)
       : super() {
@@ -321,33 +325,52 @@ class GrpcServerConnection extends AbstractServerConnection {
   }
 
   @override
-  Future<int> getStackStream(String token, int gameId) async {
-    // try {
-    //   ResponseStream<StackState> stackStream =
-    //       client.getStackStream(GetStackStateRequest(
-    //     token: token,
-    //     gameId: gameId,
-    //   ));
-
-    //   await for (StackState ss in stackStream) {
-    //     stackState = ss;
-    //     _notifyListeners();
-    //   }
-    // } catch (e) {
-    //   return -1;
-    // }
-    return 0;
-  }
-
-  @override
   Future<int> streamPlayerAction(PlayerAction action) async {
     playerActionStreamController.add(action);
     return 0;
   }
 
   @override
-  Future<int> getGameStateStream(String token, int gameId) {
-    // TODO: implement getGameStateStream
+  Future<int> getStackStream(String token, int gameId) async {
+    try {
+      ResponseStream<StackState> stream =
+          client.getStackStream(StackRequest(token: token, gameId: gameId));
+
+      stackStream = stream;
+
+      stackStream!.listen(
+        (value) {
+          stackState = value;
+          _notifyListeners();
+        },
+        cancelOnError: true,
+        onError: (e) {
+          debugPrint('Error: $e');
+        },
+        onDone: () {
+          stackState = null;
+          stackStream = null;
+          _notifyListeners();
+          debugPrint('Stack Stream Done');
+        },
+      );
+    } catch (e) {
+      return -1;
+    }
+    return 0;
+  }
+
+  @override
+  Future<int> requestCard(String token, int gameId) async {
+    stackRequestStreamController.add(StackRequest(
+      token: token,
+      gameId: gameId,
+    ));
+    return 0;
+  }
+
+  @override
+  Future<int> getGameStateStream(String token, int gameId) async {
     try {
       ResponseStream<GameState> gameStateStream =
           client.getGameState(GetGameStateRequest(
@@ -372,9 +395,9 @@ class GrpcServerConnection extends AbstractServerConnection {
         },
       );
     } catch (e) {
-      return Future(() => -1);
+      return -1;
     }
-    return Future(() => 0);
+    return 0;
   }
 
   @override
@@ -541,12 +564,6 @@ class GrpcServerConnection extends AbstractServerConnection {
       return -1;
     }
 
-    return 0;
-  }
-
-  @override
-  Future<int> requestCard(String token, int gameId) async {
-    // TODO: implement requestCard
     return 0;
   }
 

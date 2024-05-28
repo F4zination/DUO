@@ -25,6 +25,7 @@ class _DUOCardStackState extends ConsumerState<DUOCardStack> {
   Widget build(BuildContext context) {
     return SizedBox(
       width: 400,
+      height: 400,
       child: Stack(
         children: [
           for (int i = 0; i < widget.cards.length; i++)
