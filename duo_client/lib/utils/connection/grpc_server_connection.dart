@@ -33,16 +33,14 @@ class GrpcServerConnection extends AbstractServerConnection {
   ResponseStream<StackState>? stackStream;
   ResponseStream<notification.Notification>? notificationStream;
   StreamController<StatusChangeRequest>? userStatusStreamController;
+
   ResponseStream<void_>? userStatusAckStream;
-  // Stream<StatusChangeRequest>? userStatusStream;
   Stream<PlayerAction> playerActionStream = const Stream.empty();
   StreamController<PlayerAction> playerActionStreamController =
       StreamController<PlayerAction>.broadcast();
 
-  Stream<StackRequest> stackRequestStream = const Stream.empty();
-  StreamController<StackRequest> stackRequestStreamController =
-      StreamController<StackRequest>.broadcast();
-
+  // Stream<StackRequest> stackRequestStream = const Stream.empty();
+  StreamController<StackRequest>? stackRequestStreamController;
   GrpcServerConnection(
       this._storage, this._notificationProvider, this._notifyListeners)
       : super() {
@@ -333,36 +331,62 @@ class GrpcServerConnection extends AbstractServerConnection {
   @override
   Future<int> getStackStream(String token, int gameId) async {
     try {
-      ResponseStream<StackState> stream =
-          client.getStackStream(StackRequest(token: token, gameId: gameId));
-
-      stackStream = stream;
-
-      stackStream!.listen(
-        (value) {
-          stackState = value;
-          _notifyListeners();
+      final streamEstablishedCompleter = Completer<void>();
+      if (!hasStackStream) {
+        stackRequestStreamController = StreamController<StackRequest>.broadcast(
+          onCancel: () =>
+              debugPrint('Stream controller for stack request cancelled'),
+        );
+        _notifyListeners();
+      }
+      final responseStream =
+          client.getStackStream(stackRequestStreamController!.stream,
+              options: CallOptions(
+                timeout: const Duration(days: 1),
+              ));
+      stackStream = responseStream;
+      stackStream?.listen(
+        (_) {
+          if (!streamEstablishedCompleter.isCompleted) {
+            if (!streamEstablishedCompleter.isCompleted) {
+              streamEstablishedCompleter.complete();
+            }
+            debugPrint('stack stream acknowledge received');
+          }
         },
-        cancelOnError: true,
-        onError: (e) {
-          debugPrint('Error: $e');
+        onError: (error) {
+          if (!streamEstablishedCompleter.isCompleted) {
+            streamEstablishedCompleter.completeError(error);
+            stackStream?.cancel();
+            stackStream = null;
+            _notifyListeners();
+          }
+          debugPrint('Error establishing stack stream: $error');
         },
         onDone: () {
-          stackState = null;
+          debugPrint('Stack stream done');
           stackStream = null;
           _notifyListeners();
-          debugPrint('Stack Stream Done');
         },
+        cancelOnError: false,
       );
+
+      await streamEstablishedCompleter.future;
+      _notifyListeners();
+      return 0;
     } catch (e) {
+      debugPrint('Error sending stack request: $e');
       return -1;
     }
-    return 0;
   }
 
   @override
   Future<int> requestCard(String token, int gameId) async {
-    stackRequestStreamController.add(StackRequest(
+    if (!hasStackStream) {
+      debugPrint('User status stream not established');
+      return -1;
+    }
+    stackRequestStreamController!.add(StackRequest(
       token: token,
       gameId: gameId,
     ));
@@ -577,7 +601,8 @@ class GrpcServerConnection extends AbstractServerConnection {
   bool get hasPlayerStream => playerStream != null;
 
   @override
-  bool get hasStackStream => stackStream != null;
+  bool get hasStackStream =>
+      stackStream != null && stackRequestStreamController != null;
 
   @override
   bool get hasUserStatusStream =>

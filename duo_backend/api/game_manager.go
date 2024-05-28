@@ -4,12 +4,15 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"io"
 	"log"
 	"sync"
 
 	db "github.com/duo/db/sqlc"
 	"github.com/duo/pb"
 	"github.com/google/uuid"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type GameUserStreams struct {
@@ -220,6 +223,11 @@ func (gm *GameManager) UpdateGameState(gameId int, state *pb.GameState) []error 
 	return nil
 }
 
+func (gm *GameManager) onStackDisconnected(gameId int) error {
+	log.Printf("stack stream of game: %d disconnected", gameId)
+	return gm.DeleteGame(gameId, true, "stack stream disconnected")
+}
+
 func (gm *GameManager) SetStackStream(gameId int, userId uuid.UUID, stream pb.DUOService_GetStackStreamServer) error {
 	game, exists := gm.GetGame(gameId)
 	if !exists {
@@ -256,13 +264,35 @@ func (gm *GameManager) SetStackStream(gameId int, userId uuid.UUID, stream pb.DU
 
 	log.Printf("stack stream of game: %d connected", gameId)
 
-	<-stream.Context().Done()
+	for {
+		select {
+		case <-stream.Context().Done():
+			return gm.onStackDisconnected(gameId)
+		default: // Add default case for non-blocking Recv()
+			if stream == nil {
+				return status.Errorf(codes.Internal, "Stream not initialized")
+			}
+			msg, err := stream.Recv()
+			if msg.GameId != int32(gameId) {
+				return status.Errorf(codes.InvalidArgument, "Wrong gameId")
+			}
+			if err != nil {
+				if err == io.EOF {
+					return gm.onStackDisconnected(gameId)
+				} else if status.Code(err) == codes.Canceled { // Check for context cancellation
+					log.Printf("Context canceled for stack: %v", userId)
+					err := gm.onStackDisconnected(gameId)
+					return err // Or handle it differently as needed
+				}
+				log.Printf("Error receiving message from stack %v: %v", userId, err)
+				err := gm.onStackDisconnected(gameId)
+				return err
+			}
 
-	log.Printf("stack stream of game: %d disconnected", gameId)
+			log.Printf("Received message from stack %v: %v", userId, msg)
 
-	gm.DeleteGame(gameId, true, "stack stream disconnected")
-
-	return nil
+		}
+	}
 }
 
 func (gm *GameManager) AddGameStateStream(gameId int, userId uuid.UUID, stream pb.DUOService_GetGameStateServer) error {

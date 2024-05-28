@@ -1,11 +1,8 @@
 import 'package:duo_client/pb/friend.pb.dart';
-import 'package:duo_client/provider/api_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class FriendProvider extends ChangeNotifier {
-  final ApiProvider _apiProvider;
-
   final List<Friend> _friends = [
     // Friend(
     //   uuid: '1',
@@ -32,9 +29,11 @@ class FriendProvider extends ChangeNotifier {
     // ),
   ];
 
-  FriendProvider(ApiProvider apiProvider) : _apiProvider = apiProvider;
+  FriendProvider();
 
   List<Friend> get friends => _friends;
+
+  //TODO[adrian] maybe: void deleteFriendRequests(String requesterId) {}
 
   void addFriend(Friend friend) {
     _friends.add(friend);
@@ -47,5 +46,4 @@ class FriendProvider extends ChangeNotifier {
   }
 }
 
-final friendProvider =
-    ChangeNotifierProvider((ref) => FriendProvider(ref.watch(apiProvider)));
+final friendProvider = ChangeNotifierProvider((ref) => FriendProvider());

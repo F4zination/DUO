@@ -107,6 +107,16 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
   }
 
   @override
+  Future<int> requestCard(String token, int gameId) async {
+    if (hasStackStream == false) {
+      debugPrint('No Stack Stream');
+      final statusCode = await getStackStream(token, gameId);
+      if (statusCode != 0) return statusCode;
+    }
+    return _serverConnection!.requestCard(token, gameId);
+  }
+
+  @override
   Future<int> streamPlayerAction(PlayerAction action) {
     return _serverConnection!.streamPlayerAction(action);
   }
@@ -166,11 +176,6 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
   }
 
   @override
-  Future<int> requestCard(String token, int gameId) {
-    return _serverConnection!.requestCard(token, gameId);
-  }
-
-  @override
   set playerState(PlayerState? _playerState) {}
 
   @override
@@ -212,10 +217,14 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
       _serverConnection?.hasNotificationStream ?? false;
 
   @override
-  set gameId(int? _gameId) {}
+  set gameId(int? _gameId) {
+    //Is not allowed to be set from here, but needs to be implemented
+  }
 
   @override
-  set isStackOwner(bool? _isStackOwner) {}
+  set isStackOwner(bool? _isStackOwner) {
+    //Is not allowed to be set from here, but needs to be implemented
+  }
 }
 
 final apiProvider = ChangeNotifierProvider<ApiProvider>((ref) {

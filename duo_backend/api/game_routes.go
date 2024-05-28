@@ -51,7 +51,7 @@ func (server *Server) GetGameState(req *pb.GetGameStateRequest, stream pb.DUOSer
 	return nil
 }
 
-func (server *Server) GetStackStream(req *pb.StackRequest, stream pb.DUOService_GetStackStreamServer) error {
+func (server *Server) GetStackStream(stream pb.DUOService_GetStackStreamServer) error {
 	payload, tokenErr := server.Maker.VerifyToken(req.Token)
 	if tokenErr != nil {
 		log.Printf("error verifying token: %v", tokenErr)

@@ -140,13 +140,14 @@ const StackRequest$json = {
   '2': [
     {'1': 'token', '3': 1, '4': 1, '5': 9, '10': 'token'},
     {'1': 'game_id', '3': 2, '4': 1, '5': 5, '10': 'gameId'},
+    {'1': 'drawing_card', '3': 3, '4': 1, '5': 8, '10': 'drawingCard'},
   ],
 };
 
 /// Descriptor for `StackRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List stackRequestDescriptor = $convert.base64Decode(
     'CgxTdGFja1JlcXVlc3QSFAoFdG9rZW4YASABKAlSBXRva2VuEhcKB2dhbWVfaWQYAiABKAVSBm'
-    'dhbWVJZA==');
+    'dhbWVJZBIhCgxkcmF3aW5nX2NhcmQYAyABKAhSC2RyYXdpbmdDYXJk');
 
 @$core.Deprecated('Use alertDescriptor instead')
 const Alert$json = {
@@ -179,12 +180,12 @@ const DrawStackState$json = {
   '1': 'DrawStackState',
   '2': [
     {'1': 'stack_id', '3': 1, '4': 1, '5': 5, '10': 'stackId'},
-    {'1': 'card_ids', '3': 4, '4': 3, '5': 9, '10': 'cardIds'},
+    {'1': 'card_ids', '3': 2, '4': 3, '5': 9, '10': 'cardIds'},
   ],
 };
 
 /// Descriptor for `DrawStackState`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List drawStackStateDescriptor = $convert.base64Decode(
     'Cg5EcmF3U3RhY2tTdGF0ZRIZCghzdGFja19pZBgBIAEoBVIHc3RhY2tJZBIZCghjYXJkX2lkcx'
-    'gEIAMoCVIHY2FyZElkcw==');
+    'gCIAMoCVIHY2FyZElkcw==');
 

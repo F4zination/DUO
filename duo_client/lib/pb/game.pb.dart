@@ -503,6 +503,7 @@ class StackRequest extends $pb.GeneratedMessage {
   factory StackRequest({
     $core.String? token,
     $core.int? gameId,
+    $core.bool? drawingCard,
   }) {
     final $result = create();
     if (token != null) {
@@ -510,6 +511,9 @@ class StackRequest extends $pb.GeneratedMessage {
     }
     if (gameId != null) {
       $result.gameId = gameId;
+    }
+    if (drawingCard != null) {
+      $result.drawingCard = drawingCard;
     }
     return $result;
   }
@@ -520,6 +524,7 @@ class StackRequest extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'StackRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'token')
     ..a<$core.int>(2, _omitFieldNames ? '' : 'gameId', $pb.PbFieldType.O3)
+    ..aOB(3, _omitFieldNames ? '' : 'drawingCard')
     ..hasRequiredFields = false
   ;
 
@@ -561,6 +566,15 @@ class StackRequest extends $pb.GeneratedMessage {
   $core.bool hasGameId() => $_has(1);
   @$pb.TagNumber(2)
   void clearGameId() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.bool get drawingCard => $_getBF(2);
+  @$pb.TagNumber(3)
+  set drawingCard($core.bool v) { $_setBool(2, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasDrawingCard() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearDrawingCard() => clearField(3);
 }
 
 class Alert extends $pb.GeneratedMessage {
@@ -697,7 +711,7 @@ class DrawStackState extends $pb.GeneratedMessage {
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DrawStackState', package: const $pb.PackageName(_omitMessageNames ? '' : 'pb'), createEmptyInstance: create)
     ..a<$core.int>(1, _omitFieldNames ? '' : 'stackId', $pb.PbFieldType.O3)
-    ..pPS(4, _omitFieldNames ? '' : 'cardIds')
+    ..pPS(2, _omitFieldNames ? '' : 'cardIds')
     ..hasRequiredFields = false
   ;
 
@@ -731,7 +745,7 @@ class DrawStackState extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   void clearStackId() => clearField(1);
 
-  @$pb.TagNumber(4)
+  @$pb.TagNumber(2)
   $core.List<$core.String> get cardIds => $_getList(1);
 }
 

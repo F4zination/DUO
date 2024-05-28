@@ -174,8 +174,8 @@ class DUOServiceClient extends $grpc.Client {
     return $createStreamingCall(_$getPlayerStream, request, options: options);
   }
 
-  $grpc.ResponseStream<$3.StackState> getStackStream($3.StackRequest request, {$grpc.CallOptions? options}) {
-    return $createStreamingCall(_$getStackStream, $async.Stream.fromIterable([request]), options: options);
+  $grpc.ResponseStream<$3.StackState> getStackStream($async.Stream<$3.StackRequest> request, {$grpc.CallOptions? options}) {
+    return $createStreamingCall(_$getStackStream, request, options: options);
   }
 }
 
@@ -305,8 +305,8 @@ abstract class DUOServiceBase extends $grpc.Service {
         ($3.PlayerState value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$3.StackRequest, $3.StackState>(
         'GetStackStream',
-        getStackStream_Pre,
-        false,
+        getStackStream,
+        true,
         true,
         ($core.List<$core.int> value) => $3.StackRequest.fromBuffer(value),
         ($3.StackState value) => value.writeToBuffer()));
@@ -372,10 +372,6 @@ abstract class DUOServiceBase extends $grpc.Service {
     yield* getGameState(call, await request);
   }
 
-  $async.Stream<$3.StackState> getStackStream_Pre($grpc.ServiceCall call, $async.Future<$3.StackRequest> request) async* {
-    yield* getStackStream(call, await request);
-  }
-
   $async.Future<$0.RegisterResponse> register($grpc.ServiceCall call, $0.RegisterRequest request);
   $async.Future<$0.LoginChallengeRequest> requestLoginChallenge($grpc.ServiceCall call, $0.LoginRequest request);
   $async.Future<$0.LoginResponse> submitLoginChallenge($grpc.ServiceCall call, $0.LoginChallengeResponse request);
@@ -393,5 +389,5 @@ abstract class DUOServiceBase extends $grpc.Service {
   $async.Future<$2.void_> startGame($grpc.ServiceCall call, $3.TokenOnlyRequest request);
   $async.Stream<$3.GameState> getGameState($grpc.ServiceCall call, $3.GetGameStateRequest request);
   $async.Stream<$3.PlayerState> getPlayerStream($grpc.ServiceCall call, $async.Stream<$3.PlayerAction> request);
-  $async.Stream<$3.StackState> getStackStream($grpc.ServiceCall call, $3.StackRequest request);
+  $async.Stream<$3.StackState> getStackStream($grpc.ServiceCall call, $async.Stream<$3.StackRequest> request);
 }

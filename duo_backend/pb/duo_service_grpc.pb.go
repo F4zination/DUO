@@ -45,7 +45,7 @@ type DUOServiceClient interface {
 	//Game
 	GetGameState(ctx context.Context, in *GetGameStateRequest, opts ...grpc.CallOption) (DUOService_GetGameStateClient, error)
 	GetPlayerStream(ctx context.Context, opts ...grpc.CallOption) (DUOService_GetPlayerStreamClient, error)
-	GetStackStream(ctx context.Context, in *StackRequest, opts ...grpc.CallOption) (DUOService_GetStackStreamClient, error)
+	GetStackStream(ctx context.Context, opts ...grpc.CallOption) (DUOService_GetStackStreamClient, error)
 }
 
 type dUOServiceClient struct {
@@ -345,28 +345,27 @@ func (x *dUOServiceGetPlayerStreamClient) Recv() (*PlayerState, error) {
 	return m, nil
 }
 
-func (c *dUOServiceClient) GetStackStream(ctx context.Context, in *StackRequest, opts ...grpc.CallOption) (DUOService_GetStackStreamClient, error) {
+func (c *dUOServiceClient) GetStackStream(ctx context.Context, opts ...grpc.CallOption) (DUOService_GetStackStreamClient, error) {
 	stream, err := c.cc.NewStream(ctx, &DUOService_ServiceDesc.Streams[6], "/pb.DUOService/GetStackStream", opts...)
 	if err != nil {
 		return nil, err
 	}
 	x := &dUOServiceGetStackStreamClient{stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
 	return x, nil
 }
 
 type DUOService_GetStackStreamClient interface {
+	Send(*StackRequest) error
 	Recv() (*StackState, error)
 	grpc.ClientStream
 }
 
 type dUOServiceGetStackStreamClient struct {
 	grpc.ClientStream
+}
+
+func (x *dUOServiceGetStackStreamClient) Send(m *StackRequest) error {
+	return x.ClientStream.SendMsg(m)
 }
 
 func (x *dUOServiceGetStackStreamClient) Recv() (*StackState, error) {
@@ -404,7 +403,7 @@ type DUOServiceServer interface {
 	//Game
 	GetGameState(*GetGameStateRequest, DUOService_GetGameStateServer) error
 	GetPlayerStream(DUOService_GetPlayerStreamServer) error
-	GetStackStream(*StackRequest, DUOService_GetStackStreamServer) error
+	GetStackStream(DUOService_GetStackStreamServer) error
 	mustEmbedUnimplementedDUOServiceServer()
 }
 
@@ -463,7 +462,7 @@ func (UnimplementedDUOServiceServer) GetGameState(*GetGameStateRequest, DUOServi
 func (UnimplementedDUOServiceServer) GetPlayerStream(DUOService_GetPlayerStreamServer) error {
 	return status.Errorf(codes.Unimplemented, "method GetPlayerStream not implemented")
 }
-func (UnimplementedDUOServiceServer) GetStackStream(*StackRequest, DUOService_GetStackStreamServer) error {
+func (UnimplementedDUOServiceServer) GetStackStream(DUOService_GetStackStreamServer) error {
 	return status.Errorf(codes.Unimplemented, "method GetStackStream not implemented")
 }
 func (UnimplementedDUOServiceServer) mustEmbedUnimplementedDUOServiceServer() {}
@@ -814,15 +813,12 @@ func (x *dUOServiceGetPlayerStreamServer) Recv() (*PlayerAction, error) {
 }
 
 func _DUOService_GetStackStream_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(StackRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(DUOServiceServer).GetStackStream(m, &dUOServiceGetStackStreamServer{stream})
+	return srv.(DUOServiceServer).GetStackStream(&dUOServiceGetStackStreamServer{stream})
 }
 
 type DUOService_GetStackStreamServer interface {
 	Send(*StackState) error
+	Recv() (*StackRequest, error)
 	grpc.ServerStream
 }
 
@@ -832,6 +828,14 @@ type dUOServiceGetStackStreamServer struct {
 
 func (x *dUOServiceGetStackStreamServer) Send(m *StackState) error {
 	return x.ServerStream.SendMsg(m)
+}
+
+func (x *dUOServiceGetStackStreamServer) Recv() (*StackRequest, error) {
+	m := new(StackRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 // DUOService_ServiceDesc is the grpc.ServiceDesc for DUOService service.
@@ -923,6 +927,7 @@ var DUOService_ServiceDesc = grpc.ServiceDesc{
 			StreamName:    "GetStackStream",
 			Handler:       _DUOService_GetStackStream_Handler,
 			ServerStreams: true,
+			ClientStreams: true,
 		},
 	},
 	Metadata: "duo_service.proto",
