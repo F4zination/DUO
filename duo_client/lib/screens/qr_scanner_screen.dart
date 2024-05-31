@@ -102,12 +102,12 @@ class _QrCodeScannerState extends State<QrCodeScanner>
     );
   }
 
-  (bool isValid, int id) _validateQrData(String data) {
+  (bool isValid, String uuid) _validateQrData(String data) {
     //has the form of id:$id
-    final int id = int.tryParse(data.split(':')[1]) ?? -1;
+    final String id = data.split(':')[1];
 
-    if (id < 0) {
-      return (false, -1);
+    if (id.isEmpty) {
+      return (false, "-1");
     }
     return (true, id);
   }

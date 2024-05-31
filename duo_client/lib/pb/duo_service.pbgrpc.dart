@@ -99,6 +99,10 @@ class DUOServiceClient extends $grpc.Client {
       '/pb.DUOService/GetStackStream',
       ($3.StackRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $3.StackState.fromBuffer(value));
+  static final _$disconnectFromGame = $grpc.ClientMethod<$3.TokenOnlyRequest, $2.void_>(
+      '/pb.DUOService/DisconnectFromGame',
+      ($3.TokenOnlyRequest value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $2.void_.fromBuffer(value));
 
   DUOServiceClient($grpc.ClientChannel channel,
       {$grpc.CallOptions? options,
@@ -176,6 +180,10 @@ class DUOServiceClient extends $grpc.Client {
 
   $grpc.ResponseStream<$3.StackState> getStackStream($async.Stream<$3.StackRequest> request, {$grpc.CallOptions? options}) {
     return $createStreamingCall(_$getStackStream, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$2.void_> disconnectFromGame($3.TokenOnlyRequest request, {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$disconnectFromGame, request, options: options);
   }
 }
 
@@ -310,6 +318,13 @@ abstract class DUOServiceBase extends $grpc.Service {
         true,
         ($core.List<$core.int> value) => $3.StackRequest.fromBuffer(value),
         ($3.StackState value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$3.TokenOnlyRequest, $2.void_>(
+        'DisconnectFromGame',
+        disconnectFromGame_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $3.TokenOnlyRequest.fromBuffer(value),
+        ($2.void_ value) => value.writeToBuffer()));
   }
 
   $async.Future<$0.RegisterResponse> register_Pre($grpc.ServiceCall call, $async.Future<$0.RegisterRequest> request) async {
@@ -372,6 +387,10 @@ abstract class DUOServiceBase extends $grpc.Service {
     yield* getGameState(call, await request);
   }
 
+  $async.Future<$2.void_> disconnectFromGame_Pre($grpc.ServiceCall call, $async.Future<$3.TokenOnlyRequest> request) async {
+    return disconnectFromGame(call, await request);
+  }
+
   $async.Future<$0.RegisterResponse> register($grpc.ServiceCall call, $0.RegisterRequest request);
   $async.Future<$0.LoginChallengeRequest> requestLoginChallenge($grpc.ServiceCall call, $0.LoginRequest request);
   $async.Future<$0.LoginResponse> submitLoginChallenge($grpc.ServiceCall call, $0.LoginChallengeResponse request);
@@ -390,4 +409,5 @@ abstract class DUOServiceBase extends $grpc.Service {
   $async.Stream<$3.GameState> getGameState($grpc.ServiceCall call, $3.GetGameStateRequest request);
   $async.Stream<$3.PlayerState> getPlayerStream($grpc.ServiceCall call, $async.Stream<$3.PlayerAction> request);
   $async.Stream<$3.StackState> getStackStream($grpc.ServiceCall call, $async.Stream<$3.StackRequest> request);
+  $async.Future<$2.void_> disconnectFromGame($grpc.ServiceCall call, $3.TokenOnlyRequest request);
 }

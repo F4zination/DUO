@@ -1,5 +1,4 @@
 import 'package:duo_client/pb/friend.pb.dart';
-import 'package:duo_client/pb/friend.pbenum.dart';
 import 'package:duo_client/pb/lobby.pb.dart';
 import 'package:duo_client/pb/game.pb.dart';
 import 'package:duo_client/provider/notification_provider.dart';
@@ -197,10 +196,7 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
   bool get hasGameStream => _serverConnection?.hasGameStream ?? false;
 
   @override
-  bool get hasLobbyStream {
-    debugPrint('Has Lobby Stream: ${_serverConnection?.hasLobbyStream}');
-    return _serverConnection?.hasLobbyStream ?? false;
-  }
+  bool get hasLobbyStream => _serverConnection?.hasLobbyStream ?? false;
 
   @override
   bool get hasUserStatusStream =>

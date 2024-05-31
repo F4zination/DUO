@@ -46,6 +46,7 @@ type DUOServiceClient interface {
 	GetGameState(ctx context.Context, in *GetGameStateRequest, opts ...grpc.CallOption) (DUOService_GetGameStateClient, error)
 	GetPlayerStream(ctx context.Context, opts ...grpc.CallOption) (DUOService_GetPlayerStreamClient, error)
 	GetStackStream(ctx context.Context, opts ...grpc.CallOption) (DUOService_GetStackStreamClient, error)
+	DisconnectFromGame(ctx context.Context, in *TokenOnlyRequest, opts ...grpc.CallOption) (*Void, error)
 }
 
 type dUOServiceClient struct {
@@ -376,6 +377,15 @@ func (x *dUOServiceGetStackStreamClient) Recv() (*StackState, error) {
 	return m, nil
 }
 
+func (c *dUOServiceClient) DisconnectFromGame(ctx context.Context, in *TokenOnlyRequest, opts ...grpc.CallOption) (*Void, error) {
+	out := new(Void)
+	err := c.cc.Invoke(ctx, "/pb.DUOService/DisconnectFromGame", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DUOServiceServer is the server API for DUOService service.
 // All implementations must embed UnimplementedDUOServiceServer
 // for forward compatibility
@@ -404,6 +414,7 @@ type DUOServiceServer interface {
 	GetGameState(*GetGameStateRequest, DUOService_GetGameStateServer) error
 	GetPlayerStream(DUOService_GetPlayerStreamServer) error
 	GetStackStream(DUOService_GetStackStreamServer) error
+	DisconnectFromGame(context.Context, *TokenOnlyRequest) (*Void, error)
 	mustEmbedUnimplementedDUOServiceServer()
 }
 
@@ -464,6 +475,9 @@ func (UnimplementedDUOServiceServer) GetPlayerStream(DUOService_GetPlayerStreamS
 }
 func (UnimplementedDUOServiceServer) GetStackStream(DUOService_GetStackStreamServer) error {
 	return status.Errorf(codes.Unimplemented, "method GetStackStream not implemented")
+}
+func (UnimplementedDUOServiceServer) DisconnectFromGame(context.Context, *TokenOnlyRequest) (*Void, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DisconnectFromGame not implemented")
 }
 func (UnimplementedDUOServiceServer) mustEmbedUnimplementedDUOServiceServer() {}
 
@@ -838,6 +852,24 @@ func (x *dUOServiceGetStackStreamServer) Recv() (*StackRequest, error) {
 	return m, nil
 }
 
+func _DUOService_DisconnectFromGame_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TokenOnlyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DUOServiceServer).DisconnectFromGame(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.DUOService/DisconnectFromGame",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DUOServiceServer).DisconnectFromGame(ctx, req.(*TokenOnlyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // DUOService_ServiceDesc is the grpc.ServiceDesc for DUOService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -888,6 +920,10 @@ var DUOService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "StartGame",
 			Handler:    _DUOService_StartGame_Handler,
+		},
+		{
+			MethodName: "DisconnectFromGame",
+			Handler:    _DUOService_DisconnectFromGame_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

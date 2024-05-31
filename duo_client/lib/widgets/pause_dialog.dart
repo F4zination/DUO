@@ -1,5 +1,8 @@
+import 'package:duo_client/pb/friend.pb.dart';
+import 'package:duo_client/provider/api_provider.dart';
 import 'package:duo_client/screens/home_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class PauseDialog extends ConsumerStatefulWidget {
@@ -44,19 +47,27 @@ class _PauseDialogState extends ConsumerState<PauseDialog> {
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: const Text('Resume'),
+                  child: const Text('Resume',
+                      style: TextStyle(color: Colors.white)),
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    //TODO: [finn]. wtf is this. why are we popping 3 times
-                    //either use Navigator.of(context).popUntil() or in this case pushReplacementNamed()
-                    // Navigator.of(context).pop();
-                    // Navigator.of(context).pop();
-                    // Navigator.of(context).pop();
+                  onPressed: () async {
+                    String token = await ref.read(apiProvider).getToken();
+                    ref
+                        .read(apiProvider)
+                        .sendUserstatusUpdate(token, FriendState.online);
+
+                    SystemChrome.setEnabledSystemUIMode(
+                        SystemUiMode.edgeToEdge);
+                    SystemChrome.setPreferredOrientations([
+                      DeviceOrientation.portraitUp,
+                      DeviceOrientation.portraitDown,
+                    ]);
                     Navigator.of(context)
                         .pushReplacementNamed(HomeScreen.route);
                   },
-                  child: const Text('Exit'),
+                  child:
+                      const Text('Exit', style: TextStyle(color: Colors.white)),
                 ),
               ],
             ),

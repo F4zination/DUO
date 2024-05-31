@@ -86,7 +86,8 @@ class _JoinDialogState extends ConsumerState<JoinDialog> {
                                   .pushNamed(QrCodeScanner.route);
                               if (id != null) {
                                 _controller.text =
-                                    Helpers.fillPrefixWithZeros(id);
+                                    Helpers.fillPrefixWithZerosForString(
+                                        id.toString());
                                 joinGame();
                               }
                             },
@@ -134,6 +135,7 @@ class _JoinDialogState extends ConsumerState<JoinDialog> {
     }
     ref.read(apiProvider).joinLobby(
         ref.read(storageProvider).accessToken, int.parse(_controller.text));
+    // TODO: some Error happens here that the user is naviaged to home screen
     Navigator.of(context).pop();
     Navigator.of(context).pushReplacementNamed(LobbyScreen.route);
   }

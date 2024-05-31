@@ -29,6 +29,7 @@ class FriendRequestTile extends ConsumerWidget {
             icon: const Icon(Icons.check, color: Colors.white),
             onPressed: () async {
               await ref.read(apiProvider).answerFriendRequest(
+                    // TODO: this requires the token the target user
                     await ref.read(apiProvider).getToken(),
                     ref.read(storageProvider).userId,
                     true,

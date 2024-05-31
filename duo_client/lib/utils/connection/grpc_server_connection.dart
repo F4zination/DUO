@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:async';
-import 'dart:ffi';
 import 'package:duo_client/pb/friend.pb.dart';
 import 'package:duo_client/pb/lobby.pb.dart';
 import 'package:duo_client/pb/notification.pb.dart' as notification;
@@ -160,6 +159,7 @@ class GrpcServerConnection extends AbstractServerConnection {
           //if is deleted
           if (lobbyStatus?.isDeleted == true) {
             debugPrint('received lobby status is deleted');
+            gameId = -2;
             lobbyStatus = null;
             lobbyStream?.cancel();
             _notifyListeners();
@@ -550,6 +550,7 @@ class GrpcServerConnection extends AbstractServerConnection {
   @override
   Future<int> sendFriendRequest(String token, String friendId) async {
     try {
+      debugPrint('Sending friend request to $friendId');
       await client.sendFriendRequest(FriendRequestRequest(
         requesterName: _storage.username,
         token: token,

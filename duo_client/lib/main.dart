@@ -1,6 +1,7 @@
 import 'package:duo_client/pb/friend.pb.dart';
 import 'package:duo_client/provider/api_provider.dart';
 import 'package:duo_client/provider/storage_provider.dart';
+import 'package:duo_client/screens/award_screen.dart';
 import 'package:duo_client/screens/game_screen.dart';
 import 'package:duo_client/screens/home_screen.dart';
 import 'package:duo_client/screens/lobby_screen.dart';
@@ -93,6 +94,7 @@ class _DuoAppState extends ConsumerState<DuoApp> {
         HomeScreen.route: (context) => const HomeScreen(),
         GameScreen.route: (context) => const GameScreen(),
         LobbyScreen.route: (context) => const LobbyScreen(),
+        AwardScreen.route: (context) => const AwardScreen(),
       },
     );
   }

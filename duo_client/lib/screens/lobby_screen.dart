@@ -31,14 +31,11 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
   @override
   void initState() {
     super.initState();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       ref.read(apiProvider).sendUserstatusUpdate(
           await ref.read(apiProvider).getToken(), FriendState.inLobby);
     });
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
   }
 
   @override
@@ -47,7 +44,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
     bool creatingLobby =
         _apiProvider.lobbyStatus == null && _apiProvider.gameId == -1;
     int lobbyId = _apiProvider.lobbyStatus?.lobbyId ?? 0;
-    if (_apiProvider.gameId != -1) {
+    if (_apiProvider.gameId > 0 && _apiProvider.lobbyStatus == null) {
       setState(() {
         joiningGame = true;
         debugPrint('Game Id: ${_apiProvider.gameId}');
@@ -56,11 +53,12 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
         });
       });
     }
-    if (_apiProvider.gameId == -1 && !_apiProvider.hasLobbyStream) {
+    if (_apiProvider.gameId == -2 && !_apiProvider.hasLobbyStream) {
       setState(() {
         debugPrint('Lobby Stream: ${_apiProvider.lobbyStatus?.lobbyId}');
         //Case if lobby is deleted by the Host
         WidgetsBinding.instance.addPostFrameCallback((_) {
+          debugPrint('Lobby deletion detected; leaving... ');
           Navigator.of(context).pushReplacementNamed(HomeScreen.route);
         });
       });
@@ -180,86 +178,95 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                         ],
                       ),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(6),
-                          child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: Constants.errorColor),
-                              onPressed: () async {
-                                int status = await ref
-                                    .read(apiProvider)
-                                    .disconnectLobby(
-                                        ref.read(storageProvider).accessToken,
-                                        ref
-                                                .watch(apiProvider)
-                                                .lobbyStatus
-                                                ?.lobbyId ??
-                                            0);
-                                if (status == 0) {
-                                  print('Disconnected sucessfully from lobby');
-                                  Navigator.of(context)
-                                      .pushReplacementNamed(HomeScreen.route);
-                                } else {
-                                  print('Error leaving lobby');
-                                }
-                              },
-                              child: const Padding(
-                                padding: EdgeInsets.all(3),
-                                child: Text('Leave Lobby',
-                                    style: TextStyle(
-                                        fontSize: 20, color: Colors.white70)),
-                              )),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(6),
-                          child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: Constants.successColor),
-                              onPressed: () async {
-                                if (ref.read(storageProvider).userId ==
-                                    ref
-                                        .read(apiProvider)
-                                        .lobbyStatus!
-                                        .users
-                                        .where((element) => element.isAdmin)
-                                        .first
-                                        .uuid) {
-                                  // TODO: change back to 3 players for a game but for testing purposes 2
-                                  if (_apiProvider.lobbyStatus!.users.length <
-                                      0) {
+                    Padding(
+                      padding: const EdgeInsets.all(Constants.defaultPadding),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(6),
+                            child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: Constants.errorColor),
+                                onPressed: () async {
+                                  int status = await ref
+                                      .read(apiProvider)
+                                      .disconnectLobby(
+                                          ref.read(storageProvider).accessToken,
+                                          ref
+                                                  .watch(apiProvider)
+                                                  .lobbyStatus
+                                                  ?.lobbyId ??
+                                              0);
+                                  if (status == 0) {
+                                    print(
+                                        'Disconnected sucessfully from lobby');
+                                    Navigator.of(context)
+                                        .pushReplacementNamed(HomeScreen.route);
+                                  } else {
+                                    print('Error leaving lobby');
+                                  }
+                                },
+                                child: const Padding(
+                                  padding: EdgeInsets.all(3),
+                                  child: Text('Leave Lobby',
+                                      style: TextStyle(
+                                          fontSize: 20, color: Colors.white70)),
+                                )),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: Constants.defaultPadding),
+                            child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: Constants.successColor),
+                                onPressed: () async {
+                                  if (ref.read(storageProvider).userId ==
+                                      ref
+                                          .read(apiProvider)
+                                          .lobbyStatus!
+                                          .users
+                                          .where((element) => element.isAdmin)
+                                          .first
+                                          .uuid) {
+                                    // TODO: change back to 3 players for a game but for testing purposes 2
+                                    if (_apiProvider.lobbyStatus!.users.length <
+                                        0) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                              'You need at least 3 players to start the game'),
+                                        ),
+                                      );
+                                      return;
+                                    }
+                                    String token =
+                                        await ref.read(apiProvider).getToken();
+                                    ref.read(apiProvider).startGame(token);
+                                    joiningGame = true;
+                                  } else {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                         content: Text(
-                                            'You need at least 3 players to start the game'),
+                                            'Only the Host can start the game'),
                                       ),
                                     );
-                                    return;
                                   }
-                                  String token =
-                                      await ref.read(apiProvider).getToken();
-                                  ref.read(apiProvider).startGame(token);
-                                  joiningGame = true;
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                          'Only the Host can start the game'),
-                                    ),
-                                  );
-                                }
-                              },
-                              child: const Padding(
-                                padding: EdgeInsets.all(3.0),
-                                child: Text('Start Game',
-                                    style: TextStyle(
-                                        fontSize: 20, color: Colors.white70)),
-                              )),
-                        )
-                      ],
-                    )
+                                },
+                                child: const Padding(
+                                  padding: EdgeInsets.all(2.0),
+                                  child: Text('Start Game',
+                                      style: TextStyle(
+                                          fontSize: 20, color: Colors.white70)),
+                                )),
+                          )
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
                   ],
                 ),
               )),

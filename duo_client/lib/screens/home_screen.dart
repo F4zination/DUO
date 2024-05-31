@@ -9,6 +9,7 @@ import 'package:duo_client/widgets/game_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter/services.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   static const route = "/home";
@@ -29,6 +30,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   void initState() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       ref.read(apiProvider).sendUserstatusUpdate(
           await ref.read(apiProvider).getToken(), FriendState.online);

@@ -1,23 +1,19 @@
-import 'package:duo_client/pb/game_statistic.pb.dart';
 import 'package:duo_client/utils/constants.dart';
+import 'package:duo_client/utils/models/played_game.dart';
 import 'package:duo_client/widgets/duo_container.dart';
 import 'package:flutter/material.dart';
 
 class RecentGameItem extends StatelessWidget {
-  final GameStatistic gameStatistic;
+  final PlayedGame playedGame;
   final VoidCallback? onTap;
   const RecentGameItem({
-    required this.gameStatistic,
+    required this.playedGame,
     this.onTap,
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    final int ownPlace = gameStatistic.playerBoard
-        .firstWhere((element) => element.name == 'Player1')
-        .rank; //TODO: Replace with real user
-
     return Padding(
       padding: const EdgeInsets.only(right: Constants.defaultPadding),
       child: DuoContainer(
@@ -35,18 +31,18 @@ class RecentGameItem extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 30,
-                    backgroundColor: switch (ownPlace) {
+                    backgroundColor: switch (playedGame.placement) {
                       1 => Constants.goldColor,
                       2 => Constants.silverColor,
                       3 => Constants.bronzeColor,
                       _ => Theme.of(context).primaryColor,
                     },
                     child: Text(
-                      switch (ownPlace) {
+                      switch (playedGame.placement) {
                         1 => '🥇',
                         2 => '🥈',
                         3 => '🥉',
-                        _ => '${ownPlace}'
+                        _ => '${playedGame.placement}'
                       },
                       style: TextStyle(
                         fontSize: 24,
@@ -64,7 +60,7 @@ class RecentGameItem extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          gameStatistic.gameTitle,
+                          playedGame.gameType,
                           overflow: TextOverflow.ellipsis,
                           style: Theme.of(context)
                               .textTheme
@@ -76,7 +72,7 @@ class RecentGameItem extends StatelessWidget {
                         ),
                         const SizedBox(height: Constants.defaultPadding / 4),
                         Text(
-                          '${gameStatistic.playerBoard.length} Players',
+                          '${playedGame.amountofPlayers} Players',
                           style:
                               Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     color: Theme.of(context)

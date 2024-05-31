@@ -52,14 +52,25 @@ func (server *Server) GetGameState(req *pb.GetGameStateRequest, stream pb.DUOSer
 }
 
 func (server *Server) GetStackStream(stream pb.DUOService_GetStackStreamServer) error {
-	payload, tokenErr := server.Maker.VerifyToken(req.Token)
+	tokenValue := stream.Context().Value("token")
+	if tokenValue == nil {
+		log.Printf("no token provided")
+		return status.Errorf(codes.Unauthenticated, "no token provided")
+	}
+	payload, tokenErr := server.Maker.VerifyToken(stream.Context().Value("token").(string))
 	if tokenErr != nil {
 		log.Printf("error verifying token: %v", tokenErr)
 		return status.Errorf(codes.Unauthenticated, "invalid token")
 	}
 
+	gameId, getErr := server.Store.GetPlayersGameId(context.Background(), payload.UserID)
+	if getErr != nil {
+		log.Printf("error getting players game id: %v", getErr)
+		return status.Errorf(codes.Internal, "error getting players game id")
+	}
+
 	// Add user to game
-	addErr := server.GameHandler.SetStackStream(int(req.GameId), payload.UserID, stream)
+	addErr := server.GameHandler.SetStackStream(int(gameId.GameID), payload.UserID, stream)
 	if addErr != nil {
 		log.Printf("error adding user to game: %v", addErr)
 		return status.Errorf(codes.Internal, "error adding user to game")

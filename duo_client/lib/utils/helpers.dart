@@ -41,6 +41,14 @@ class Helpers {
     return numberString;
   }
 
+  static String fillPrefixWithZerosForString(String number) {
+    for (int i = 0; i < Constants.lengthJoinCode - number.length; i++) {
+      number = '0$number';
+    }
+    debugPrint('Number: $number');
+    return number;
+  }
+
   static Widget getTopThreeCircleAvatar(BuildContext context, int index) {
     assert(index > 0 && index < 4, 'Index must be between 1 and 3');
     return CircleAvatar(

@@ -80,7 +80,6 @@ func (server *Server) SendFriendRequestResponse(context context.Context, req *pb
 		log.Printf("error parsing target id: %v", uuidErr)
 		return nil, status.Errorf(codes.InvalidArgument, "invalid target id")
 	}
-
 	if req.Accept {
 		//accepted
 		_, addFriendErr := server.Store.AddFriendship(context, db.AddFriendshipParams{

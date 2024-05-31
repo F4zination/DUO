@@ -1,6 +1,7 @@
 import 'package:duo_client/provider/friend_provider.dart';
 import 'package:duo_client/provider/game_rule_provider.dart';
 import 'package:duo_client/provider/game_statistic_provider.dart';
+import 'package:duo_client/provider/played_games_provider.dart';
 import 'package:duo_client/screens/home_screen.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:duo_client/widgets/add_friend_dialog.dart';
@@ -75,10 +76,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             children: [
                               const SizedBox(width: Constants.defaultPadding),
                               ...ref
-                                  .watch(gameStatisticProvider)
-                                  .gameStatistics
-                                  .map((gameStatistic) => RecentGameItem(
-                                        gameStatistic: gameStatistic,
+                                  .watch(playedGamesProvider)
+                                  .playedGames
+                                  .map((playedGame) => RecentGameItem(
+                                        playedGame: playedGame,
                                       )),
                             ],
                           ),
