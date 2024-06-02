@@ -31,8 +31,8 @@ WHERE user1_id = $1 OR user2_id = $1;
 -- name: AddFriendship :one
 INSERT INTO friendships (user1_id, user2_id)
 VALUES (
-    CASE WHEN $1 < $2 THEN $1 ELSE $2 END,
-    CASE WHEN $1 < $2 THEN $2 ELSE $1 END
+    CASE WHEN $1::uuid < $2::uuid THEN $1::uuid ELSE $2::uuid END,
+    CASE WHEN $1::uuid < $2::uuid THEN $2::uuid ELSE $1::uuid END
 )
 ON CONFLICT (user1_id, user2_id) DO NOTHING
 RETURNING *;

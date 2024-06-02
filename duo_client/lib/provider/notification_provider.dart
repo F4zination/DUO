@@ -1,4 +1,3 @@
-import 'package:duo_client/provider/api_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:duo_client/pb/notification.pb.dart' as notification;
