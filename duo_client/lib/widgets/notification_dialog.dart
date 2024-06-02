@@ -76,6 +76,9 @@ class _NotificationDialogState extends ConsumerState<NotificationDialog> {
                                   padding: const EdgeInsets.all(
                                       Constants.defaultPadding / 2),
                                   child: FriendRequestTile(
+                                      onDeleted: () => setState(() {
+                                            _friendRequests.removeAt(index);
+                                          }),
                                       friendRequest: _friendRequests[index]),
                                 );
                               },

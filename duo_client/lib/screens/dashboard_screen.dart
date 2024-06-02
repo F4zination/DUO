@@ -1,3 +1,5 @@
+import 'package:duo_client/pb/friend.pbjson.dart';
+import 'package:duo_client/provider/api_provider.dart';
 import 'package:duo_client/provider/friend_provider.dart';
 import 'package:duo_client/provider/game_rule_provider.dart';
 import 'package:duo_client/provider/game_statistic_provider.dart';
@@ -13,14 +15,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class DashboardScreen extends StatefulWidget {
+class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
 
   @override
-  State<DashboardScreen> createState() => _DashboardScreenState();
+  ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class _DashboardScreenState extends ConsumerState<DashboardScreen> {
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      ref.read(apiProvider).getFriends(await ref.read(apiProvider).getToken());
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

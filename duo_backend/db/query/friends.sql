@@ -22,9 +22,9 @@ AND status = 'pending';
 
 -- name: GetFriendsByUserId :many
 SELECT * FROM friendships JOIN duouser ON (
-    (friendships.user1_id = duouser.id AND friendships.user2_id = $1)
+    (friendships.user1_id = duouser.uuid AND friendships.user2_id = $1)
     OR
-    (friendships.user2_id = duouser.id AND friendships.user1_id = $1)
+    (friendships.user2_id = duouser.uuid AND friendships.user1_id = $1)
 )
 WHERE user1_id = $1 OR user2_id = $1;
 

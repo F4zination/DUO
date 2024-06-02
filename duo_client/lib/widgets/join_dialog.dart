@@ -136,7 +136,7 @@ class _JoinDialogState extends ConsumerState<JoinDialog> {
     ref.read(apiProvider).joinLobby(
         ref.read(storageProvider).accessToken, int.parse(_controller.text));
     // TODO: some Error happens here that the user is naviaged to home screen
-    Navigator.of(context).pop();
+
     Navigator.of(context).pushReplacementNamed(LobbyScreen.route);
   }
 }

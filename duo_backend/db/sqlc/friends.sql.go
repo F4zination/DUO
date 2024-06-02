@@ -104,9 +104,9 @@ func (q *Queries) DeleteFriendship(ctx context.Context, arg DeleteFriendshipPara
 
 const getFriendsByUserId = `-- name: GetFriendsByUserId :many
 SELECT user1_id, user2_id, uuid, username, user_status, score, public_key FROM friendships JOIN duouser ON (
-    (friendships.user1_id = duouser.id AND friendships.user2_id = $1)
+    (friendships.user1_id = duouser.uuid AND friendships.user2_id = $1)
     OR
-    (friendships.user2_id = duouser.id AND friendships.user1_id = $1)
+    (friendships.user2_id = duouser.uuid AND friendships.user1_id = $1)
 )
 WHERE user1_id = $1 OR user2_id = $1
 `

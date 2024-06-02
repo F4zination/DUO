@@ -1,6 +1,6 @@
 import 'package:duo_client/pb/friend.pb.dart';
 import 'package:duo_client/provider/api_provider.dart';
-import 'package:duo_client/provider/notification_provider.dart';
+import 'package:duo_client/provider/friend_provider.dart';
 import 'package:duo_client/provider/storage_provider.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:duo_client/utils/helpers.dart';
@@ -10,7 +10,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class FriendRequestTile extends ConsumerWidget {
   final FriendRequest friendRequest;
-  const FriendRequestTile({required this.friendRequest, super.key});
+  final void Function() onDeleted;
+  const FriendRequestTile(
+      {required this.friendRequest, required this.onDeleted, super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -28,18 +30,28 @@ class FriendRequestTile extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.check, color: Colors.white),
             onPressed: () async {
+              onDeleted();
               await ref.read(apiProvider).answerFriendRequest(
-                    // TODO: this requires the token the target user
                     await ref.read(apiProvider).getToken(),
-                    ref.read(storageProvider).userId,
+                    friendRequest.requesterUuid,
                     true,
                   );
-              // ref.read(notificationProvider).removeNotification();
+              ref
+                  .read(apiProvider)
+                  .getFriends(await ref.read(apiProvider).getToken());
+              //ref.read(notificationProvider).removeNotification();
             },
           ),
           IconButton(
             icon: const Icon(Icons.close, color: Colors.white),
-            onPressed: () {},
+            onPressed: () async {
+              onDeleted();
+              await ref.read(apiProvider).answerFriendRequest(
+                    await ref.read(apiProvider).getToken(),
+                    friendRequest.requesterUuid,
+                    false,
+                  );
+            },
           ),
         ],
       ),

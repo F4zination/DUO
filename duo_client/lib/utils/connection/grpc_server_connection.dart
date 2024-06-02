@@ -5,6 +5,7 @@ import 'package:duo_client/pb/lobby.pb.dart';
 import 'package:duo_client/pb/notification.pb.dart' as notification;
 import 'package:duo_client/pb/user_state.pb.dart';
 import 'package:duo_client/pb/void.pb.dart';
+import 'package:duo_client/provider/friend_provider.dart';
 import 'package:duo_client/provider/notification_provider.dart';
 import 'package:duo_client/provider/storage_provider.dart';
 
@@ -25,6 +26,7 @@ class GrpcServerConnection extends AbstractServerConnection {
   late final VoidCallback _notifyListeners;
   final StorageProvider _storage;
   final NotificationProvider _notificationProvider;
+  final FriendProvider _friendProvider;
 
   ResponseStream<LobbyStatus>? lobbyStream;
   ResponseStream<GameState>? gameStream;
@@ -40,8 +42,8 @@ class GrpcServerConnection extends AbstractServerConnection {
 
   // Stream<StackRequest> stackRequestStream = const Stream.empty();
   StreamController<StackRequest>? stackRequestStreamController;
-  GrpcServerConnection(
-      this._storage, this._notificationProvider, this._notifyListeners)
+  GrpcServerConnection(this._storage, this._notificationProvider,
+      this._friendProvider, this._notifyListeners)
       : super() {
     channel = ClientChannel(
       _storage.grpcHost,
@@ -540,6 +542,7 @@ class GrpcServerConnection extends AbstractServerConnection {
       FriendList response = await client.getFriendList(TokenOnlyRequest(
         token: token,
       ));
+      _friendProvider.setFriends(response.friends);
       return response.friends;
     } catch (e) {
       debugPrint('Error fetching friends: $e');

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class FriendProvider extends ChangeNotifier {
-  ApiProvider? _apiProvider;
   final List<Friend> _friends = [
     // Friend(
     //   uuid: '1',
@@ -35,18 +34,17 @@ class FriendProvider extends ChangeNotifier {
 
   List<Friend> get friends => _friends;
 
-  Future<void> fetchFriends() async {
-    _friends.clear();
-    String token = await _apiProvider!.getToken();
-    _friends.addAll(await _apiProvider!.getFriends(token));
-    notifyListeners();
-  }
-
   //TODO[adrian] maybe: void deleteFriendRequests(String requesterId) {}
 
   void addFriend(Friend friend) {
     _friends.add(friend);
     // dont know if this is necessary
+    notifyListeners();
+  }
+
+  void setFriends(List<Friend> friends) {
+    _friends.clear();
+    _friends.addAll(friends);
     notifyListeners();
   }
 
