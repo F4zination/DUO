@@ -74,7 +74,9 @@ class AddFriendDialog extends ConsumerWidget {
                             .pushNamed(QrCodeScanner.route) as String?;
                         if (friendId != null) {
                           await ref.read(apiProvider).sendFriendRequest(
-                              await ref.read(apiProvider).getToken(), friendId);
+                              await ref.read(apiProvider).getToken(),
+                              ref.read(storageProvider).username,
+                              friendId);
                         }
                       },
                       icon: const Icon(

@@ -5,9 +5,7 @@ import 'package:duo_client/pb/lobby.pb.dart';
 import 'package:duo_client/pb/notification.pb.dart' as notification;
 import 'package:duo_client/pb/user_state.pb.dart';
 import 'package:duo_client/pb/void.pb.dart';
-import 'package:duo_client/provider/friend_provider.dart';
-import 'package:duo_client/provider/notification_provider.dart';
-import 'package:duo_client/provider/storage_provider.dart';
+import 'package:duo_client/utils/connection/server_events.dart';
 
 import '../../pb/auth_messages.pb.dart';
 import 'abstract_connection.dart';
@@ -23,10 +21,6 @@ import 'package:rsa_encrypt/rsa_encrypt.dart';
 class GrpcServerConnection extends AbstractServerConnection {
   late final ClientChannel channel;
   late final DUOServiceClient client;
-  late final VoidCallback _notifyListeners;
-  final StorageProvider _storage;
-  final NotificationProvider _notificationProvider;
-  final FriendProvider _friendProvider;
 
   ResponseStream<LobbyStatus>? lobbyStream;
   ResponseStream<GameState>? gameStream;
@@ -40,15 +34,12 @@ class GrpcServerConnection extends AbstractServerConnection {
   StreamController<PlayerAction> playerActionStreamController =
       StreamController<PlayerAction>.broadcast();
 
-  // Stream<StackRequest> stackRequestStream = const Stream.empty();
   StreamController<StackRequest>? stackRequestStreamController;
-  GrpcServerConnection(this._storage, this._notificationProvider,
-      this._friendProvider, this._notifyListeners)
-      : super() {
+  GrpcServerConnection({required String host}) : super() {
     channel = ClientChannel(
-      _storage.grpcHost,
+      host,
       port: Constants.port,
-      //TODO make secure
+      //TODO make secure for release
       options: const ChannelOptions(credentials: ChannelCredentials.insecure()),
     );
     client = DUOServiceClient(channel);
@@ -68,10 +59,12 @@ class GrpcServerConnection extends AbstractServerConnection {
         publicKey: publicPEMKey,
       ));
 
-      await _storage.setUsername(username);
-      await _storage.setUserId(resp.uuid);
-      await _storage.setAccessToken(resp.authToken);
-      await _storage.setPrivateKey(privatePEMKey);
+      eventController.add(RegisterUserEvent(
+        uuid: resp.uuid,
+        username: username,
+        accessToken: resp.authToken,
+        privatePEMKey: privatePEMKey,
+      ));
     } catch (e) {
       // If the registration fails, return -1
       return -1;
@@ -82,7 +75,7 @@ class GrpcServerConnection extends AbstractServerConnection {
 
   /// Logs in a user with the server
   @override
-  Future<int> loginUser(String uuid) async {
+  Future<int> loginUser(String uuid, String privateKey) async {
     String decryptedChallenge = '';
 
     ////////////////////////////////////////////
@@ -92,7 +85,6 @@ class GrpcServerConnection extends AbstractServerConnection {
       LoginChallengeRequest lcr =
           await client.requestLoginChallenge(LoginRequest(uuid: uuid));
 
-      String privateKey = _storage.privateKey;
       var helper = RsaKeyHelper();
 
       RSAPrivateKey privKey = helper.parsePrivateKeyFromPem(privateKey);
@@ -120,9 +112,11 @@ class GrpcServerConnection extends AbstractServerConnection {
         decryptedChallenge: decryptedChallenge,
       ));
 
-      await _storage.setExpireDate(lr.expiresAt.toDateTime());
-      await _storage.setAccessToken(lr.token);
       debugPrint('created token and expire date');
+      eventController.add(LoginUserEvent(
+        token: lr.token,
+        expirationDate: lr.expiresAt.toDateTime(),
+      ));
     } catch (e) {
       return -1;
     }
@@ -143,45 +137,35 @@ class GrpcServerConnection extends AbstractServerConnection {
 
       lobbyStream?.listen(
         (value) {
-          lobbyStatus = value;
+          // lobbyStatus = value;
+          eventController.add(LobbyStatusEvent(value));
           //if game is starting
-          if (lobbyStatus?.isStarting == true) {
+          if (value.isStarting == true) {
             debugPrint('received lobby status is starting == true');
-            gameId = lobbyStatus?.gameId;
-            isStackOwner = lobbyStatus?.users
-                    .firstWhere((element) => element.isStack)
-                    .uuid ==
-                _storage.userId;
-            _notifyListeners();
-            lobbyStatus = null;
             lobbyStream?.cancel();
-            _notifyListeners();
             return;
           }
           //if is deleted
-          if (lobbyStatus?.isDeleted == true) {
+          if (value.isDeleted == true) {
             debugPrint('received lobby status is deleted');
-            gameId = -2;
-            lobbyStatus = null;
+
             lobbyStream?.cancel();
-            _notifyListeners();
             return;
           }
-          _notifyListeners();
         },
         cancelOnError: true,
         onError: (e) {
+          eventController.add(LobbyStatusDoneEvent());
           debugPrint('Error in Lobby Stream: $e');
         },
         onDone: () {
-          lobbyStatus = null;
+          eventController.add(LobbyStatusDoneEvent());
           lobbyStream = null;
-          _notifyListeners();
           debugPrint('Lobby Stream Done');
         },
       );
     } catch (e) {
-      print('Error in Lobby Stream: $e');
+      debugPrint('Error in Lobby Stream: $e');
       return -1;
     }
     return 0;
@@ -200,39 +184,28 @@ class GrpcServerConnection extends AbstractServerConnection {
 
       lobbyStream?.listen(
         (value) {
-          lobbyStatus = value;
+          eventController.add(LobbyStatusEvent(value));
           //if is starting
-          if (lobbyStatus?.isStarting == true) {
-            gameId = lobbyStatus?.gameId;
-            _notifyListeners();
-            isStackOwner = lobbyStatus?.users
-                    .firstWhere((element) => element.isStack)
-                    .uuid ==
-                _storage.userId;
-            _notifyListeners();
-            lobbyStatus = null;
+          if (value.isStarting == true) {
             lobbyStream?.cancel();
-            _notifyListeners();
           }
           //if is deleted
-          if (lobbyStatus?.isDeleted == true) {
+          if (value.isDeleted == true) {
             debugPrint('received lobby status is deleted');
-            lobbyStatus = null;
+
             lobbyStream?.cancel();
             lobbyStream = null;
-            _notifyListeners();
           }
-          _notifyListeners();
         },
         cancelOnError: true,
         onError: (e) {
+          eventController.add(LobbyStatusDoneEvent());
           debugPrint('Error in Lobby Stream: $e');
           return -1;
         },
         onDone: () {
-          lobbyStatus = null;
+          eventController.add(LobbyStatusDoneEvent());
           lobbyStream = null;
-          _notifyListeners();
           debugPrint('Lobby Stream Done');
         },
       );
@@ -253,13 +226,11 @@ class GrpcServerConnection extends AbstractServerConnection {
       // ));
       // debugPrint('Response: ${res.success}');
 
+      eventController.add(LobbyStatusDoneEvent());
       await lobbyStream?.cancel();
-      lobbyStatus = null;
       lobbyStream = null;
 
       debugPrint('Lobby Stream Cancelled');
-
-      _notifyListeners();
 
       return 0;
     } catch (e) {
@@ -289,7 +260,7 @@ class GrpcServerConnection extends AbstractServerConnection {
         token: token,
         userUuid: deviceId,
       ));
-      _notifyListeners();
+      //TODO[finn] check this: _notifyListeners();
     } catch (e) {
       return -1;
     }
@@ -304,17 +275,19 @@ class GrpcServerConnection extends AbstractServerConnection {
 
       playerStream.listen(
         (value) {
-          playerState = value;
-          _notifyListeners();
+          // playerState = value;
+          // _notifyListeners();
+          eventController.add(PlayerStateEvent(value));
         },
         cancelOnError: true,
         onError: (e) {
+          eventController.add(PlayerStateDoneEvent());
           debugPrint('Error: $e');
         },
         onDone: () {
-          playerState = null;
+          // playerState = null;
+          eventController.add(PlayerStateDoneEvent());
           gameStream = null;
-          _notifyListeners();
           debugPrint('Player Stream Done');
         },
       );
@@ -339,7 +312,6 @@ class GrpcServerConnection extends AbstractServerConnection {
           onCancel: () =>
               debugPrint('Stream controller for stack request cancelled'),
         );
-        _notifyListeners();
       }
       final responseStream =
           client.getStackStream(stackRequestStreamController!.stream,
@@ -348,11 +320,12 @@ class GrpcServerConnection extends AbstractServerConnection {
               ));
       stackStream = responseStream;
       stackStream?.listen(
-        (_) {
+        (value) {
           if (!streamEstablishedCompleter.isCompleted) {
             if (!streamEstablishedCompleter.isCompleted) {
               streamEstablishedCompleter.complete();
             }
+            eventController.add(StackStateEvent(value));
             debugPrint('stack stream acknowledge received');
           }
         },
@@ -361,20 +334,20 @@ class GrpcServerConnection extends AbstractServerConnection {
             streamEstablishedCompleter.completeError(error);
             stackStream?.cancel();
             stackStream = null;
-            _notifyListeners();
+            eventController.add(StackStateDoneEvent());
           }
           debugPrint('Error establishing stack stream: $error');
         },
         onDone: () {
           debugPrint('Stack stream done');
           stackStream = null;
-          _notifyListeners();
+          eventController.add(StackStateDoneEvent());
         },
         cancelOnError: false,
       );
 
       await streamEstablishedCompleter.future;
-      _notifyListeners();
+      eventController.add(StackStateInitEvent());
       return 0;
     } catch (e) {
       debugPrint('Error sending stack request: $e');
@@ -406,17 +379,16 @@ class GrpcServerConnection extends AbstractServerConnection {
 
       gameStateStream.listen(
         (value) {
-          gameState = value;
-          _notifyListeners();
+          eventController.add(GameStateEvent(value));
         },
         cancelOnError: true,
         onError: (e) {
+          eventController.add(GameStateDoneEvent());
           debugPrint('Error: $e');
         },
         onDone: () {
-          gameState = null;
           gameStream = null;
-          _notifyListeners();
+          eventController.add(GameStateDoneEvent());
           debugPrint('Game Stream Done');
         },
       );
@@ -437,7 +409,6 @@ class GrpcServerConnection extends AbstractServerConnection {
           onCancel: () =>
               debugPrint('Stream controller for user status update cancelled'),
         );
-        _notifyListeners();
       }
       final responseStream =
           client.statusChangeStream(userStatusStreamController!.stream,
@@ -452,6 +423,7 @@ class GrpcServerConnection extends AbstractServerConnection {
               streamEstablishedCompleter.complete();
             }
             debugPrint('User status stream acknowledge received');
+            eventController.add(UserStatusAckEvent());
           }
         },
         onError: (error) {
@@ -459,20 +431,20 @@ class GrpcServerConnection extends AbstractServerConnection {
             streamEstablishedCompleter.completeError(error);
             userStatusAckStream?.cancel();
             userStatusAckStream = null;
-            _notifyListeners();
+            eventController.add(UserStatusDoneEvent());
           }
           debugPrint('Error establishing user status stream: $error');
         },
         onDone: () {
           debugPrint('User status stream done');
           userStatusAckStream = null;
-          _notifyListeners();
+          eventController.add(UserStatusDoneEvent());
         },
         cancelOnError: true,
       );
 
       await streamEstablishedCompleter.future;
-      _notifyListeners();
+      eventController.add(UserStatusInitEvent());
       return 0;
     } catch (e) {
       debugPrint('Error sending userstatus update: $e');
@@ -542,7 +514,7 @@ class GrpcServerConnection extends AbstractServerConnection {
       FriendList response = await client.getFriendList(TokenOnlyRequest(
         token: token,
       ));
-      _friendProvider.setFriends(response.friends);
+      eventController.add(GetFriendsEvent(response.friends));
       return response.friends;
     } catch (e) {
       debugPrint('Error fetching friends: $e');
@@ -551,11 +523,12 @@ class GrpcServerConnection extends AbstractServerConnection {
   }
 
   @override
-  Future<int> sendFriendRequest(String token, String friendId) async {
+  Future<int> sendFriendRequest(
+      String token, String username, String friendId) async {
     try {
       debugPrint('Sending friend request to $friendId');
       await client.sendFriendRequest(FriendRequestRequest(
-        requesterName: _storage.username,
+        requesterName: username,
         token: token,
         targetId: friendId,
       ));
@@ -576,18 +549,21 @@ class GrpcServerConnection extends AbstractServerConnection {
       notificationStream = stream;
       notificationStream!.listen(
         (value) {
-          _notificationProvider.addNotification(value);
-          _notifyListeners();
+          eventController.add(NotificationEvent(value));
+          // _notificationProvider.addNotification(value);
+          // _notifyListeners();
         },
         cancelOnError: true,
         onError: (e) {
+          eventController.add(NotificationDoneEvent());
           debugPrint('Error: $e');
         },
         onDone: () {
+          notificationStream = null;
+          eventController.add(NotificationDoneEvent());
           debugPrint('Notification Stream Done');
         },
       );
-      _notifyListeners();
     } catch (e) {
       return -1;
     }
