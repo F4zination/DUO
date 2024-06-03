@@ -88,6 +88,7 @@ class _DuoAppState extends ConsumerState<DuoApp> {
                   debugPrint('User not found');
                   showDialog(
                     context: context,
+                    barrierDismissible: false,
                     builder: (context) => const GetUserDialog(),
                   );
                 }
