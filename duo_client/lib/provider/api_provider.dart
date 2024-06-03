@@ -3,6 +3,7 @@ import 'package:duo_client/pb/lobby.pb.dart';
 import 'package:duo_client/pb/game.pb.dart';
 import 'package:duo_client/provider/friend_provider.dart';
 import 'package:duo_client/provider/notification_provider.dart';
+import 'package:duo_client/utils/connection/listener_manager.dart';
 import 'package:flutter/widgets.dart';
 
 import 'storage_provider.dart';
@@ -21,6 +22,7 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
   final StorageProvider _storageProvider;
   final FriendProvider _friendProvider;
   final NotificationProvider _notificationProvider;
+  final ListenerManager listenerManager;
 
   @override
   LobbyStatus? get lobbyStatus => _serverConnection?.lobbyStatus;
@@ -34,8 +36,8 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
   @override
   GameState? get gameState => _serverConnection?.gameState;
 
-  ApiProvider(
-      this._storageProvider, this._notificationProvider, this._friendProvider) {
+  ApiProvider(this._storageProvider, this._notificationProvider,
+      this._friendProvider, this.listenerManager) {
     init(_storageProvider.lastSelectedConnectionType); //Defaults to grpc
   }
 
@@ -44,7 +46,7 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
     switch (type) {
       case ServerConnectionType.grpc:
         _serverConnection = GrpcServerConnection(_storageProvider,
-            _notificationProvider, _friendProvider, notifyListeners);
+            _notificationProvider, _friendProvider, listenerManager);
         break;
       case ServerConnectionType.bluetooth:
         //maybe implement bluetooth connection

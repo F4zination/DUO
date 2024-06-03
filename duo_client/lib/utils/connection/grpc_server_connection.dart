@@ -8,6 +8,7 @@ import 'package:duo_client/pb/void.pb.dart';
 import 'package:duo_client/provider/friend_provider.dart';
 import 'package:duo_client/provider/notification_provider.dart';
 import 'package:duo_client/provider/storage_provider.dart';
+import 'package:duo_client/utils/connection/listener_manager.dart';
 
 import '../../pb/auth_messages.pb.dart';
 import 'abstract_connection.dart';
@@ -23,7 +24,7 @@ import 'package:rsa_encrypt/rsa_encrypt.dart';
 class GrpcServerConnection extends AbstractServerConnection {
   late final ClientChannel channel;
   late final DUOServiceClient client;
-  late final VoidCallback _notifyListeners;
+  late final ListenerManager listenerManager;
   final StorageProvider _storage;
   final NotificationProvider _notificationProvider;
   final FriendProvider _friendProvider;
@@ -43,7 +44,7 @@ class GrpcServerConnection extends AbstractServerConnection {
   // Stream<StackRequest> stackRequestStream = const Stream.empty();
   StreamController<StackRequest>? stackRequestStreamController;
   GrpcServerConnection(this._storage, this._notificationProvider,
-      this._friendProvider, this._notifyListeners)
+      this._friendProvider, this.listenerManager)
       : super() {
     channel = ClientChannel(
       _storage.grpcHost,
@@ -152,10 +153,10 @@ class GrpcServerConnection extends AbstractServerConnection {
                     .firstWhere((element) => element.isStack)
                     .uuid ==
                 _storage.userId;
-            _notifyListeners();
+            listenerManager.notifyListeners();
             lobbyStatus = null;
             lobbyStream?.cancel();
-            _notifyListeners();
+            listenerManager.notifyListeners();
             return;
           }
           //if is deleted
@@ -164,10 +165,10 @@ class GrpcServerConnection extends AbstractServerConnection {
             gameId = -2;
             lobbyStatus = null;
             lobbyStream?.cancel();
-            _notifyListeners();
+            listenerManager.notifyListeners();
             return;
           }
-          _notifyListeners();
+          listenerManager.notifyListeners();
         },
         cancelOnError: true,
         onError: (e) {
@@ -176,7 +177,7 @@ class GrpcServerConnection extends AbstractServerConnection {
         onDone: () {
           lobbyStatus = null;
           lobbyStream = null;
-          _notifyListeners();
+          listenerManager.notifyListeners();
           debugPrint('Lobby Stream Done');
         },
       );
@@ -204,15 +205,15 @@ class GrpcServerConnection extends AbstractServerConnection {
           //if is starting
           if (lobbyStatus?.isStarting == true) {
             gameId = lobbyStatus?.gameId;
-            _notifyListeners();
+            listenerManager.notifyListeners();
             isStackOwner = lobbyStatus?.users
                     .firstWhere((element) => element.isStack)
                     .uuid ==
                 _storage.userId;
-            _notifyListeners();
+            listenerManager.notifyListeners();
             lobbyStatus = null;
             lobbyStream?.cancel();
-            _notifyListeners();
+            listenerManager.notifyListeners();
           }
           //if is deleted
           if (lobbyStatus?.isDeleted == true) {
@@ -220,9 +221,9 @@ class GrpcServerConnection extends AbstractServerConnection {
             lobbyStatus = null;
             lobbyStream?.cancel();
             lobbyStream = null;
-            _notifyListeners();
+            listenerManager.notifyListeners();
           }
-          _notifyListeners();
+          listenerManager.notifyListeners();
         },
         cancelOnError: true,
         onError: (e) {
@@ -232,7 +233,7 @@ class GrpcServerConnection extends AbstractServerConnection {
         onDone: () {
           lobbyStatus = null;
           lobbyStream = null;
-          _notifyListeners();
+          listenerManager.notifyListeners();
           debugPrint('Lobby Stream Done');
         },
       );
@@ -259,7 +260,7 @@ class GrpcServerConnection extends AbstractServerConnection {
 
       debugPrint('Lobby Stream Cancelled');
 
-      _notifyListeners();
+      listenerManager.notifyListeners();
 
       return 0;
     } catch (e) {
@@ -289,7 +290,7 @@ class GrpcServerConnection extends AbstractServerConnection {
         token: token,
         userUuid: deviceId,
       ));
-      _notifyListeners();
+      listenerManager.notifyListeners();
     } catch (e) {
       return -1;
     }
@@ -305,7 +306,7 @@ class GrpcServerConnection extends AbstractServerConnection {
       playerStream.listen(
         (value) {
           playerState = value;
-          _notifyListeners();
+          listenerManager.notifyListeners();
         },
         cancelOnError: true,
         onError: (e) {
@@ -314,7 +315,7 @@ class GrpcServerConnection extends AbstractServerConnection {
         onDone: () {
           playerState = null;
           gameStream = null;
-          _notifyListeners();
+          listenerManager.notifyListeners();
           debugPrint('Player Stream Done');
         },
       );
@@ -339,7 +340,7 @@ class GrpcServerConnection extends AbstractServerConnection {
           onCancel: () =>
               debugPrint('Stream controller for stack request cancelled'),
         );
-        _notifyListeners();
+        listenerManager.notifyListeners();
       }
       final responseStream =
           client.getStackStream(stackRequestStreamController!.stream,
@@ -361,20 +362,20 @@ class GrpcServerConnection extends AbstractServerConnection {
             streamEstablishedCompleter.completeError(error);
             stackStream?.cancel();
             stackStream = null;
-            _notifyListeners();
+            listenerManager.notifyListeners();
           }
           debugPrint('Error establishing stack stream: $error');
         },
         onDone: () {
           debugPrint('Stack stream done');
           stackStream = null;
-          _notifyListeners();
+          listenerManager.notifyListeners();
         },
         cancelOnError: false,
       );
 
       await streamEstablishedCompleter.future;
-      _notifyListeners();
+      listenerManager.notifyListeners();
       return 0;
     } catch (e) {
       debugPrint('Error sending stack request: $e');
@@ -407,7 +408,7 @@ class GrpcServerConnection extends AbstractServerConnection {
       gameStateStream.listen(
         (value) {
           gameState = value;
-          _notifyListeners();
+          listenerManager.notifyListeners();
         },
         cancelOnError: true,
         onError: (e) {
@@ -416,7 +417,7 @@ class GrpcServerConnection extends AbstractServerConnection {
         onDone: () {
           gameState = null;
           gameStream = null;
-          _notifyListeners();
+          listenerManager.notifyListeners();
           debugPrint('Game Stream Done');
         },
       );
@@ -437,7 +438,7 @@ class GrpcServerConnection extends AbstractServerConnection {
           onCancel: () =>
               debugPrint('Stream controller for user status update cancelled'),
         );
-        _notifyListeners();
+        listenerManager.notifyListeners();
       }
       final responseStream =
           client.statusChangeStream(userStatusStreamController!.stream,
@@ -459,20 +460,20 @@ class GrpcServerConnection extends AbstractServerConnection {
             streamEstablishedCompleter.completeError(error);
             userStatusAckStream?.cancel();
             userStatusAckStream = null;
-            _notifyListeners();
+            listenerManager.notifyListeners();
           }
           debugPrint('Error establishing user status stream: $error');
         },
         onDone: () {
           debugPrint('User status stream done');
           userStatusAckStream = null;
-          _notifyListeners();
+          listenerManager.notifyListeners();
         },
         cancelOnError: true,
       );
 
       await streamEstablishedCompleter.future;
-      _notifyListeners();
+      listenerManager.notifyListeners();
       return 0;
     } catch (e) {
       debugPrint('Error sending userstatus update: $e');
@@ -577,7 +578,7 @@ class GrpcServerConnection extends AbstractServerConnection {
       notificationStream!.listen(
         (value) {
           _notificationProvider.addNotification(value);
-          _notifyListeners();
+          listenerManager.notifyListeners();
         },
         cancelOnError: true,
         onError: (e) {
@@ -587,7 +588,7 @@ class GrpcServerConnection extends AbstractServerConnection {
           debugPrint('Notification Stream Done');
         },
       );
-      _notifyListeners();
+      listenerManager.notifyListeners();
     } catch (e) {
       return -1;
     }
