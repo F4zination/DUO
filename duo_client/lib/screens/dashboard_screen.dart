@@ -1,4 +1,3 @@
-import 'package:duo_client/pb/friend.pbjson.dart';
 import 'package:duo_client/provider/api_provider.dart';
 import 'package:duo_client/provider/friend_provider.dart';
 import 'package:duo_client/provider/game_rule_provider.dart';

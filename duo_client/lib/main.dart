@@ -1,6 +1,5 @@
 import 'package:duo_client/pb/friend.pb.dart';
 import 'package:duo_client/provider/api_provider.dart';
-import 'package:duo_client/provider/friend_provider.dart';
 import 'package:duo_client/provider/storage_provider.dart';
 import 'package:duo_client/screens/award_screen.dart';
 import 'package:duo_client/screens/game_screen.dart';
@@ -8,11 +7,17 @@ import 'package:duo_client/screens/home_screen.dart';
 import 'package:duo_client/screens/lobby_screen.dart';
 import 'package:duo_client/screens/qr_scanner_screen.dart';
 import 'package:duo_client/screens/splash_screen.dart';
+import 'package:duo_client/utils/connection/grpc_server_connection.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:duo_client/widgets/get_user_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+/// Main entry point for accessing the service locator
+/// It helps getting the current AbstractServerConnection instance
+GetIt getIt = GetIt.instance;
 
 void main() {
   runApp(const ProviderScope(child: DuoApp()));
@@ -71,15 +76,19 @@ class _DuoAppState extends ConsumerState<DuoApp> {
 
                 debugPrint(
                     'trying to connect to ${ref.read(storageProvider).grpcHost}');
-                ref.read(apiProvider).init(ServerConnectionType.grpc);
+
+                getIt.registerSingleton(GrpcServerConnection(
+                  host: ref.read(storageProvider).grpcHost,
+                ));
+                // you can register other apis here (e.g. bluetooth)
 
                 await ref.read(apiProvider).initUserStatusStream();
                 ref.read(apiProvider).sendUserstatusUpdate(
                     await ref.read(apiProvider).getToken(), FriendState.online);
 
-                return await ref
-                    .read(apiProvider)
-                    .loginUser(ref.read(storageProvider).userId);
+                return await ref.read(apiProvider).loginUser(
+                    ref.read(storageProvider).userId,
+                    ref.read(storageProvider).privateKey);
               },
               onLoadingComplete: (dynamic status) {
                 if (status == 0) {
