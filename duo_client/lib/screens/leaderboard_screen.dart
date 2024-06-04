@@ -65,7 +65,6 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
               ..sort(
                 (a, b) => b.score.compareTo(a.score),
               );
-            //TODO add player to list
 
             return Column(
               mainAxisSize: MainAxisSize.min,
@@ -79,8 +78,8 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                       boardPlace: index + 1,
                       friend: friends[index],
                       isBetterThanPlayer:
-                          friends[index].score > self_user.score, //TODO
-                      isPlayer: friends[index].name == self_user.name, //TODO
+                          friends[index].score > self_user.score,
+                      isPlayer: friends[index].name == self_user.name,
                     );
                   },
                 ),
