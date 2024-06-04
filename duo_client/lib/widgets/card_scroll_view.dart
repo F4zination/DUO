@@ -86,7 +86,7 @@ class _CardScrollViewState extends ConsumerState<CardScrollView> {
         itemCount: cards.length,
         itemBuilder: (context, index) {
           return Dismissible(
-            key: Key(cards[index].cardName),
+            key: UniqueKey(),
             direction: isTurn ? DismissDirection.up : DismissDirection.none,
             onDismissed: (direction) {
               if (!_isReordering) {

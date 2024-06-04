@@ -113,6 +113,7 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
           }
         case StackStateEvent:
           {
+            debugPrint('Received Stack State Event');
             final stackStateEvent = event as StackStateEvent;
             _stackState = stackStateEvent.state;
             notifyListeners();
@@ -342,7 +343,6 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
       "Event stream should not be accessed from apiProvider");
 
   @override
-  // TODO: implement eventController
   StreamController<ServerEvent> get eventController => throw UnimplementedError(
       "Event controller should not be accessed from apiProvider");
 }

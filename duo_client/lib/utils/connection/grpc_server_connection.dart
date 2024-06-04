@@ -327,6 +327,7 @@ class GrpcServerConnection extends AbstractServerConnection {
               streamEstablishedCompleter.complete();
             }
             eventController.add(StackStateEvent(value));
+            debugPrint('card on top: ${value.placeStack.cardIdOnTop}');
             debugPrint('stack stream acknowledge received');
           }
         },
@@ -382,6 +383,7 @@ class GrpcServerConnection extends AbstractServerConnection {
 
       gameStream?.listen(
         (value) {
+          debugPrint('new game state: $value');
           eventController.add(GameStateEvent(value));
         },
         cancelOnError: true,

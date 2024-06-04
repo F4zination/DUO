@@ -48,19 +48,20 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
       setState(() {
         joiningGame = true;
         debugPrint('Game Id: ${_apiProvider.gameId}');
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          Navigator.of(context).pushReplacementNamed(GameScreen.route);
-        });
+      });
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pushReplacementNamed(GameScreen.route);
       });
     }
     if (_apiProvider.gameId == -2 && !_apiProvider.hasLobbyStream) {
       setState(() {
         debugPrint('Lobby Stream: ${_apiProvider.lobbyStatus?.lobbyId}');
         //Case if lobby is deleted by the Host
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          debugPrint('Lobby deletion detected; leaving... ');
-          Navigator.of(context).pushReplacementNamed(HomeScreen.route);
-        });
+
+        debugPrint('Lobby deletion detected; leaving... ');
+      });
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pushReplacementNamed(HomeScreen.route);
       });
     }
 

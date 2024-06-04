@@ -18,9 +18,7 @@ class _GameStacksState extends ConsumerState<GameStacks> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       //init the stack stream
       String token = await ref.read(apiProvider).getToken();
-      await ref
-          .read(apiProvider)
-          .getStackStream(token, ref.read(apiProvider).gameId);
+      ref.read(apiProvider).getStackStream(token, ref.read(apiProvider).gameId);
     });
     super.initState();
   }
@@ -30,8 +28,12 @@ class _GameStacksState extends ConsumerState<GameStacks> {
     ApiProvider _apiProvider = ref.watch(apiProvider);
     StackState stackState = _apiProvider.stackState ??
         StackState(
-          drawStack: DrawStackState(cardIds: ['green_3']),
-          placeStack: PlaceStackState(cardIdOnTop: 'green_4'),
+          drawStack: DrawStackState(
+              cardIds:
+                  _apiProvider.stackState?.drawStack.cardIds ?? ['green_1']),
+          placeStack: PlaceStackState(
+              cardIdOnTop:
+                  _apiProvider.stackState?.placeStack.cardIdOnTop ?? 'green_1'),
         );
     return Padding(
       padding: const EdgeInsets.all(8.0),

@@ -83,7 +83,8 @@ class InviteDialog extends ConsumerWidget {
                         await Share.share(
                             'Join me on Duo using this code: *$invideCode*');
                       },
-                    )
+                    ),
+                    // const SizedBox(width: Constants.defaultPadding / 2),
                   ],
                 ),
               ),

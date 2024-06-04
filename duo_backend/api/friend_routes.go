@@ -56,11 +56,12 @@ func (server *Server) SendFriendRequest(context context.Context, req *pb.FriendR
 	}
 
 	_, dbErr := server.Store.AddFriendRequest(context, db.AddFriendRequestParams{
-		RequesterID: payload.UserID,
-		RequesteeID: targetUuid,
+		RequesterID:   payload.UserID,
+		RequesterName: payload.Username,
+		RequesteeID:   targetUuid,
 	})
 
-	if dbErr != nil {
+	if dbErr != nil && dbErr != sql.ErrNoRows {
 		log.Printf("error adding friend request: %v", dbErr)
 		return nil, status.Errorf(codes.Internal, "error adding friend request to db")
 	}
