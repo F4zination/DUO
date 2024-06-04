@@ -34,9 +34,9 @@ class FriendRequestTile extends ConsumerWidget {
                     friendRequest.requesterUuid,
                     true,
                   );
-              ref
-                  .read(apiProvider)
-                  .getFriends(await ref.read(apiProvider).getToken());
+              // ref
+              //     .read(apiProvider)
+              //     .getFriends(await ref.read(apiProvider).getToken());
               //ref.read(notificationProvider).removeNotification();
             },
           ),

@@ -34,6 +34,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
           await ref.read(apiProvider).getToken(), ref.read(apiProvider).gameId);
       ref.read(apiProvider).sendUserstatusUpdate(
           await ref.read(apiProvider).getToken(), FriendState.inGame);
+      debugPrint('Status in initState of game_screen: $status');
       if (status != 0) {
         debugPrint('Error getting game state stream');
       }
@@ -46,6 +47,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
   @override
   void dispose() {
+    debugPrint('Disposing game_screen');
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,

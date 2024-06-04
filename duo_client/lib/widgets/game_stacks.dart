@@ -1,6 +1,5 @@
 import 'package:duo_client/pb/game.pb.dart';
 import 'package:duo_client/provider/api_provider.dart';
-import 'package:duo_client/provider/storage_provider.dart';
 import 'package:duo_client/widgets/duo_card_stack.dart';
 import 'package:duo_client/widgets/playingcard.dart';
 import 'package:flutter/material.dart';
@@ -16,10 +15,12 @@ class GameStacks extends ConsumerStatefulWidget {
 class _GameStacksState extends ConsumerState<GameStacks> {
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       //init the stack stream
-      ref.read(apiProvider).getStackStream(
-          ref.read(storageProvider).accessToken, ref.read(apiProvider).gameId);
+      String token = await ref.read(apiProvider).getToken();
+      await ref
+          .read(apiProvider)
+          .getStackStream(token, ref.read(apiProvider).gameId);
     });
     super.initState();
   }

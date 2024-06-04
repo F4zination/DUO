@@ -1,7 +1,6 @@
 import 'package:duo_client/provider/api_provider.dart';
 import 'package:duo_client/provider/friend_provider.dart';
 import 'package:duo_client/provider/game_rule_provider.dart';
-import 'package:duo_client/provider/game_statistic_provider.dart';
 import 'package:duo_client/provider/played_games_provider.dart';
 import 'package:duo_client/screens/home_screen.dart';
 import 'package:duo_client/utils/constants.dart';
@@ -77,22 +76,17 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   child: Padding(
                     padding: const EdgeInsets.only(
                         bottom: Constants.defaultPadding * 3),
-                    child: ref
-                            .read(gameStatisticProvider)
-                            .gameStatistics
-                            .isEmpty
-                        ? const EmptySegmentText(text: 'No games played yet')
-                        : Row(
-                            children: [
-                              const SizedBox(width: Constants.defaultPadding),
-                              ...ref
-                                  .watch(playedGamesProvider)
-                                  .playedGames
-                                  .map((playedGame) => RecentGameItem(
-                                        playedGame: playedGame,
-                                      )),
-                            ],
-                          ),
+                    child: Row(
+                      children: [
+                        const SizedBox(width: Constants.defaultPadding),
+                        ...ref
+                            .watch(playedGamesProvider)
+                            .playedGames
+                            .map((playedGame) => RecentGameItem(
+                                  playedGame: playedGame,
+                                )),
+                      ],
+                    ),
                   ),
                 );
               }),
@@ -114,25 +108,30 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 return gameRules.isEmpty
                     ? const EmptySegmentText(text: 'No gamerules yet')
                     : SizedBox(
-                        height: 100,
+                        height: 130,
                         child: ListView.builder(
+                          shrinkWrap: true,
                           scrollDirection: Axis.horizontal,
                           itemBuilder: (context, index) => Padding(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: Constants.defaultPadding),
-                            child: DuoContainer(
-                              width: 150,
-                              child: Center(
-                                child: Text(
-                                  gameRules[index].name,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleLarge
-                                      ?.copyWith(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onPrimary,
-                                      ),
+                                horizontal: Constants.defaultPadding / 2),
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  bottom: Constants.defaultPadding * 2.3),
+                              child: DuoContainer(
+                                width: 150,
+                                child: Center(
+                                  child: Text(
+                                    gameRules[index].name,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleLarge
+                                        ?.copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onPrimary,
+                                        ),
+                                  ),
                                 ),
                               ),
                             ),
@@ -141,7 +140,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         ),
                       );
               }),
-              const SizedBox(height: Constants.defaultPadding * 2),
+              const SizedBox(height: Constants.defaultPadding / 2),
               DuoHeader(title: 'Friends', actions: [
                 IconButton(
                   tooltip: 'Add friend',

@@ -255,6 +255,7 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
 
   @override
   Future<int> getGameStateStream(String token, int gameId) {
+    debugPrint('called getGameStateStream');
     return getIt.get<GrpcServerConnection>().getGameStateStream(token, gameId);
   }
 
