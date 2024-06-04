@@ -192,9 +192,15 @@ func (server *Server) DeleteFriend(context context.Context, req *pb.DeleteFriend
 		return nil, status.Errorf(codes.Unauthenticated, "invalid token")
 	}
 
+	parsedUuid, uuidErr := uuid.Parse(req.TargetId)
+	if uuidErr != nil {
+		log.Printf("error parsing target id: %v", uuidErr)
+		return nil, status.Errorf(codes.InvalidArgument, "invalid target id")
+	}
+
 	_, delErr := server.Store.DeleteFriendship(context, db.DeleteFriendshipParams{
 		Column1: payload.UserID,
-		Column2: req.TargetId,
+		Column2: parsedUuid,
 	})
 
 	if delErr != nil {
