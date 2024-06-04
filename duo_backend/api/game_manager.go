@@ -511,7 +511,11 @@ func (gm *GameManager) AddPlayerStream(gameId int, userId uuid.UUID, stream pb.D
 		return getErr
 	}
 
-	gm.UpdatePlayersCards(gameId, userId.String(), playersCards)
+	updateErr := gm.UpdatePlayersCards(gameId, userId.String(), playersCards)
+	if updateErr != nil {
+		log.Printf("error updating players cards: %v", updateErr)
+		return updateErr
+	}
 
 	sendErr := gm.SendFirstGameStateIfAllPlayersAreReady(gameId)
 	if sendErr != nil {

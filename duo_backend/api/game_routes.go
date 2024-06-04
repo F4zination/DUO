@@ -81,7 +81,6 @@ func (server *Server) GetStackStream(stream pb.DUOService_GetStackStreamServer) 
 }
 
 func (server *Server) GetPlayerStream(stream pb.DUOService_GetPlayerStreamServer) error {
-
 	msg, err := stream.Recv()
 	if err != nil {
 		log.Printf("error receiving message: %v", err)
