@@ -2,7 +2,6 @@ import 'package:duo_client/pb/friend.pb.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:duo_client/widgets/duo_container.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class AddTile extends StatefulWidget {
   const AddTile({
@@ -17,7 +16,6 @@ class AddTile extends StatefulWidget {
 }
 
 class _AddTileState extends State<AddTile> {
-  bool isLoading = false;
   bool watingForPlayer = false;
   late Friend? player;
 
@@ -33,9 +31,6 @@ class _AddTileState extends State<AddTile> {
         child: InkWell(
           borderRadius: BorderRadius.circular(Constants.defaultRadius),
           onTap: () {
-            setState(() {
-              isLoading = true;
-            });
             showDialog(
               context: context,
               builder: (context) => widget.Dialog,
@@ -58,39 +53,24 @@ class _AddTileState extends State<AddTile> {
           },
           child: Padding(
             padding: const EdgeInsets.all(Constants.defaultPadding),
-            child: isLoading
-                ? Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const SizedBox(height: 15),
-                      const SpinKitFadingFour(color: Colors.white, size: 30),
-                      if (watingForPlayer)
-                        Padding(
-                          padding:
-                              const EdgeInsets.all(Constants.defaultPadding),
-                          child: Text('Waiting for ${player!.name}',
-                              style: const TextStyle(color: Colors.white60)),
-                        )
-                    ],
-                  )
-                : Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.add,
-                        size: 35,
-                        color: Theme.of(context).colorScheme.onPrimary,
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        'Add',
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onPrimary,
-                          fontSize: 20,
-                        ),
-                      ),
-                    ],
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.add,
+                  size: 35,
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'Add',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onPrimary,
+                    fontSize: 20,
                   ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

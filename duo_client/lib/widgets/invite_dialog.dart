@@ -16,9 +16,11 @@ class InviteDialog extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.read(apiProvider).getToken().then((token) {
-      ref.read(apiProvider).getFriends(token);
-    });
+    // if this code is executed, it will cause an error
+    // the lobbyStatus will become null and the app will crash
+    // ref.read(apiProvider).getToken().then((token) {
+    //   ref.read(apiProvider).getFriends(token);
+    // });
 
     return Dialog(
       backgroundColor: Constants.secondaryColorDark,

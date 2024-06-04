@@ -110,23 +110,25 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               ]),
               Consumer(builder: (context, ref, child) {
                 var gameRules = ref.watch(gameRuleProvider).gameRules;
-                return gameRules.isNotEmpty
+                return gameRules.isEmpty
                     ? const EmptySegmentText(text: 'No gamerules yet')
                     : SizedBox(
                         height: 100,
                         child: ListView.builder(
                           scrollDirection: Axis.horizontal,
                           itemBuilder: (context, index) => Padding(
-                            padding: const EdgeInsets.only(
-                                right: Constants.defaultPadding),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: Constants.defaultPadding),
                             child: Container(
                               width: 100,
                               decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.surface,
+                                color: Theme.of(context).colorScheme.secondary,
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Center(
-                                child: Text(gameRules[index].name),
+                                child: Text(gameRules[index].name,
+                                    style:
+                                        const TextStyle(color: Colors.white)),
                               ),
                             ),
                           ),

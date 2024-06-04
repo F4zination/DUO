@@ -149,7 +149,6 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                         children: [
                           ...(ref.watch(apiProvider).lobbyStatus?.users ?? [])
                               .map((user) {
-                            // TODO: the user.isStack is not working but is in Database correctly
                             return Padding(
                                 padding: const EdgeInsets.all(
                                     Constants.defaultPadding / 2),
