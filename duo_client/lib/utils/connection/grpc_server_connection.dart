@@ -30,7 +30,6 @@ class GrpcServerConnection extends AbstractServerConnection {
   StreamController<StatusChangeRequest>? userStatusStreamController;
 
   ResponseStream<void_>? userStatusAckStream;
-  Stream<PlayerAction> playerActionStream = const Stream.empty();
   StreamController<PlayerAction> playerActionStreamController =
       StreamController<PlayerAction>.broadcast();
 
@@ -271,26 +270,28 @@ class GrpcServerConnection extends AbstractServerConnection {
   Future<int> getPlayerStream(String token, int gameId) async {
     try {
       ResponseStream<PlayerState> playerStream =
-          client.getPlayerStream(playerActionStream);
+          client.getPlayerStream(playerActionStreamController.stream);
 
-      playerStream.listen(
-        (value) {
-          // playerState = value;
-          // _notifyListeners();
-          eventController.add(PlayerStateEvent(value));
-        },
-        cancelOnError: true,
-        onError: (e) {
-          eventController.add(PlayerStateDoneEvent());
-          debugPrint('Error: $e');
-        },
-        onDone: () {
-          // playerState = null;
-          eventController.add(PlayerStateDoneEvent());
-          gameStream = null;
-          debugPrint('Player Stream Done');
-        },
-      );
+      this.playerStream = playerStream;
+
+      this.playerStream?.listen(
+            (value) {
+              // playerState = value;
+              // _notifyListeners();
+              eventController.add(PlayerStateEvent(value));
+            },
+            cancelOnError: false,
+            onError: (e) {
+              eventController.add(PlayerStateDoneEvent());
+              debugPrint('Error: $e');
+            },
+            onDone: () {
+              // playerState = null;
+              eventController.add(PlayerStateDoneEvent());
+              gameStream = null;
+              debugPrint('Player Stream Done');
+            },
+          );
     } catch (e) {
       return -1;
     }
@@ -377,7 +378,9 @@ class GrpcServerConnection extends AbstractServerConnection {
         gameId: gameId,
       ));
 
-      gameStateStream.listen(
+      gameStream = gameStateStream;
+
+      gameStream?.listen(
         (value) {
           eventController.add(GameStateEvent(value));
         },

@@ -22,15 +22,21 @@ class _CardScrollViewState extends ConsumerState<CardScrollView> {
   bool _isReordering = false;
   bool isTurn = false;
   List<duo.PlayingCard> cards = [];
-  final StreamController<PlayerAction> _playerActionController =
-      StreamController<PlayerAction>();
+
   //ToDo: BUG if the cards are removed before the animation is done it will crash or before on Reorder is done
 
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      ref.read(apiProvider).getPlayerStream(
-          ref.read(storageProvider).accessToken, ref.read(apiProvider).gameId);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      String token = await ref.read(apiProvider).getToken();
+      await ref
+          .read(apiProvider)
+          .getPlayerStream(token, ref.read(apiProvider).gameId);
+      ref.read(apiProvider).streamPlayerAction(PlayerAction(
+            action: PlayerAction_ActionType.INIT,
+            cardId: '',
+            token: token,
+          ));
     });
 
     super.initState();
@@ -111,20 +117,9 @@ class _CardScrollViewState extends ConsumerState<CardScrollView> {
   }
 
   void playCard(int index) {
-    _playerActionController.add(PlayerAction(
-      action: PlayerAction_ActionType.PLACE,
-      cardId: cards[index].cardName,
-    ));
-  }
-
-  void drawCard() {
-    _playerActionController
-        .add(PlayerAction()..action = PlayerAction_ActionType.DRAW);
-  }
-
-  @override
-  void dispose() {
-    _playerActionController.close();
-    super.dispose();
+    ref.read(apiProvider).streamPlayerAction(PlayerAction(
+          action: PlayerAction_ActionType.PLACE,
+          cardId: cards[index].cardName,
+        ));
   }
 }

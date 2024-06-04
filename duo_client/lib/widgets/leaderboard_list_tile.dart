@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 class LeaderboardListTile extends StatelessWidget {
   final int boardPlace;
   final Friend friend;
+  final int ownScore;
   final bool isBetterThanPlayer;
   final VoidCallback? onTap;
   final bool isPlayer;
@@ -14,6 +15,7 @@ class LeaderboardListTile extends StatelessWidget {
     required this.boardPlace,
     required this.friend,
     required this.isBetterThanPlayer,
+    required this.ownScore,
     this.isPlayer = false,
     this.onTap,
     super.key,
@@ -100,13 +102,17 @@ class LeaderboardListTile extends StatelessWidget {
                       ]),
                 ),
                 Text(
-                  isBetterThanPlayer
-                      ? '+${friend.score.toString()}'
-                      : '-${friend.score.toString()}',
+                  isPlayer
+                      ? ownScore.toString()
+                      : isBetterThanPlayer
+                          ? '+${(ownScore - friend.score).toString()}'
+                          : '-${(ownScore - friend.score).toString()}',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: isBetterThanPlayer
-                            ? Constants.successColor
-                            : Constants.errorColor,
+                        color: isPlayer
+                            ? Constants.goldColor
+                            : isBetterThanPlayer
+                                ? Constants.successColor
+                                : Constants.errorColor,
                       ),
                 ),
                 const SizedBox(

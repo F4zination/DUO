@@ -77,6 +77,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
                     return LeaderboardListTile(
                       boardPlace: index + 1,
                       friend: friends[index],
+                      ownScore: self_user.score,
                       isBetterThanPlayer:
                           friends[index].score > self_user.score,
                       isPlayer: friends[index].name == self_user.name,
