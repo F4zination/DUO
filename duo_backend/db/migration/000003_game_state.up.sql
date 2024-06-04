@@ -21,19 +21,3 @@ CREATE INDEX player_id_idx ON game_player_rel (player_id);
 
 ALTER TABLE game_player_rel ADD CONSTRAINT fk_game_id FOREIGN KEY (game_id) REFERENCES game_state(id) ON DELETE CASCADE;
 ALTER TABLE game_player_rel ADD CONSTRAINT fk_player_id FOREIGN KEY (player_id) REFERENCES duouser(uuid) ON DELETE CASCADE;
-
-CREATE TABLE IF NOT EXISTS game_stack_draw_card_rel (
-    game_id BIGINT NOT NULL,
-    card_id VARCHAR(70) NOT NULL,
-    stack_position INT NOT NULL
-);
-
-ALTER TABLE game_stack_draw_card_rel ADD CONSTRAINT fk_game_id FOREIGN KEY (game_id) REFERENCES game_state(id) ON DELETE CASCADE;
-
-CREATE TABLE IF NOT EXISTS game_stack_place_card_rel (
-    game_id BIGINT NOT NULL,
-    card_id VARCHAR(70) NOT NULL,
-    stack_position INT NOT NULL
-);
-
-ALTER TABLE game_stack_place_card_rel ADD CONSTRAINT fk_game_id FOREIGN KEY (game_id) REFERENCES game_state(id) ON DELETE CASCADE;

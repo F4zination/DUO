@@ -46,6 +46,7 @@ message PlayerAction {
         DRAW = 0;
         PLACE = 1;
         SKIP = 2;
+        INIT = 3;
     }
     ActionType action = 1;
     string card_id = 2;

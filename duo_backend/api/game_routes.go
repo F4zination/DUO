@@ -52,12 +52,13 @@ func (server *Server) GetGameState(req *pb.GetGameStateRequest, stream pb.DUOSer
 }
 
 func (server *Server) GetStackStream(stream pb.DUOService_GetStackStreamServer) error {
-	tokenValue := stream.Context().Value("token")
-	if tokenValue == nil {
-		log.Printf("no token provided")
-		return status.Errorf(codes.Unauthenticated, "no token provided")
+	msg, err := stream.Recv()
+	if err != nil {
+		log.Printf("error receiving message: %v", err)
+		return status.Errorf(codes.Internal, "error receiving message")
 	}
-	payload, tokenErr := server.Maker.VerifyToken(stream.Context().Value("token").(string))
+
+	payload, tokenErr := server.Maker.VerifyToken(msg.Token)
 	if tokenErr != nil {
 		log.Printf("error verifying token: %v", tokenErr)
 		return status.Errorf(codes.Unauthenticated, "invalid token")
@@ -80,7 +81,13 @@ func (server *Server) GetStackStream(stream pb.DUOService_GetStackStreamServer) 
 }
 
 func (server *Server) GetPlayerStream(stream pb.DUOService_GetPlayerStreamServer) error {
-	payload, tokenErr := server.Maker.VerifyToken(stream.Context().Value("token").(string))
+
+	msg, err := stream.Recv()
+	if err != nil {
+		log.Printf("error receiving message: %v", err)
+		return status.Errorf(codes.Internal, "error receiving message")
+	}
+	payload, tokenErr := server.Maker.VerifyToken(msg.Token)
 	if tokenErr != nil {
 		log.Printf("error verifying token: %v", tokenErr)
 		return status.Errorf(codes.Unauthenticated, "invalid token")

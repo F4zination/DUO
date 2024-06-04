@@ -125,6 +125,7 @@ const PlayerAction_ActionType$json = {
     {'1': 'DRAW', '2': 0},
     {'1': 'PLACE', '2': 1},
     {'1': 'SKIP', '2': 2},
+    {'1': 'INIT', '2': 3},
   ],
 };
 
@@ -132,7 +133,8 @@ const PlayerAction_ActionType$json = {
 final $typed_data.Uint8List playerActionDescriptor = $convert.base64Decode(
     'CgxQbGF5ZXJBY3Rpb24SMwoGYWN0aW9uGAEgASgOMhsucGIuUGxheWVyQWN0aW9uLkFjdGlvbl'
     'R5cGVSBmFjdGlvbhIXCgdjYXJkX2lkGAIgASgJUgZjYXJkSWQSFAoFdG9rZW4YAyABKAlSBXRv'
-    'a2VuIisKCkFjdGlvblR5cGUSCAoERFJBVxAAEgkKBVBMQUNFEAESCAoEU0tJUBAC');
+    'a2VuIjUKCkFjdGlvblR5cGUSCAoERFJBVxAAEgkKBVBMQUNFEAESCAoEU0tJUBACEggKBElOSV'
+    'QQAw==');
 
 @$core.Deprecated('Use stackRequestDescriptor instead')
 const StackRequest$json = {

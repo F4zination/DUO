@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math/rand"
 	"sync"
 
 	db "github.com/duo/db/sqlc"
@@ -15,7 +16,115 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+var duoCards []string = []string{
+	"red_1",
+	"red_1",
+	"red_2",
+	"red_2",
+	"red_3",
+	"red_3",
+	"red_4",
+	"red_4",
+	"red_5",
+	"red_5",
+	"red_6",
+	"red_6",
+	"red_7",
+	"red_7",
+	"red_8",
+	"red_8",
+	"red_9",
+	"red_9",
+	"green_1",
+	"green_1",
+	"green_2",
+	"green_2",
+	"green_3",
+	"green_3",
+	"green_4",
+	"green_4",
+	"green_5",
+	"green_5",
+	"green_6",
+	"green_6",
+	"green_7",
+	"green_7",
+	"green_8",
+	"green_8",
+	"green_9",
+	"green_9",
+	"purple_1",
+	"purple_1",
+	"purple_2",
+	"purple_2",
+	"purple_3",
+	"purple_3",
+	"purple_4",
+	"purple_4",
+	"purple_5",
+	"purple_5",
+	"purple_6",
+	"purple_6",
+	"purple_7",
+	"purple_7",
+	"purple_8",
+	"purple_8",
+	"purple_9",
+	"purple_9",
+	"yellow_1",
+	"yellow_1",
+	"yellow_2",
+	"yellow_2",
+	"yellow_3",
+	"yellow_3",
+	"yellow_4",
+	"yellow_4",
+	"yellow_5",
+	"yellow_5",
+	"yellow_6",
+	"yellow_6",
+	"yellow_7",
+	"yellow_7",
+	"yellow_8",
+	"yellow_8",
+	"yellow_9",
+	"yellow_9",
+	"draw_4",
+	"draw_4",
+	"draw_4",
+	"draw_4",
+	"green_change_directions",
+	"green_change_directions",
+	"green_draw_2",
+	"green_draw_2",
+	"green_suspend",
+	"green_suspend",
+	"purple_change_directions",
+	"purple_change_directions",
+	"purple_draw_2",
+	"purple_draw_2",
+	"purple_suspend",
+	"purple_suspend",
+	"red_change_directions",
+	"red_change_directions",
+	"red_draw_2",
+	"red_draw_2",
+	"red_suspend",
+	"red_suspend",
+	"yellow_change_directions",
+	"yellow_change_directions",
+	"yellow_draw_2",
+	"yellow_draw_2",
+	"yellow_suspend",
+	"yellow_suspend",
+	"select_color",
+	"select_color",
+	"select_color",
+	"select_color",
+}
+
 type GameUserStreams struct {
+	PlayersCards    []string
 	GameStateStream pb.DUOService_GetGameStateServer
 	PlayerStream    pb.DUOService_GetPlayerStreamServer
 	UserId          uuid.UUID
@@ -23,14 +132,28 @@ type GameUserStreams struct {
 
 func NewGameUserStream(userId uuid.UUID) *GameUserStreams {
 	return &GameUserStreams{
-		UserId: userId,
+		PlayersCards: []string{},
+		UserId:       userId,
 	}
 }
 
 type Game struct {
-	StackStream pb.DUOService_GetStackStreamServer
-	UserStreams []GameUserStreams
-	Mu          sync.RWMutex
+	StackStream         pb.DUOService_GetStackStreamServer
+	CardsOnDrawStack    []string //last card is on top
+	CardsOnPlaceStack   []string //last card is on top
+	UserStreams         []GameUserStreams
+	WaitingForDrawCount int32
+	Mu                  sync.RWMutex
+}
+
+func NewGame(cardIds []string) *Game {
+	return &Game{
+		CardsOnDrawStack:    cardIds,
+		UserStreams:         []GameUserStreams{},
+		StackStream:         nil,
+		WaitingForDrawCount: 0,
+		Mu:                  sync.RWMutex{},
+	}
 }
 
 type GameManager struct {
@@ -88,8 +211,30 @@ func (gm *GameManager) CreateGame(lobby *Lobby, lobbyId int32) (int, error) {
 	}
 
 	gm.Mu.Lock()
-	gm.GameStreams[int(dbGame.ID)] = &Game{}
+	gm.GameStreams[int(dbGame.ID)] = NewGame(duoCards) //TODO make dynamic
 	gm.Mu.Unlock()
+
+	shuffleErr := gm.shuffleDrawStack(int(dbGame.ID))
+	if shuffleErr != nil {
+		log.Printf("error shuffling place stack: %v", shuffleErr)
+		return 0, shuffleErr
+	}
+
+	topCardFromDrawStack, drawErr := gm.DrawCardsFromStack(int(dbGame.ID), 1)
+	if drawErr != nil {
+		log.Printf("error drawing card from stack: %v", drawErr)
+		return 0, drawErr
+	}
+
+	game, exists := gm.GetGame(int(dbGame.ID))
+	if !exists {
+		log.Printf("game does not exist")
+		return 0, fmt.Errorf("game does not exist")
+	}
+
+	game.Mu.Lock()
+	game.CardsOnPlaceStack = append(game.CardsOnPlaceStack, topCardFromDrawStack[0])
+	game.Mu.Unlock()
 
 	return int(dbGame.ID), nil
 }
@@ -150,31 +295,18 @@ func (gm *GameManager) UpdateGameState(gameId int, state *pb.GameState) []error 
 
 	isCardOnTopOfStack := len(state.CardOnTopOfDiscard) != 0
 
+	game.Mu.RLock()
 	if isCardOnTopOfStack {
-		placeStack, placeErr := gm.store.GetGamePlaceStack(context.Background(), int64(gameId))
-		if placeErr != nil && placeErr != sql.ErrNoRows {
-			log.Printf("error getting place stack: %v", placeErr)
-			return []error{placeErr}
-		}
-		drawStack, drawErr := gm.store.GetGameDrawStack(context.Background(), int64(gameId))
-		if drawErr != nil && drawErr != sql.ErrNoRows {
-			log.Printf("error getting draw stack: %v", drawErr)
-			return []error{drawErr}
-		}
-		drawStackIds := make([]string, len(drawStack))
-		for i, card := range drawStack {
-			drawStackIds[i] = card.CardID
-		}
 		//Send data to stackStream
 		if game.StackStream != nil {
 			sendErr := game.StackStream.Send(&pb.StackState{
 				PlaceStack: &pb.PlaceStackState{
-					AmountCards: int32(len(placeStack)),
+					AmountCards: int32(len(game.CardsOnPlaceStack)),
 					CardIdOnTop: state.CardOnTopOfDiscard,
 				},
 				DrawStack: &pb.DrawStackState{
 					StackId: int32(gameId),
-					CardIds: drawStackIds,
+					CardIds: game.CardsOnDrawStack,
 				},
 				Direction: state.Direction,
 			})
@@ -184,6 +316,7 @@ func (gm *GameManager) UpdateGameState(gameId int, state *pb.GameState) []error 
 			}
 		}
 	}
+	game.Mu.RUnlock()
 
 	_, updateErr := gm.store.UpdateGameState(context.Background(), db.UpdateGameStateParams{
 		ID: int32(gameId),
@@ -370,8 +503,15 @@ func (gm *GameManager) AddPlayerStream(gameId int, userId uuid.UUID, stream pb.D
 		}
 		game.UserStreams[index].PlayerStream = stream
 	}
-
 	game.Mu.Unlock()
+
+	playersCards, getErr := gm.DrawCardsFromStack(gameId, 7) //TODO: make dynamic
+	if getErr != nil {
+		log.Printf("error drawing cards: %v", getErr)
+		return getErr
+	}
+
+	gm.UpdatePlayersCards(gameId, userId.String(), playersCards)
 
 	sendErr := gm.SendFirstGameStateIfAllPlayersAreReady(gameId)
 	if sendErr != nil {
@@ -579,32 +719,22 @@ func (gm *GameManager) SendFirstGameStateIfAllPlayersAreReady(gameId int) error 
 			return nextPlayerErr
 		}
 
-		drawStack, drawErr := gm.store.GetGameDrawStack(context.Background(), int64(gameId))
-		if drawErr != nil && drawErr != sql.ErrNoRows {
-			log.Printf("error getting draw stack: %v", drawErr)
-			return drawErr
-		}
-		drawStackIds := make([]string, len(drawStack))
-		for i, card := range drawStack {
-			drawStackIds[i] = card.CardID
-		}
-
 		//Send data to stackStream
 		game, exists := gm.GetGame(gameId)
 		if !exists {
 			log.Printf("game does not exist")
 			return fmt.Errorf("game does not exist")
 		}
-
+		game.Mu.RLock()
 		if game.StackStream != nil {
 			sendErr := game.StackStream.Send(&pb.StackState{
 				PlaceStack: &pb.PlaceStackState{
-					AmountCards: 0,
-					CardIdOnTop: "",
+					AmountCards: int32(len(game.CardsOnPlaceStack)),
+					CardIdOnTop: game.CardsOnPlaceStack[len(game.CardsOnPlaceStack)-1],
 				},
 				DrawStack: &pb.DrawStackState{
 					StackId: int32(gameId),
-					CardIds: drawStackIds,
+					CardIds: game.CardsOnDrawStack,
 				},
 				Direction: direction,
 			})
@@ -613,10 +743,11 @@ func (gm *GameManager) SendFirstGameStateIfAllPlayersAreReady(gameId int) error 
 				return sendErr
 			}
 		}
+		game.Mu.RUnlock()
 
 		//Send
 		err := gm.UpdateGameState(gameId, &pb.GameState{
-			CardOnTopOfDiscard: "",
+			CardOnTopOfDiscard: game.CardsOnPlaceStack[len(game.CardsOnPlaceStack)-1],
 			CurrentPlayerUuid:  nextPlayerUuid.String(),
 			CurrentPlayerName:  nextPlayerName,
 			Direction:          direction,
@@ -630,5 +761,95 @@ func (gm *GameManager) SendFirstGameStateIfAllPlayersAreReady(gameId int) error 
 		}
 		return nil
 	}
+	return nil
+}
+
+func (gm *GameManager) UpdatePlayersCards(gameId int, userId string, cards []string) error {
+	game, exists := gm.GetGame(gameId)
+	if !exists {
+		log.Printf("game does not exist")
+		return fmt.Errorf("game does not exist")
+	}
+
+	game.Mu.Lock()
+	for _, user := range game.UserStreams {
+		if user.UserId.String() == userId {
+			if user.PlayerStream != nil {
+				user.PlayersCards = cards
+				sendErr := user.PlayerStream.Send(&pb.PlayerState{
+					Hand:  cards,
+					Alert: &pb.Alert{},
+				})
+				if sendErr != nil {
+					log.Printf("error sending player state to user %v: %v", userId, sendErr)
+					game.Mu.RUnlock()
+					return sendErr
+				}
+			}
+		}
+	}
+	game.Mu.Unlock()
+
+	return nil
+}
+
+func (gm *GameManager) DrawCardsFromStack(gameId int, amount int32) ([]string, error) {
+	game, exists := gm.GetGame(gameId)
+	if !exists {
+		log.Printf("game does not exist")
+		return []string{}, fmt.Errorf("game does not exist")
+	}
+
+	if len(game.CardsOnDrawStack) < int(amount) {
+		shuffleErr := gm.shufflePlaceStackInDrawStack(gameId)
+		if shuffleErr != nil {
+			log.Printf("error shuffling place stack in draw stack: %v", shuffleErr)
+			return []string{}, shuffleErr
+		}
+	}
+
+	game.Mu.Lock()
+	drawnCards := game.CardsOnDrawStack[len(game.CardsOnDrawStack)-int(amount):]
+	game.CardsOnDrawStack = game.CardsOnDrawStack[:len(game.CardsOnDrawStack)-int(amount)]
+	game.Mu.Unlock()
+
+	return drawnCards, nil
+
+}
+
+func (gm *GameManager) shuffleDrawStack(gameId int) error {
+	game, exists := gm.GetGame(gameId)
+	if !exists {
+		log.Printf("game does not exist")
+		return fmt.Errorf("game does not exist")
+	}
+
+	game.Mu.Lock()
+	for i := 0; i < len(game.CardsOnDrawStack)-1; i++ {
+		j := rand.Intn(len(game.CardsOnDrawStack) - 1)
+		game.CardsOnDrawStack[i], game.CardsOnDrawStack[j] = game.CardsOnDrawStack[j], game.CardsOnDrawStack[i]
+	}
+	game.Mu.Unlock()
+
+	return nil
+
+}
+
+func (gm *GameManager) shufflePlaceStackInDrawStack(gameId int) error {
+	game, exists := gm.GetGame(int(gameId))
+	if !exists {
+		log.Printf("game does not exist")
+		return fmt.Errorf("game does not exist")
+	}
+
+	game.Mu.Lock()
+	for i := 0; i < len(game.CardsOnPlaceStack)-1; i++ {
+		j := rand.Intn(len(game.CardsOnPlaceStack) - 1)
+		game.CardsOnPlaceStack[i], game.CardsOnPlaceStack[j] = game.CardsOnPlaceStack[j], game.CardsOnPlaceStack[i]
+		game.CardsOnDrawStack = append(game.CardsOnDrawStack, game.CardsOnPlaceStack[i])
+		game.CardsOnPlaceStack = []string{game.CardsOnPlaceStack[len(game.CardsOnPlaceStack)-1]}
+	}
+	game.Mu.Unlock()
+
 	return nil
 }

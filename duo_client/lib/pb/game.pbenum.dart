@@ -32,11 +32,13 @@ class PlayerAction_ActionType extends $pb.ProtobufEnum {
   static const PlayerAction_ActionType DRAW = PlayerAction_ActionType._(0, _omitEnumNames ? '' : 'DRAW');
   static const PlayerAction_ActionType PLACE = PlayerAction_ActionType._(1, _omitEnumNames ? '' : 'PLACE');
   static const PlayerAction_ActionType SKIP = PlayerAction_ActionType._(2, _omitEnumNames ? '' : 'SKIP');
+  static const PlayerAction_ActionType INIT = PlayerAction_ActionType._(3, _omitEnumNames ? '' : 'INIT');
 
   static const $core.List<PlayerAction_ActionType> values = <PlayerAction_ActionType> [
     DRAW,
     PLACE,
     SKIP,
+    INIT,
   ];
 
   static final $core.Map<$core.int, PlayerAction_ActionType> _byValue = $pb.ProtobufEnum.initByValue(values);
