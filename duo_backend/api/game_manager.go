@@ -368,6 +368,8 @@ func (gm *GameManager) SetStackStream(gameId int, userId uuid.UUID, stream pb.DU
 		return fmt.Errorf("game does not exist")
 	}
 
+	log.Printf("setting stack stream of game: %d", gameId)
+
 	//Stack stream mustn't be set
 	if game.StackStream != nil {
 		log.Printf("stack stream already set")
