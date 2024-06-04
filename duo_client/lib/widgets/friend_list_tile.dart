@@ -1,11 +1,13 @@
 import 'package:duo_client/pb/friend.pb.dart';
+import 'package:duo_client/provider/api_provider.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:duo_client/utils/helpers.dart';
 import 'package:duo_client/widgets/duo_container.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class FriendListTile extends StatelessWidget {
+class FriendListTile extends ConsumerWidget {
   final Friend friend;
   final VoidCallback? onTap;
   final bool? showIcons;
@@ -17,7 +19,7 @@ class FriendListTile extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return DuoContainer(
       margin: const EdgeInsets.only(
         right: Constants.defaultPadding,
@@ -105,7 +107,11 @@ class FriendListTile extends StatelessWidget {
                               colorFilter: const ColorFilter.mode(
                                   Colors.white54, BlendMode.srcIn),
                             ),
-                            onPressed: () {},
+                            onPressed: () async {
+                              ref.read(apiProvider).deleteFriend(
+                                  await ref.read(apiProvider).getToken(),
+                                  friend.uuid);
+                            },
                           ),
                         ],
                       )

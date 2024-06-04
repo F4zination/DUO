@@ -85,14 +85,14 @@ func (q *Queries) DeleteFriendRequest(ctx context.Context, arg DeleteFriendReque
 
 const deleteFriendship = `-- name: DeleteFriendship :one
 DELETE FROM friendships
-WHERE CASE WHEN $1 < $2 THEN user1_id ELSE user2_id END = $1
-AND CASE WHEN $1 < $2 THEN user2_id ELSE user1_id END = $2
+WHERE CASE WHEN $1::uuid < $2::uuid THEN user1_id ELSE user2_id END = $1::uuid
+AND CASE WHEN $1::uuid < $2::uuid THEN user2_id ELSE user1_id END = $2::uuid
 RETURNING user1_id, user2_id
 `
 
 type DeleteFriendshipParams struct {
-	Column1 interface{} `json:"column_1"`
-	Column2 interface{} `json:"column_2"`
+	Column1 uuid.UUID `json:"column_1"`
+	Column2 uuid.UUID `json:"column_2"`
 }
 
 func (q *Queries) DeleteFriendship(ctx context.Context, arg DeleteFriendshipParams) (Friendship, error) {

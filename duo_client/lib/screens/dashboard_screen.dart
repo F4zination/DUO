@@ -6,6 +6,7 @@ import 'package:duo_client/provider/played_games_provider.dart';
 import 'package:duo_client/screens/home_screen.dart';
 import 'package:duo_client/utils/constants.dart';
 import 'package:duo_client/widgets/add_friend_dialog.dart';
+import 'package:duo_client/widgets/duo_container.dart';
 import 'package:duo_client/widgets/duo_header.dart';
 import 'package:duo_client/widgets/friend_list_tile.dart';
 import 'package:duo_client/widgets/notification_dialog.dart';
@@ -119,16 +120,20 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                           itemBuilder: (context, index) => Padding(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: Constants.defaultPadding),
-                            child: Container(
-                              width: 100,
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.secondary,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
+                            child: DuoContainer(
+                              width: 150,
                               child: Center(
-                                child: Text(gameRules[index].name,
-                                    style:
-                                        const TextStyle(color: Colors.white)),
+                                child: Text(
+                                  gameRules[index].name,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleLarge
+                                      ?.copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onPrimary,
+                                      ),
+                                ),
                               ),
                             ),
                           ),

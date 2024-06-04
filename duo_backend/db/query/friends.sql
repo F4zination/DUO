@@ -39,6 +39,6 @@ RETURNING *;
 
 -- name: DeleteFriendship :one
 DELETE FROM friendships
-WHERE CASE WHEN $1 < $2 THEN user1_id ELSE user2_id END = $1
-AND CASE WHEN $1 < $2 THEN user2_id ELSE user1_id END = $2
+WHERE CASE WHEN $1::uuid < $2::uuid THEN user1_id ELSE user2_id END = $1::uuid
+AND CASE WHEN $1::uuid < $2::uuid THEN user2_id ELSE user1_id END = $2::uuid
 RETURNING *;

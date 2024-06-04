@@ -286,8 +286,10 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
   }
 
   @override
-  Future<int> deleteFriend(String token, String friendId) {
-    return getIt.get<GrpcServerConnection>().deleteFriend(token, friendId);
+  Future<int> deleteFriend(String token, String friendId) async {
+    await getIt.get<GrpcServerConnection>().deleteFriend(token, friendId);
+    getIt.get<GrpcServerConnection>().getFriends(token);
+    return Future(() => 0);
   }
 
   @override
