@@ -269,12 +269,12 @@ class GrpcServerConnection extends AbstractServerConnection {
   @override
   Future<int> getPlayerStream(String token, int gameId) async {
     try {
-      ResponseStream<PlayerState> playerStream =
+      ResponseStream<PlayerState> stream =
           client.getPlayerStream(playerActionStreamController.stream);
 
-      this.playerStream = playerStream;
+      playerStream = stream;
 
-      this.playerStream?.listen(
+      playerStream?.listen(
             (value) {
               // playerState = value;
               // _notifyListeners();
