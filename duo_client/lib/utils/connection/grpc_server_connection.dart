@@ -275,25 +275,25 @@ class GrpcServerConnection extends AbstractServerConnection {
       playerStream = stream;
 
       playerStream?.listen(
-            (value) {
-              // playerState = value;
-              // _notifyListeners();
-              debugPrint('Received Player State Event: $value');
+        (value) {
+          // playerState = value;
+          // _notifyListeners();
+          debugPrint('Received Player State Event: $value');
 
-              eventController.add(PlayerStateEvent(value));
-            },
-            cancelOnError: false,
-            onError: (e) {
-              eventController.add(PlayerStateDoneEvent());
-              debugPrint('Error: $e');
-            },
-            onDone: () {
-              // playerState = null;
-              eventController.add(PlayerStateDoneEvent());
-              gameStream = null;
-              debugPrint('Player Stream Done');
-            },
-          );
+          eventController.add(PlayerStateEvent(value));
+        },
+        cancelOnError: false,
+        onError: (e) {
+          eventController.add(PlayerStateDoneEvent());
+          debugPrint('Error: $e');
+        },
+        onDone: () {
+          // playerState = null;
+          eventController.add(PlayerStateDoneEvent());
+          gameStream = null;
+          debugPrint('Player Stream Done');
+        },
+      );
     } catch (e) {
       return -1;
     }
@@ -368,6 +368,20 @@ class GrpcServerConnection extends AbstractServerConnection {
     stackRequestStreamController!.add(StackRequest(
       token: token,
       gameId: gameId,
+    ));
+    return 0;
+  }
+
+  @override
+  Future<int> stackInit(String token, int gameId) async {
+    if (!hasStackStream) {
+      debugPrint('User status stream not established');
+      return -1;
+    }
+    stackRequestStreamController!.add(StackRequest(
+      token: token,
+      gameId: gameId,
+      drawingCard: false,
     ));
     return 0;
   }

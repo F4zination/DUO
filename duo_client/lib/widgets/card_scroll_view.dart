@@ -19,8 +19,7 @@ class CardScrollView extends ConsumerStatefulWidget {
 }
 
 class _CardScrollViewState extends ConsumerState<CardScrollView> {
-  bool _isReordering = false;
-  bool isTurn = false;
+  bool isTurn = true;
   List<duo.PlayingCard> cards = [];
 
   //ToDo: BUG if the cards are removed before the animation is done it will crash or before on Reorder is done
@@ -51,17 +50,11 @@ class _CardScrollViewState extends ConsumerState<CardScrollView> {
         },
         onReorder: (oldIndex, newIndex) {
           setState(() {
-            _isReordering = true;
             if (newIndex > oldIndex) {
               newIndex -= 1;
             }
             final card = cards.removeAt(oldIndex);
             cards.insert(newIndex, card);
-          });
-          Future.delayed(widget._waitDuration, () {
-            setState(() {
-              _isReordering = false;
-            });
           });
         },
         scrollDirection: Axis.horizontal,
@@ -71,21 +64,11 @@ class _CardScrollViewState extends ConsumerState<CardScrollView> {
             key: UniqueKey(),
             direction: DismissDirection.up,
             onDismissed: (direction) {
-              if (!_isReordering) {
-                setState(() {
-                  _isReordering = true;
-                  // ref.read(gameStateProvider).removeCard(index);
-                  cards.removeAt(index);
-                  playCard(index);
-                  print('Removing card with value ${cards[index].cardName}');
-                });
-              } else {
-                print('Reordering in progress');
-              }
-              Future.delayed(widget._waitDuration, () {
-                setState(() {
-                  _isReordering = false;
-                });
+              debugPrint('Removing card with value ${cards[index].cardName}');
+              setState(() {
+                cards.removeAt(index);
+                playCard(index);
+                print('Removing card with value ${cards[index].cardName}');
               });
             },
             child: Padding(

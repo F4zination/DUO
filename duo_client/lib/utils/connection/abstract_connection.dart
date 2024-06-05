@@ -44,6 +44,7 @@ abstract class AbstractServerConnection {
   Future<int> getPlayerStream(String token, int gameId);
   Future<int> getStackStream(String token, int gameId);
   Future<int> requestCard(String token, int gameId);
+  Future<int> stackInit(String token, int gameId);
   Future<int> changeStackDevice(String token, String deviceId);
   Future<int> streamPlayerAction(PlayerAction action);
 

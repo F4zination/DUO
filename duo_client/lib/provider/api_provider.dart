@@ -250,6 +250,16 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
   }
 
   @override
+  Future<int> stackInit(String token, int gameId) async {
+    if (hasStackStream == false) {
+      debugPrint('No Stack Stream');
+      final statusCode = await getStackStream(token, gameId);
+      if (statusCode != 0) return statusCode;
+    }
+    return getIt.get<GrpcServerConnection>().stackInit(token, gameId);
+  }
+
+  @override
   Future<int> streamPlayerAction(PlayerAction action) {
     return getIt.get<GrpcServerConnection>().streamPlayerAction(action);
   }
