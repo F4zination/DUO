@@ -36,9 +36,11 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       ref.read(apiProvider).sendUserstatusUpdate(token, FriendState.inGame);
       if (ref.read(apiProvider).isStackOwner) {
         debugPrint('Getting stack stream');
-        ref
+        await ref
             .read(apiProvider)
             .getStackStream(token, ref.read(apiProvider).gameId);
+        debugPrint('Requesting card for player');
+        ref.read(apiProvider).stackInit(token, ref.read(apiProvider).gameId);
       } else {
         debugPrint('Getting player stream');
         await ref

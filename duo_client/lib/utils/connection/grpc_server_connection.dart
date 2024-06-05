@@ -357,6 +357,20 @@ class GrpcServerConnection extends AbstractServerConnection {
   }
 
   @override
+  Future<int> stackInit(String token, int gameId) async {
+    if (!hasStackStream) {
+      debugPrint('User status stream not established');
+      return -1;
+    }
+    stackRequestStreamController!.add(StackRequest(
+      token: token,
+      gameId: gameId,
+      drawingCard: false,
+    ));
+    return 0;
+  }
+
+  @override
   Future<int> getGameStateStream(String token, int gameId) async {
     try {
       ResponseStream<GameState> gameStateStream =
