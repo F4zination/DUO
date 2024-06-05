@@ -86,11 +86,14 @@ func (server *Server) GetPlayerStream(stream pb.DUOService_GetPlayerStreamServer
 		log.Printf("error receiving message: %v", err)
 		return status.Errorf(codes.Internal, "error receiving message")
 	}
+
 	payload, tokenErr := server.Maker.VerifyToken(msg.Token)
 	if tokenErr != nil {
 		log.Printf("error verifying token: %v", tokenErr)
 		return status.Errorf(codes.Unauthenticated, "invalid token")
 	}
+
+	log.Printf("Received PlayerAction message: %v", msg.Action)
 
 	gameId, getErr := server.Store.GetPlayersGameId(context.Background(), payload.UserID)
 	if getErr != nil {
