@@ -214,7 +214,7 @@ func (gm *GameManager) CreateGame(lobby *Lobby, lobbyId int32) (int, error) {
 	gm.GameStreams[int(dbGame.ID)] = NewGame(duoCards) //TODO make dynamic
 	gm.Mu.Unlock()
 
-	shuffleErr := gm.shuffleDrawStack(int(dbGame.ID))
+	shuffleErr := gm.shuffleDrawStack(int(dbGame.ID), true)
 	if shuffleErr != nil {
 		log.Printf("error shuffling place stack: %v", shuffleErr)
 		return 0, shuffleErr
@@ -856,16 +856,23 @@ func (gm *GameManager) DrawCardsFromStack(gameId int, amount int32) ([]string, e
 
 }
 
-func (gm *GameManager) shuffleDrawStack(gameId int) error {
+func (gm *GameManager) shuffleDrawStack(gameId int, shuffleTopCardToo bool) error {
 	game, exists := gm.GetGame(gameId)
 	if !exists {
 		log.Printf("game does not exist")
 		return fmt.Errorf("game does not exist")
 	}
 
+	var length int
+	if shuffleTopCardToo {
+		length = len(game.CardsOnPlaceStack)
+	} else {
+		length = len(game.CardsOnPlaceStack) - 1
+	}
+
 	game.Mu.Lock()
-	for i := 0; i < len(game.CardsOnDrawStack)-1; i++ {
-		j := rand.Intn(len(game.CardsOnDrawStack) - 1)
+	for i := 0; i < length; i++ {
+		j := rand.Intn(length)
 		game.CardsOnDrawStack[i], game.CardsOnDrawStack[j] = game.CardsOnDrawStack[j], game.CardsOnDrawStack[i]
 	}
 	game.Mu.Unlock()
