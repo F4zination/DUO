@@ -408,10 +408,10 @@ func (gm *GameManager) SetStackStream(gameId int, userId uuid.UUID, stream pb.DU
 				return status.Errorf(codes.Internal, "Stream not initialized")
 			}
 			msg, err := stream.Recv()
-			if msg.GameId != int32(gameId) {
-				return status.Errorf(codes.InvalidArgument, "Wrong gameId")
-			}
 			if err != nil {
+				if msg.GameId != int32(gameId) {
+					return status.Errorf(codes.InvalidArgument, "Wrong gameId")
+				}
 				if err == io.EOF {
 					return gm.onStackDisconnected(gameId)
 				} else if status.Code(err) == codes.Canceled { // Check for context cancellation
