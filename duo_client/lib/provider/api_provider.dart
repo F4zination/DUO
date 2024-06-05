@@ -119,7 +119,6 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
             notifyListeners();
             break;
           }
-        case StackStateInitEvent:
         case UserStatusInitEvent:
           {
             notifyListeners();
