@@ -40,30 +40,18 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
 
   @override
   Widget build(BuildContext context) {
-    ApiProvider _apiProvider = ref.watch(apiProvider);
-    bool creatingLobby =
-        _apiProvider.lobbyStatus == null && _apiProvider.gameId == -1;
-    int lobbyId = _apiProvider.lobbyStatus?.lobbyId ?? 0;
-    if (_apiProvider.gameId > 0 && _apiProvider.lobbyStatus == null) {
-      setState(() {
-        joiningGame = true;
-        debugPrint('Game Id: ${_apiProvider.gameId}');
-      });
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+    // ApiProvider _apiProvider = ref.watch(apiProvider);
+    bool creatingLobby = ref.watch(apiProvider).lobbyStatus == null &&
+        ref.watch(apiProvider).gameId == -1;
+    int lobbyId = ref.read(apiProvider).lobbyStatus?.lobbyId ?? 0;
+    ref.listen(apiProvider, (ApiProvider? oldState, ApiProvider? newState) {
+      if ((newState?.gameId ?? 0) > 0 && newState?.lobbyStatus == null) {
         Navigator.of(context).pushReplacementNamed(GameScreen.route);
-      });
-    }
-    if (_apiProvider.gameId == -2 && !_apiProvider.hasLobbyStream) {
-      setState(() {
-        debugPrint('Lobby Stream: ${_apiProvider.lobbyStatus?.lobbyId}');
-        //Case if lobby is deleted by the Host
-
-        debugPrint('Lobby deletion detected; leaving... ');
-      });
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      }
+      if ((newState?.gameId) == -2 && !(newState?.hasLobbyStream ?? true)) {
         Navigator.of(context).pushReplacementNamed(HomeScreen.route);
-      });
-    }
+      }
+    });
 
     return Scaffold(
       backgroundColor: Constants.bgColor,
@@ -230,7 +218,11 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen>
                                           .first
                                           .uuid) {
                                     // TODO: change back to 3 players for a game but for testing purposes 2
-                                    if (_apiProvider.lobbyStatus!.users.length <
+                                    if (ref
+                                            .read(apiProvider)
+                                            .lobbyStatus!
+                                            .users
+                                            .length <
                                         0) {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(

@@ -26,23 +26,6 @@ class _CardScrollViewState extends ConsumerState<CardScrollView> {
   //ToDo: BUG if the cards are removed before the animation is done it will crash or before on Reorder is done
 
   @override
-  void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      String token = await ref.read(apiProvider).getToken();
-      await ref
-          .read(apiProvider)
-          .getPlayerStream(token, ref.read(apiProvider).gameId);
-      ref.read(apiProvider).streamPlayerAction(PlayerAction(
-            action: PlayerAction_ActionType.INIT,
-            cardId: '',
-            token: token,
-          ));
-    });
-
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final _apiProvider = ref.watch(apiProvider);
     final _storageProvider = ref.watch(storageProvider);
@@ -50,10 +33,9 @@ class _CardScrollViewState extends ConsumerState<CardScrollView> {
         ? [
             //TODO delete
             const duo.PlayingCard.fromCard(cardName: 'green_3'),
-            const duo.PlayingCard.fromCard(cardName: 'purple_draw_2'),
-            const duo.PlayingCard.fromCard(cardName: 'red_change_directions'),
-            const duo.PlayingCard.fromCard(cardName: 'yellow_suspend'),
-            const duo.PlayingCard.fromCard(cardName: 'draw_4'),
+            const duo.PlayingCard.fromCard(cardName: 'purple_4'),
+            const duo.PlayingCard.fromCard(cardName: 'yellow_draw_2'),
+            const duo.PlayingCard.fromCard(cardName: 'red_1'),
           ]
         : _apiProvider.playerState!.hand
             .map<duo.PlayingCard>((e) => duo.PlayingCard.fromCard(cardName: e))
@@ -87,7 +69,7 @@ class _CardScrollViewState extends ConsumerState<CardScrollView> {
         itemBuilder: (context, index) {
           return Dismissible(
             key: UniqueKey(),
-            direction: isTurn ? DismissDirection.up : DismissDirection.none,
+            direction: DismissDirection.up,
             onDismissed: (direction) {
               if (!_isReordering) {
                 setState(() {

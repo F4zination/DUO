@@ -14,16 +14,6 @@ class GameStacks extends ConsumerStatefulWidget {
 
 class _GameStacksState extends ConsumerState<GameStacks> {
   @override
-  void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      //init the stack stream
-      String token = await ref.read(apiProvider).getToken();
-      ref.read(apiProvider).getStackStream(token, ref.read(apiProvider).gameId);
-    });
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     ApiProvider _apiProvider = ref.watch(apiProvider);
     StackState stackState = _apiProvider.stackState ??
