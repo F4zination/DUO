@@ -278,6 +278,8 @@ class GrpcServerConnection extends AbstractServerConnection {
             (value) {
               // playerState = value;
               // _notifyListeners();
+              debugPrint('Received Player State Event: $value');
+
               eventController.add(PlayerStateEvent(value));
             },
             cancelOnError: false,
