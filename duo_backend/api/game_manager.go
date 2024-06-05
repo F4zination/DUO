@@ -361,7 +361,7 @@ func (gm *GameManager) onStackDisconnected(gameId int) error {
 	return gm.DeleteGame(gameId, true, "stack stream disconnected")
 }
 
-func (gm *GameManager) SetStackStream(gameId int, userId uuid.UUID, stream pb.DUOService_GetStackStreamServer) error {
+func (gm *GameManager) SetStackStream(gameId int, userId uuid.UUID, initMsg *pb.StackRequest, stream pb.DUOService_GetStackStreamServer) error {
 	game, exists := gm.GetGame(gameId)
 	if !exists {
 		log.Printf("[stack stream] game does not exist")
@@ -399,6 +399,27 @@ func (gm *GameManager) SetStackStream(gameId int, userId uuid.UUID, stream pb.DU
 
 	log.Printf(" [stack stream]stack stream of game: %d connected", gameId)
 
+	if !initMsg.DrawingCard {
+		//INIT MESSAGE
+		game.Mu.Lock()
+		sendErr := game.StackStream.Send(&pb.StackState{
+			PlaceStack: &pb.PlaceStackState{
+				AmountCards: int32(len(game.CardsOnPlaceStack)),
+				CardIdOnTop: game.CardsOnPlaceStack[len(game.CardsOnPlaceStack)-1],
+			},
+			DrawStack: &pb.DrawStackState{
+				StackId: int32(gameId),
+				CardIds: game.CardsOnDrawStack,
+			},
+		})
+		if sendErr != nil {
+			log.Printf("[stack stream] error sending init message to stack %v: %v", userId, sendErr)
+			game.Mu.Unlock()
+			return sendErr
+		}
+		game.Mu.Unlock()
+	}
+
 	for {
 		select {
 		case <-stream.Context().Done():
@@ -425,29 +446,10 @@ func (gm *GameManager) SetStackStream(gameId int, userId uuid.UUID, stream pb.DU
 			}
 
 			log.Printf("[stack stream] Received message from stack %v: %v", userId, msg)
-			if !msg.DrawingCard {
-				//INIT MESSAGE
-				game.Mu.Lock()
-				sendErr := game.StackStream.Send(&pb.StackState{
-					PlaceStack: &pb.PlaceStackState{
-						AmountCards: int32(len(game.CardsOnPlaceStack)),
-						CardIdOnTop: game.CardsOnPlaceStack[len(game.CardsOnPlaceStack)-1],
-					},
-					DrawStack: &pb.DrawStackState{
-						StackId: int32(gameId),
-						CardIds: game.CardsOnDrawStack,
-					},
-				})
-				if sendErr != nil {
-					log.Printf("[stack stream] error sending init message to stack %v: %v", userId, sendErr)
-					game.Mu.Unlock()
-					return sendErr
-				}
-				game.Mu.Unlock()
-			} else {
-				//CARD DRAW MESSAGE
-				//TODO
-			}
+
+			//CARD DRAW MESSAGE
+			//TODO
+
 		}
 	}
 }

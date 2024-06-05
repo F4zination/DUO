@@ -73,7 +73,7 @@ func (server *Server) GetStackStream(stream pb.DUOService_GetStackStreamServer) 
 	}
 
 	// Add user to game
-	addErr := server.GameHandler.SetStackStream(int(gameId.GameID), payload.UserID, stream)
+	addErr := server.GameHandler.SetStackStream(int(gameId.GameID), payload.UserID, msg, stream)
 	if addErr != nil {
 		log.Printf("error adding user to game: %v", addErr)
 		return status.Errorf(codes.Internal, "error adding user to game")
