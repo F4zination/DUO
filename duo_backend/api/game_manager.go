@@ -484,6 +484,8 @@ func (gm *GameManager) AddPlayerStream(gameId int, userId uuid.UUID, stream pb.D
 		return fmt.Errorf("game does not exist")
 	}
 
+	log.Printf("[Player stream] setting player stream of game: %d", gameId)
+
 	game.Mu.Lock()
 	index := -1
 	for i, user := range game.UserStreams {
