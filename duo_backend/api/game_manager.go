@@ -865,9 +865,9 @@ func (gm *GameManager) shuffleDrawStack(gameId int, shuffleTopCardToo bool) erro
 
 	var length int
 	if shuffleTopCardToo {
-		length = len(game.CardsOnPlaceStack)
+		length = len(game.CardsOnDrawStack)
 	} else {
-		length = len(game.CardsOnPlaceStack) - 1
+		length = len(game.CardsOnDrawStack) - 1
 	}
 
 	game.Mu.Lock()
