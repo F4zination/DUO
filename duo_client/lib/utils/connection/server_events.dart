@@ -33,10 +33,6 @@ class StackStateEvent extends ServerEvent {
   StackStateEvent(this.state);
 }
 
-class StackStateInitEvent extends ServerEvent {
-  StackStateInitEvent();
-}
-
 class StackStateDoneEvent extends ServerEvent {
   StackStateDoneEvent();
 }

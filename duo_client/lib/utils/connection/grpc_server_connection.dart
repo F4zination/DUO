@@ -33,7 +33,8 @@ class GrpcServerConnection extends AbstractServerConnection {
   StreamController<PlayerAction> playerActionStreamController =
       StreamController<PlayerAction>.broadcast();
 
-  StreamController<StackRequest>? stackRequestStreamController;
+  StreamController<StackRequest>? stackRequestStreamController =
+      StreamController<StackRequest>.broadcast();
   GrpcServerConnection({required String host}) : super() {
     channel = ClientChannel(
       host,
@@ -309,13 +310,6 @@ class GrpcServerConnection extends AbstractServerConnection {
   @override
   Future<int> getStackStream(String token, int gameId) async {
     try {
-      final streamEstablishedCompleter = Completer<void>();
-      if (!hasStackStream) {
-        stackRequestStreamController = StreamController<StackRequest>.broadcast(
-          onCancel: () =>
-              debugPrint('Stream controller for stack request cancelled'),
-        );
-      }
       final responseStream =
           client.getStackStream(stackRequestStreamController!.stream,
               options: CallOptions(
@@ -324,22 +318,14 @@ class GrpcServerConnection extends AbstractServerConnection {
       stackStream = responseStream;
       stackStream?.listen(
         (value) {
-          if (!streamEstablishedCompleter.isCompleted) {
-            if (!streamEstablishedCompleter.isCompleted) {
-              streamEstablishedCompleter.complete();
-            }
-            eventController.add(StackStateEvent(value));
-            debugPrint('card on top: ${value.placeStack.cardIdOnTop}');
-            debugPrint('stack stream acknowledge received');
-          }
+          eventController.add(StackStateEvent(value));
+          debugPrint('card on top: ${value.placeStack.cardIdOnTop}');
+          debugPrint('stack stream acknowledge received');
         },
         onError: (error) {
-          if (!streamEstablishedCompleter.isCompleted) {
-            streamEstablishedCompleter.completeError(error);
-            stackStream?.cancel();
-            stackStream = null;
-            eventController.add(StackStateDoneEvent());
-          }
+          stackStream?.cancel();
+          stackStream = null;
+          eventController.add(StackStateDoneEvent());
           debugPrint('Error establishing stack stream: $error');
         },
         onDone: () {
@@ -350,8 +336,6 @@ class GrpcServerConnection extends AbstractServerConnection {
         cancelOnError: false,
       );
 
-      await streamEstablishedCompleter.future;
-      eventController.add(StackStateInitEvent());
       return 0;
     } catch (e) {
       debugPrint('Error sending stack request: $e');

@@ -424,8 +424,8 @@ func (gm *GameManager) SetStackStream(gameId int, userId uuid.UUID, stream pb.DU
 				return err
 			}
 
+			//TODO
 			log.Printf("[stack stream] Received message from stack %v: %v", userId, msg)
-
 		}
 	}
 }
