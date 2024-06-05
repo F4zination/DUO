@@ -364,26 +364,26 @@ func (gm *GameManager) onStackDisconnected(gameId int) error {
 func (gm *GameManager) SetStackStream(gameId int, userId uuid.UUID, stream pb.DUOService_GetStackStreamServer) error {
 	game, exists := gm.GetGame(gameId)
 	if !exists {
-		log.Printf("game does not exist")
+		log.Printf("[stack stream] game does not exist")
 		return fmt.Errorf("game does not exist")
 	}
 
-	log.Printf("setting stack stream of game: %d", gameId)
+	log.Printf("[stack stream] setting stack stream of game: %d", gameId)
 
 	//Stack stream mustn't be set
 	if game.StackStream != nil {
-		log.Printf("stack stream already set")
+		log.Printf("[stack stream] stack stream already set")
 		return fmt.Errorf("stack stream already set")
 	}
 
 	dbGame, getErr := gm.store.GetGameStateById(context.Background(), int32(gameId))
 	if getErr != nil {
-		log.Printf("error getting game: %v", getErr)
+		log.Printf("[stack stream] error getting game: %v", getErr)
 		return getErr
 	}
 
 	if dbGame.StackID != userId {
-		log.Printf("user %v is not the stack owner", userId)
+		log.Printf("[stack stream] user %v is not the stack owner", userId)
 		return fmt.Errorf("user %v is not the stack owner", userId)
 	}
 
@@ -393,11 +393,11 @@ func (gm *GameManager) SetStackStream(gameId int, userId uuid.UUID, stream pb.DU
 
 	sendErr := gm.SendFirstGameStateIfAllPlayersAreReady(gameId)
 	if sendErr != nil {
-		log.Printf("error sending first game state: %v", sendErr)
+		log.Printf("[stack stream] error sending first game state: %v", sendErr)
 		return sendErr
 	}
 
-	log.Printf("stack stream of game: %d connected", gameId)
+	log.Printf(" [stack stream]stack stream of game: %d connected", gameId)
 
 	for {
 		select {
@@ -415,16 +415,16 @@ func (gm *GameManager) SetStackStream(gameId int, userId uuid.UUID, stream pb.DU
 				if err == io.EOF {
 					return gm.onStackDisconnected(gameId)
 				} else if status.Code(err) == codes.Canceled { // Check for context cancellation
-					log.Printf("Context canceled for stack: %v", userId)
+					log.Printf("[stack stream] Context canceled for stack: %v", userId)
 					err := gm.onStackDisconnected(gameId)
 					return err // Or handle it differently as needed
 				}
-				log.Printf("Error receiving message from stack %v: %v", userId, err)
+				log.Printf("[stack stream] Error receiving message from stack %v: %v", userId, err)
 				err := gm.onStackDisconnected(gameId)
 				return err
 			}
 
-			log.Printf("Received message from stack %v: %v", userId, msg)
+			log.Printf("[stack stream] Received message from stack %v: %v", userId, msg)
 
 		}
 	}
@@ -433,7 +433,7 @@ func (gm *GameManager) SetStackStream(gameId int, userId uuid.UUID, stream pb.DU
 func (gm *GameManager) AddGameStateStream(gameId int, userId uuid.UUID, stream pb.DUOService_GetGameStateServer) error {
 	game, exists := gm.GetGame(gameId)
 	if !exists {
-		log.Printf("game does not exist")
+		log.Printf("[GameState stream] game does not exist")
 		return fmt.Errorf("game does not exist")
 	}
 
@@ -452,9 +452,9 @@ func (gm *GameManager) AddGameStateStream(gameId int, userId uuid.UUID, stream p
 		})
 	} else {
 		if game.UserStreams[index].GameStateStream != nil {
-			log.Printf("game state stream already set")
+			log.Printf("[GameState stream] game state stream already set")
 			game.Mu.Unlock()
-			return fmt.Errorf("game state stream already set")
+			return fmt.Errorf("[GameState stream] game state stream already set")
 		}
 		game.UserStreams[index].GameStateStream = stream
 	}
@@ -462,15 +462,15 @@ func (gm *GameManager) AddGameStateStream(gameId int, userId uuid.UUID, stream p
 
 	sendErr := gm.SendFirstGameStateIfAllPlayersAreReady(gameId)
 	if sendErr != nil {
-		log.Printf("error sending first game state: %v", sendErr)
+		log.Printf("[GameState stream] error sending first game state: %v", sendErr)
 		return sendErr
 	}
 
-	log.Printf("game state stream of game: %d connected", gameId)
+	log.Printf("[GameState stream] game state stream of game: %d connected", gameId)
 
 	<-stream.Context().Done()
 
-	log.Printf("game state stream of game: %d disconnected", gameId)
+	log.Printf("[GameState stream] game state stream of game: %d disconnected", gameId)
 
 	gm.RemovePlayerFromGame(gameId, userId)
 
@@ -480,7 +480,7 @@ func (gm *GameManager) AddGameStateStream(gameId int, userId uuid.UUID, stream p
 func (gm *GameManager) AddPlayerStream(gameId int, userId uuid.UUID, stream pb.DUOService_GetPlayerStreamServer) error {
 	game, exists := gm.GetGame(gameId)
 	if !exists {
-		log.Printf("game does not exist")
+		log.Printf("[Player stream] game does not exist")
 		return fmt.Errorf("game does not exist")
 	}
 
@@ -499,9 +499,9 @@ func (gm *GameManager) AddPlayerStream(gameId int, userId uuid.UUID, stream pb.D
 		})
 	} else {
 		if game.UserStreams[index].PlayerStream != nil {
-			log.Printf("player stream already set")
+			log.Printf("[Player stream] player stream already set")
 			game.Mu.Unlock()
-			return fmt.Errorf("player stream already set")
+			return fmt.Errorf("[Player stream] player stream already set")
 		}
 		game.UserStreams[index].PlayerStream = stream
 	}
@@ -509,35 +509,35 @@ func (gm *GameManager) AddPlayerStream(gameId int, userId uuid.UUID, stream pb.D
 
 	playersCards, getErr := gm.DrawCardsFromStack(gameId, 7) //TODO: make dynamic
 	if getErr != nil {
-		log.Printf("error drawing cards: %v", getErr)
+		log.Printf("[Player stream] error drawing cards: %v", getErr)
 		return getErr
 	}
 
 	updateErr := gm.UpdatePlayersCards(gameId, userId.String(), playersCards)
 	if updateErr != nil {
-		log.Printf("error updating players cards: %v", updateErr)
+		log.Printf("[Player stream] error updating players cards: %v", updateErr)
 		return updateErr
 	}
 
 	sendErr := gm.SendFirstGameStateIfAllPlayersAreReady(gameId)
 	if sendErr != nil {
-		log.Printf("error sending first game state: %v", sendErr)
+		log.Printf("[Player stream] error sending first game state: %v", sendErr)
 		return sendErr
 	}
 
-	log.Printf("player stream of game: %d connected", gameId)
+	log.Printf("[Player stream] player stream of game: %d connected", gameId)
 
 	//Listen for player stream disconnect or messages
 	for {
 		recvMsg, recvErr := stream.Recv()
 		if recvErr != nil {
-			log.Printf("error receiving player stream: %v", recvErr)
+			log.Printf("[Player stream] error receiving player stream: %v", recvErr)
 			break
 		}
 
 		dbGame, getErr := gm.store.GetGameStateById(context.Background(), int32(gameId))
 		if getErr != nil {
-			log.Printf("error getting game: %v", getErr)
+			log.Printf("[Player stream] error getting game: %v", getErr)
 		}
 
 		var direction pb.Direction
@@ -549,16 +549,16 @@ func (gm *GameManager) AddPlayerStream(gameId int, userId uuid.UUID, stream pb.D
 
 		nextPlayerUuid, nextPlayerName, nextPlayerErr := gm.GetNextPlayer(gameId, dbGame.IsClockwise)
 		if nextPlayerErr != nil {
-			log.Printf("error getting next player: %v", nextPlayerErr)
+			log.Printf("[Player stream] error getting next player: %v", nextPlayerErr)
 		}
 
 		allPlayersReady, readyErr := gm.HasEveryoneJoined(gameId)
 		if readyErr != nil {
-			log.Printf("error checking if everyone is ready: %v", readyErr)
+			log.Printf("[Player stream] error checking if everyone is ready: %v", readyErr)
 		}
 
 		if !allPlayersReady {
-			log.Printf("not all players are ready")
+			log.Printf("[Player stream] not all players are ready")
 		}
 
 		//Handle player stream messages
@@ -574,14 +574,14 @@ func (gm *GameManager) AddPlayerStream(gameId int, userId uuid.UUID, stream pb.D
 				IsGameOver:         false,
 			})
 			if placeErr != nil {
-				log.Printf("error placing card: %v", placeErr)
+				log.Printf("[Player stream] error placing card: %v", placeErr)
 				break
 			}
 		}
 
 	}
 
-	log.Printf("player stream of game: %d disconnected", gameId)
+	log.Printf("[Player stream] player stream of game: %d disconnected", gameId)
 
 	gm.RemovePlayerFromGame(gameId, userId)
 
@@ -606,6 +606,8 @@ func (gm *GameManager) RemovePlayerFromGame(gameId int, userId uuid.UUID) error 
 	game.Mu.Lock()
 	game.UserStreams = newStreams
 	game.Mu.Unlock()
+
+	//TODO db
 
 	log.Printf("player %v removed from game: %d", userId, gameId)
 

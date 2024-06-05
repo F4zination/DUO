@@ -101,6 +101,8 @@ func (server *Server) GetPlayerStream(stream pb.DUOService_GetPlayerStreamServer
 		return status.Errorf(codes.Internal, "error getting players game id")
 	}
 
+	log.Printf("Game ID: %v", gameId.GameID)
+
 	// Add user to game
 	addErr := server.GameHandler.AddPlayerStream(int(gameId.GameID), payload.UserID, stream)
 	if addErr != nil {
