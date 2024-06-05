@@ -58,6 +58,8 @@ func (server *Server) GetStackStream(stream pb.DUOService_GetStackStreamServer) 
 		return status.Errorf(codes.Internal, "error receiving message")
 	}
 
+	log.Printf("Received Stack message with gameId: %v", msg.GameId)
+
 	payload, tokenErr := server.Maker.VerifyToken(msg.Token)
 	if tokenErr != nil {
 		log.Printf("error verifying token: %v", tokenErr)

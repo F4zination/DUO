@@ -585,7 +585,11 @@ func (gm *GameManager) AddPlayerStream(gameId int, userId uuid.UUID, stream pb.D
 
 	log.Printf("[Player stream] player stream of game: %d disconnected", gameId)
 
-	gm.RemovePlayerFromGame(gameId, userId)
+	removeErr := gm.RemovePlayerFromGame(gameId, userId)
+	if removeErr != nil {
+		log.Printf("[Player stream] error removing player from game: %v", removeErr)
+		return removeErr
+	}
 
 	return nil
 }
@@ -642,6 +646,8 @@ func (gm *GameManager) DeleteGame(gameId int, sendGameOverMessage bool, gameOver
 	gm.Mu.Lock()
 	delete(gm.GameStreams, gameId)
 	gm.Mu.Unlock()
+
+	log.Printf("game %d deleted", gameId)
 
 	return nil
 }
@@ -737,6 +743,7 @@ func (gm *GameManager) SendFirstGameStateIfAllPlayersAreReady(gameId int) error 
 		}
 		game.Mu.RLock()
 		if game.StackStream != nil {
+
 			sendErr := game.StackStream.Send(&pb.StackState{
 				PlaceStack: &pb.PlaceStackState{
 					AmountCards: int32(len(game.CardsOnPlaceStack)),
