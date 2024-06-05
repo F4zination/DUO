@@ -424,8 +424,30 @@ func (gm *GameManager) SetStackStream(gameId int, userId uuid.UUID, stream pb.DU
 				return err
 			}
 
-			//TODO
 			log.Printf("[stack stream] Received message from stack %v: %v", userId, msg)
+			if !msg.DrawingCard {
+				//INIT MESSAGE
+				game.Mu.Lock()
+				sendErr := game.StackStream.Send(&pb.StackState{
+					PlaceStack: &pb.PlaceStackState{
+						AmountCards: int32(len(game.CardsOnPlaceStack)),
+						CardIdOnTop: game.CardsOnPlaceStack[len(game.CardsOnPlaceStack)-1],
+					},
+					DrawStack: &pb.DrawStackState{
+						StackId: int32(gameId),
+						CardIds: game.CardsOnDrawStack,
+					},
+				})
+				if sendErr != nil {
+					log.Printf("[stack stream] error sending init message to stack %v: %v", userId, sendErr)
+					game.Mu.Unlock()
+					return sendErr
+				}
+				game.Mu.Unlock()
+			} else {
+				//CARD DRAW MESSAGE
+				//TODO
+			}
 		}
 	}
 }
