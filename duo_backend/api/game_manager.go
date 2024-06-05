@@ -142,7 +142,9 @@ type Game struct {
 	CardsOnDrawStack    []string //last card is on top
 	CardsOnPlaceStack   []string //last card is on top
 	UserStreams         []GameUserStreams
-	WaitingForDrawCount int32
+	CurrentPlayerID     uuid.UUID
+	WaitingForDrawCount int32 //How many cards need to be drawn, before the next player can play
+	Direction           pb.Direction
 	Mu                  sync.RWMutex
 }
 
@@ -152,6 +154,7 @@ func NewGame(cardIds []string) *Game {
 		UserStreams:         []GameUserStreams{},
 		StackStream:         nil,
 		WaitingForDrawCount: 0,
+		Direction:           pb.Direction_CLOCKWISE,
 		Mu:                  sync.RWMutex{},
 	}
 }
@@ -211,7 +214,7 @@ func (gm *GameManager) CreateGame(lobby *Lobby, lobbyId int32) (int, error) {
 	}
 
 	gm.Mu.Lock()
-	gm.GameStreams[int(dbGame.ID)] = NewGame(duoCards) //TODO make dynamic
+	gm.GameStreams[int(dbGame.ID)] = NewGame(duoCards) //TODO make cards dynamic
 	gm.Mu.Unlock()
 
 	shuffleErr := gm.shuffleDrawStack(int(dbGame.ID), true)
@@ -252,27 +255,49 @@ func (gm *GameManager) GetGame(gameId int) (*Game, bool) {
 func (gm *GameManager) HasEveryoneJoined(gameId int) (bool, error) {
 	game, exists := gm.GetGame(gameId)
 	if !exists {
-		log.Printf("game does not exist")
+		log.Printf("[Has Everyone Joined] game does not exist")
 		return false, fmt.Errorf("game does not exist")
 	}
 
 	dbUsers, getErr := gm.store.GetPlayersInGame(context.Background(), int32(gameId))
 	if getErr != nil {
-		log.Printf("error getting players in game: %v", getErr)
+		log.Printf("[Has Everyone Joined] error getting players in game: %v", getErr)
 		return false, getErr
 	}
 
-	if len(game.UserStreams) != len(dbUsers) {
-		return false, nil
+	dbGame, getErr := gm.store.GetGameStateById(context.Background(), int32(gameId))
+	if getErr != nil {
+		log.Printf("[Has Everyone Joined] error getting game: %v", getErr)
+		return false, getErr
 	}
 
 	game.Mu.RLock()
+	for _, user := range dbUsers {
+		if user.PlayerID == dbGame.StackID {
+			continue
+		}
+		found := false
+		for _, gameUser := range game.UserStreams {
+			if user.PlayerID == gameUser.UserId {
+				found = true
+				break
+			}
+		}
+		if !found {
+			log.Printf("[Has Everyone Joined] player %v not found in game", user.PlayerID)
+			game.Mu.RUnlock()
+			return false, nil
+		}
+	}
+
 	for _, user := range game.UserStreams {
 		if user.GameStateStream == nil {
+			log.Printf("[Has Everyone Joined] game state stream of player %v not set", user.UserId)
 			game.Mu.RUnlock()
 			return false, nil
 		}
 		if user.PlayerStream == nil {
+			log.Printf("[Has Everyone Joined] player stream of player %v not set", user.UserId)
 			game.Mu.RUnlock()
 			return false, nil
 		}
@@ -280,6 +305,7 @@ func (gm *GameManager) HasEveryoneJoined(gameId int) (bool, error) {
 	game.Mu.RUnlock()
 
 	if game.StackStream == nil {
+		log.Printf("[Has Everyone Joined] stack stream not set")
 		return false, nil
 	}
 
@@ -289,11 +315,11 @@ func (gm *GameManager) HasEveryoneJoined(gameId int) (bool, error) {
 func (gm *GameManager) UpdateGameState(gameId int, state *pb.GameState) []error {
 	game, exists := gm.GetGame(gameId)
 	if !exists {
-		log.Printf("game does not exist")
+		log.Printf("[Update Game State] game does not exist")
 		return []error{fmt.Errorf("game does not exist")}
 	}
 
-	isCardOnTopOfStack := len(state.CardOnTopOfDiscard) != 0
+	isCardOnTopOfStack := len(game.CardsOnPlaceStack) != 0
 
 	game.Mu.RLock()
 	if isCardOnTopOfStack {
@@ -302,37 +328,55 @@ func (gm *GameManager) UpdateGameState(gameId int, state *pb.GameState) []error 
 			sendErr := game.StackStream.Send(&pb.StackState{
 				PlaceStack: &pb.PlaceStackState{
 					AmountCards: int32(len(game.CardsOnPlaceStack)),
-					CardIdOnTop: state.CardOnTopOfDiscard,
+					CardIdOnTop: game.CardsOnPlaceStack[len(game.CardsOnPlaceStack)-1],
 				},
 				DrawStack: &pb.DrawStackState{
 					StackId: int32(gameId),
 					CardIds: game.CardsOnDrawStack,
 				},
-				Direction: state.Direction,
+				Direction: game.Direction,
 			})
 			if sendErr != nil {
-				log.Printf("error sending card on top of stack to game %d: %v", gameId, sendErr)
+				log.Printf("[Update Game State] error sending card on top of stack to game %d: %v", gameId, sendErr)
 				return []error{sendErr}
 			}
 		}
 	}
+
 	game.Mu.RUnlock()
+
+	var stateToUse *pb.GameState
+	if state == nil {
+		stateFromGame, getErr := gm.getGameStateFromGame(gameId)
+		if getErr != nil {
+			log.Printf("[Update Game State] error getting game state from game: %v", getErr)
+			return []error{getErr}
+		}
+		stateToUse = stateFromGame
+	} else {
+		stateToUse = state
+	}
+
+	game.Mu.Lock()
+	game.CurrentPlayerID = uuid.MustParse(stateToUse.CurrentPlayerUuid)
+	// game.Direction = stateToUse.Direction
+	game.Mu.Unlock()
 
 	_, updateErr := gm.store.UpdateGameState(context.Background(), db.UpdateGameStateParams{
 		ID: int32(gameId),
 		CurrentPlayerID: uuid.NullUUID{
-			UUID:  uuid.MustParse(state.CurrentPlayerUuid),
+			UUID:  uuid.MustParse(stateToUse.CurrentPlayerUuid),
 			Valid: true,
 		},
 		IsClockwise: sql.NullBool{
-			Bool:  state.Direction == pb.Direction_CLOCKWISE,
+			Bool:  stateToUse.Direction == pb.Direction_CLOCKWISE,
 			Valid: true,
 		},
-		CardOnTopOfStack: sql.NullString{String: state.CardOnTopOfDiscard, Valid: isCardOnTopOfStack},
+		CardOnTopOfStack: sql.NullString{String: game.CardsOnPlaceStack[len(game.CardsOnPlaceStack)-1], Valid: isCardOnTopOfStack},
 	})
 
 	if updateErr != nil {
-		log.Printf("error updating game state: %v", updateErr)
+		log.Printf("[Update Game State] error updating game state: %v", updateErr)
 		return []error{updateErr}
 	}
 
@@ -343,7 +387,7 @@ func (gm *GameManager) UpdateGameState(gameId int, state *pb.GameState) []error 
 			sendErr := user.GameStateStream.Send(state)
 			if sendErr != nil {
 				errs = append(errs, sendErr)
-				log.Printf("error sending game state to user %v: %v", user.UserId, sendErr)
+				log.Printf("[Update Game State] error sending game state to user %v: %v", user.UserId, sendErr)
 			}
 		}
 	}
@@ -424,25 +468,21 @@ func (gm *GameManager) SetStackStream(gameId int, userId uuid.UUID, initMsg *pb.
 		select {
 		case <-stream.Context().Done():
 			return gm.onStackDisconnected(gameId)
-		default: // Add default case for non-blocking Recv()
+		default:
 			if stream == nil {
 				return status.Errorf(codes.Internal, "Stream not initialized")
 			}
 			msg, err := stream.Recv()
 			if err != nil {
-				if msg.GameId != int32(gameId) {
-					return status.Errorf(codes.InvalidArgument, "Wrong gameId")
-				}
 				if err == io.EOF {
 					return gm.onStackDisconnected(gameId)
 				} else if status.Code(err) == codes.Canceled { // Check for context cancellation
 					log.Printf("[stack stream] Context canceled for stack: %v", userId)
-					err := gm.onStackDisconnected(gameId)
-					return err // Or handle it differently as needed
+					return gm.onStackDisconnected(gameId)
 				}
 				log.Printf("[stack stream] Error receiving message from stack %v: %v", userId, err)
-				err := gm.onStackDisconnected(gameId)
-				return err
+				return gm.onStackDisconnected(gameId)
+
 			}
 
 			log.Printf("[stack stream] Received message from stack %v: %v", userId, msg)
@@ -539,6 +579,8 @@ func (gm *GameManager) AddPlayerStream(gameId int, userId uuid.UUID, stream pb.D
 		return getErr
 	}
 
+	log.Printf("[Player stream] player %v drew cards: %v", userId, playersCards)
+
 	updateErr := gm.UpdatePlayersCards(gameId, userId.String(), playersCards)
 	if updateErr != nil {
 		log.Printf("[Player stream] error updating players cards: %v", updateErr)
@@ -561,22 +603,7 @@ func (gm *GameManager) AddPlayerStream(gameId int, userId uuid.UUID, stream pb.D
 			break
 		}
 
-		dbGame, getErr := gm.store.GetGameStateById(context.Background(), int32(gameId))
-		if getErr != nil {
-			log.Printf("[Player stream] error getting game: %v", getErr)
-		}
-
-		var direction pb.Direction
-		if dbGame.IsClockwise {
-			direction = pb.Direction_CLOCKWISE
-		} else {
-			direction = pb.Direction_COUNTER_CLOCKWISE
-		}
-
-		nextPlayerUuid, nextPlayerName, nextPlayerErr := gm.GetNextPlayer(gameId, dbGame.IsClockwise)
-		if nextPlayerErr != nil {
-			log.Printf("[Player stream] error getting next player: %v", nextPlayerErr)
-		}
+		log.Printf("[Player stream] received message from player %v: %v", userId, recvMsg)
 
 		allPlayersReady, readyErr := gm.HasEveryoneJoined(gameId)
 		if readyErr != nil {
@@ -589,12 +616,84 @@ func (gm *GameManager) AddPlayerStream(gameId int, userId uuid.UUID, stream pb.D
 
 		//Handle player stream messages
 		if recvMsg.Action == pb.PlayerAction_PLACE {
+
+			game.Mu.RLock()
+			if game.CurrentPlayerID != userId {
+				log.Printf("[Player stream] player %v is not the current player", userId)
+				game.Mu.RUnlock()
+				continue
+			}
+
+			if game.WaitingForDrawCount > 0 {
+				log.Printf("[Player stream] player %v needs to draw %d cards", userId, game.WaitingForDrawCount)
+				game.Mu.RUnlock()
+				continue
+			}
+
+			if len(recvMsg.CardId) == 0 {
+				log.Printf("[Player stream] player %v did not send a card id", userId)
+				game.Mu.RUnlock()
+				continue
+			}
+
+			//TODO: Check for wrong card color or number ...
+
+			//Check if card is in players hand
+			playerIndex := -1
+			for i, user := range game.UserStreams {
+				if user.UserId == userId {
+					playerIndex = i
+					break
+				}
+			}
+			if playerIndex == -1 {
+				log.Printf("[Player stream] player %v not found in game", userId)
+				game.Mu.RUnlock()
+				continue
+			}
+
+			cardIndex := -1
+			for i, card := range game.UserStreams[playerIndex].PlayersCards {
+				if card == recvMsg.CardId {
+					cardIndex = i
+					break
+				}
+			}
+			if cardIndex == -1 {
+				log.Printf("[Player stream] card %v not found in players hand", recvMsg.CardId)
+				log.Printf("[Player stream] players hand: %v", game.UserStreams[playerIndex].PlayersCards)
+				game.Mu.RUnlock()
+				continue
+			}
+			game.Mu.RUnlock()
+
+			game.Mu.Lock()
+			//Remove card from players hand
+			game.UserStreams[playerIndex].PlayersCards = append(game.UserStreams[playerIndex].PlayersCards[:cardIndex], game.UserStreams[playerIndex].PlayersCards[cardIndex+1:]...)
+
+			//Place card on place stack
+			game.CardsOnPlaceStack = append(game.CardsOnPlaceStack, recvMsg.CardId)
+
+			//TODO: Check for special cards
+			game.Mu.Unlock()
+
+			nextPlayerUuid, nextPlayerName, nextPlayerErr := gm.GetNextPlayer(gameId, game.Direction == pb.Direction_CLOCKWISE, 1)
+			if nextPlayerErr != nil {
+				log.Printf("[Player stream] error getting next player: %v", nextPlayerErr)
+				break
+			}
+
+			game.Mu.Lock()
+			game.CurrentPlayerID = nextPlayerUuid
+
+			game.Mu.Unlock()
+
 			//Place card
 			placeErr := gm.UpdateGameState(gameId, &pb.GameState{
 				CardOnTopOfDiscard: recvMsg.CardId,
 				CurrentPlayerUuid:  nextPlayerUuid.String(),
 				CurrentPlayerName:  nextPlayerName,
-				Direction:          direction,
+				Direction:          game.Direction,
 				GameId:             int32(gameId),
 				AllPlayersReady:    allPlayersReady,
 				IsGameOver:         false,
@@ -604,7 +703,6 @@ func (gm *GameManager) AddPlayerStream(gameId int, userId uuid.UUID, stream pb.D
 				break
 			}
 		}
-
 	}
 
 	log.Printf("[Player stream] player stream of game: %d disconnected", gameId)
@@ -621,8 +719,8 @@ func (gm *GameManager) AddPlayerStream(gameId int, userId uuid.UUID, stream pb.D
 func (gm *GameManager) RemovePlayerFromGame(gameId int, userId uuid.UUID) error {
 	game, exists := gm.GetGame(gameId)
 	if !exists {
-		log.Printf("game does not exist")
-		return fmt.Errorf("game does not exist")
+		log.Printf("[Remove Player From Game] game does not exist")
+		return fmt.Errorf("[Remove Player From Game] game does not exist")
 	}
 
 	game.Mu.RLock()
@@ -637,9 +735,16 @@ func (gm *GameManager) RemovePlayerFromGame(gameId int, userId uuid.UUID) error 
 	game.UserStreams = newStreams
 	game.Mu.Unlock()
 
-	//TODO db
+	_, delErr := gm.store.RemovePlayerFromGame(context.Background(), db.RemovePlayerFromGameParams{
+		GameID:   int32(gameId),
+		PlayerID: userId,
+	})
+	if delErr != nil {
+		log.Printf("[Remove Player From Game] error removing player from game: %v", delErr)
+		return delErr
+	}
 
-	log.Printf("player %v removed from game: %d", userId, gameId)
+	log.Printf("[Remove Player From Game] player %v removed from game: %d", userId, gameId)
 
 	return nil
 }
@@ -647,8 +752,8 @@ func (gm *GameManager) RemovePlayerFromGame(gameId int, userId uuid.UUID) error 
 func (gm *GameManager) DeleteGame(gameId int, sendGameOverMessage bool, gameOverReason string) error {
 	_, exists := gm.GetGame(gameId)
 	if !exists {
-		log.Printf("game does not exist")
-		return fmt.Errorf("game does not exist")
+		log.Printf("[Delete Game] game does not exist")
+		return fmt.Errorf("[Delete Game] game does not exist")
 	}
 
 	if sendGameOverMessage {
@@ -659,11 +764,11 @@ func (gm *GameManager) DeleteGame(gameId int, sendGameOverMessage bool, gameOver
 			GameId:         int32(gameId),
 		})
 	}
-	log.Printf("deleting game %d", gameId)
+	log.Printf("[Delete Game] deleting game %d", gameId)
 
 	_, delErr := gm.store.DeleteGameState(context.Background(), int32(gameId))
 	if delErr != nil {
-		log.Printf("error deleting game: %v", delErr)
+		log.Printf("[Delete Game] error deleting game: %v", delErr)
 		return delErr
 	}
 
@@ -671,53 +776,44 @@ func (gm *GameManager) DeleteGame(gameId int, sendGameOverMessage bool, gameOver
 	delete(gm.GameStreams, gameId)
 	gm.Mu.Unlock()
 
-	log.Printf("game %d deleted", gameId)
+	log.Printf("[Delete Game] game %d deleted", gameId)
 
 	return nil
 }
 
-func (gm *GameManager) GetNextPlayer(gameId int, clockwise bool) (uuid.UUID, string, error) {
+func (gm *GameManager) GetNextPlayer(gameId int, clockwise bool, amount int) (uuid.UUID, string, error) {
 	game, exists := gm.GetGame(gameId)
 	if !exists {
-		log.Printf("game does not exist")
-		return uuid.UUID{}, "", fmt.Errorf("game does not exist")
+		log.Printf("[Get next player] game does not exist")
+		return uuid.UUID{}, "", fmt.Errorf("[Get next player] game does not exist")
 	}
 
-	dbGame, getErr := gm.store.GetGameStateById(context.Background(), int32(gameId))
-	if getErr != nil {
-		log.Printf("error getting game: %v", getErr)
-		return uuid.UUID{}, "", getErr
-	}
-
+	game.Mu.RLock()
 	positionOfCurrentPlayer := -1
 	for i, user := range game.UserStreams {
-		if user.UserId == dbGame.CurrentPlayerID {
+		if user.UserId == game.CurrentPlayerID {
 			positionOfCurrentPlayer = i
 			break
 		}
 	}
+	game.Mu.RUnlock()
 
+	//choose random if no current player
 	if positionOfCurrentPlayer == -1 {
-		log.Printf("current player not found")
-		return uuid.UUID{}, "", fmt.Errorf("current player not found")
+		positionOfCurrentPlayer = rand.Intn(len(game.UserStreams))
 	}
 
 	if clockwise {
-		positionOfCurrentPlayer++
+		positionOfCurrentPlayer += amount
 	} else {
-		positionOfCurrentPlayer--
-	}
-
-	if positionOfCurrentPlayer < 0 {
-		positionOfCurrentPlayer = len(game.UserStreams) - 1
-	} else if positionOfCurrentPlayer >= len(game.UserStreams) {
-		positionOfCurrentPlayer = 0
+		positionOfCurrentPlayer -= amount
 	}
 
 	game.Mu.RLock()
-	if game.UserStreams[positionOfCurrentPlayer].UserId == dbGame.StackID {
-		game.Mu.RUnlock()
-		return gm.GetNextPlayer(gameId, clockwise)
+	if positionOfCurrentPlayer < 0 {
+		positionOfCurrentPlayer = len(game.UserStreams) + positionOfCurrentPlayer
+	} else if positionOfCurrentPlayer >= len(game.UserStreams) {
+		positionOfCurrentPlayer = positionOfCurrentPlayer - len(game.UserStreams)
 	}
 
 	uuid := game.UserStreams[positionOfCurrentPlayer].UserId
@@ -725,7 +821,7 @@ func (gm *GameManager) GetNextPlayer(gameId int, clockwise bool) (uuid.UUID, str
 
 	user, getErr := gm.store.GetUserByUUID(context.Background(), uuid)
 	if getErr != nil {
-		log.Printf("error getting user: %v", getErr)
+		log.Printf("[Get next player] error getting user: %v", getErr)
 		return uuid, "", getErr
 	}
 
@@ -735,14 +831,16 @@ func (gm *GameManager) GetNextPlayer(gameId int, clockwise bool) (uuid.UUID, str
 func (gm *GameManager) SendFirstGameStateIfAllPlayersAreReady(gameId int) error {
 	allPlayersReady, readyErr := gm.HasEveryoneJoined(gameId)
 	if readyErr != nil {
-		log.Printf("error checking if everyone is ready: %v", readyErr)
+		log.Printf("[Send first game state] error checking if everyone is ready: %v", readyErr)
 		return readyErr
 	}
 
 	if allPlayersReady {
+		log.Printf("[Send first game state] all players are ready in game %d, sending first gamestate message", gameId)
+
 		dbGame, getErr := gm.store.GetGameStateById(context.Background(), int32(gameId))
 		if getErr != nil {
-			log.Printf("error getting game: %v", getErr)
+			log.Printf("[Send first game state] error getting game: %v", getErr)
 			return getErr
 		}
 
@@ -753,17 +851,17 @@ func (gm *GameManager) SendFirstGameStateIfAllPlayersAreReady(gameId int) error 
 			direction = pb.Direction_COUNTER_CLOCKWISE
 		}
 
-		nextPlayerUuid, nextPlayerName, nextPlayerErr := gm.GetNextPlayer(gameId, dbGame.IsClockwise)
+		nextPlayerUuid, nextPlayerName, nextPlayerErr := gm.GetNextPlayer(gameId, dbGame.IsClockwise, 1)
 		if nextPlayerErr != nil {
-			log.Printf("error getting next player: %v", nextPlayerErr)
+			log.Printf("[Send first game state] error getting next player: %v", nextPlayerErr)
 			return nextPlayerErr
 		}
 
 		//Send data to stackStream
 		game, exists := gm.GetGame(gameId)
 		if !exists {
-			log.Printf("game does not exist")
-			return fmt.Errorf("game does not exist")
+			log.Printf("[Send first game state] game does not exist")
+			return fmt.Errorf("[Send first game state] game does not exist")
 		}
 		game.Mu.RLock()
 		if game.StackStream != nil {
@@ -780,7 +878,7 @@ func (gm *GameManager) SendFirstGameStateIfAllPlayersAreReady(gameId int) error 
 				Direction: direction,
 			})
 			if sendErr != nil {
-				log.Printf("error sending card on top of stack to game %d: %v", gameId, sendErr)
+				log.Printf("[Send first game state] error sending card on top of stack to game %d: %v", gameId, sendErr)
 				return sendErr
 			}
 		}
@@ -797,9 +895,10 @@ func (gm *GameManager) SendFirstGameStateIfAllPlayersAreReady(gameId int) error 
 			IsGameOver:         false,
 		})
 		if err != nil {
-			log.Printf("error updating game state: %v", err)
+			log.Printf("[Send first game state] error updating game state: %v", err)
 			return err[0]
 		}
+		log.Printf("[Send first game state] first game state sent in game %d", gameId)
 		return nil
 	}
 	return nil
@@ -808,21 +907,22 @@ func (gm *GameManager) SendFirstGameStateIfAllPlayersAreReady(gameId int) error 
 func (gm *GameManager) UpdatePlayersCards(gameId int, userId string, cards []string) error {
 	game, exists := gm.GetGame(gameId)
 	if !exists {
-		log.Printf("game does not exist")
+		log.Printf("[update player cards] game does not exist")
 		return fmt.Errorf("game does not exist")
 	}
 
 	game.Mu.Lock()
-	for _, user := range game.UserStreams {
+	for index, user := range game.UserStreams {
 		if user.UserId.String() == userId {
+			game.UserStreams[index].PlayersCards = cards
+			log.Printf("[update player cards] updated cards of player %v: %v", userId, cards)
 			if user.PlayerStream != nil {
-				user.PlayersCards = cards
 				sendErr := user.PlayerStream.Send(&pb.PlayerState{
 					Hand:  cards,
 					Alert: &pb.Alert{},
 				})
 				if sendErr != nil {
-					log.Printf("error sending player state to user %v: %v", userId, sendErr)
+					log.Printf("[update player cards] error sending player state to user %v: %v", userId, sendErr)
 					game.Mu.RUnlock()
 					return sendErr
 				}
@@ -837,14 +937,14 @@ func (gm *GameManager) UpdatePlayersCards(gameId int, userId string, cards []str
 func (gm *GameManager) DrawCardsFromStack(gameId int, amount int32) ([]string, error) {
 	game, exists := gm.GetGame(gameId)
 	if !exists {
-		log.Printf("game does not exist")
+		log.Printf("[Draw cards from stack] game does not exist")
 		return []string{}, fmt.Errorf("game does not exist")
 	}
 
 	if len(game.CardsOnDrawStack) < int(amount) {
 		shuffleErr := gm.shufflePlaceStackInDrawStack(gameId)
 		if shuffleErr != nil {
-			log.Printf("error shuffling place stack in draw stack: %v", shuffleErr)
+			log.Printf("[Draw cards from stack] error shuffling place stack in draw stack: %v", shuffleErr)
 			return []string{}, shuffleErr
 		}
 	}
@@ -861,7 +961,7 @@ func (gm *GameManager) DrawCardsFromStack(gameId int, amount int32) ([]string, e
 func (gm *GameManager) shuffleDrawStack(gameId int, shuffleTopCardToo bool) error {
 	game, exists := gm.GetGame(gameId)
 	if !exists {
-		log.Printf("game does not exist")
+		log.Printf("[Shuffle Draw Stack] game does not exist")
 		return fmt.Errorf("game does not exist")
 	}
 
@@ -886,7 +986,7 @@ func (gm *GameManager) shuffleDrawStack(gameId int, shuffleTopCardToo bool) erro
 func (gm *GameManager) shufflePlaceStackInDrawStack(gameId int) error {
 	game, exists := gm.GetGame(int(gameId))
 	if !exists {
-		log.Printf("game does not exist")
+		log.Printf("[Shuffle Place Stack in Draw Stack] game does not exist")
 		return fmt.Errorf("game does not exist")
 	}
 
@@ -900,4 +1000,38 @@ func (gm *GameManager) shufflePlaceStackInDrawStack(gameId int) error {
 	game.Mu.Unlock()
 
 	return nil
+}
+
+func (gm *GameManager) getGameStateFromGame(gameId int) (*pb.GameState, error) {
+	game, exists := gm.GetGame(gameId)
+	if !exists {
+		log.Printf("[Get game state from game] game does not exist")
+		return nil, fmt.Errorf("game does not exist")
+	}
+
+	allPlayersReady, readyErr := gm.HasEveryoneJoined(gameId)
+	if readyErr != nil {
+		log.Printf("[Get game state from game] error checking if everyone is ready: %v", readyErr)
+		return nil, readyErr
+	}
+
+	user, getErr := gm.store.GetUserByUUID(context.Background(), game.CurrentPlayerID)
+	if getErr != nil {
+		log.Printf("[Get game state from game] error getting user: %v", getErr)
+		return nil, getErr
+	}
+
+	game.Mu.RLock()
+	state := &pb.GameState{
+		CardOnTopOfDiscard: game.CardsOnPlaceStack[len(game.CardsOnPlaceStack)-1],
+		CurrentPlayerUuid:  game.CurrentPlayerID.String(),
+		Direction:          game.Direction,
+		GameId:             int32(gameId),
+		IsGameOver:         false,
+		AllPlayersReady:    allPlayersReady,
+		CurrentPlayerName:  user.Username,
+		GameOverReason:     "",
+	}
+	game.Mu.RUnlock()
+	return state, nil
 }

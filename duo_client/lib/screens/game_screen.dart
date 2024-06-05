@@ -30,9 +30,6 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     Future.delayed(Duration.zero, () async {
       String token = await ref.read(apiProvider).getToken();
       debugPrint('Getting game state stream');
-      ref
-          .read(apiProvider)
-          .getGameStateStream(token, ref.read(apiProvider).gameId);
       ref.read(apiProvider).sendUserstatusUpdate(token, FriendState.inGame);
       if (ref.read(apiProvider).isStackOwner) {
         debugPrint('Getting stack stream');
@@ -43,6 +40,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         ref.read(apiProvider).stackInit(token, ref.read(apiProvider).gameId);
       } else {
         debugPrint('Getting player stream');
+        ref
+            .read(apiProvider)
+            .getGameStateStream(token, ref.read(apiProvider).gameId);
         await ref
             .read(apiProvider)
             .getPlayerStream(token, ref.read(apiProvider).gameId);
@@ -60,6 +60,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   @override
   void dispose() {
     debugPrint('Disposing game_screen');
+    closeAllStreams();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
@@ -92,12 +93,25 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             onPressed: () {
               showDialog(
                 context: context,
-                builder: (context) => const PauseDialog(),
+                builder: (context) => PauseDialog(
+                  onExit: () {
+                    closeAllStreams();
+                  },
+                ),
               );
             },
           ),
         ),
       ]),
     );
+  }
+
+  void closeAllStreams() {
+    if (ref.read(apiProvider).isStackOwner) {
+      ref.read(apiProvider).closeStackStream();
+    } else {
+      ref.read(apiProvider).closePlayerStream();
+      ref.read(apiProvider).closeGameStream();
+    }
   }
 }

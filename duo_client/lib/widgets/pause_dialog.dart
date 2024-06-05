@@ -6,7 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class PauseDialog extends ConsumerStatefulWidget {
-  const PauseDialog({super.key});
+  final VoidCallback onExit;
+  const PauseDialog({required this.onExit, super.key});
 
   @override
   ConsumerState<PauseDialog> createState() => _PauseDialogState();
@@ -63,6 +64,8 @@ class _PauseDialogState extends ConsumerState<PauseDialog> {
                       DeviceOrientation.portraitUp,
                       DeviceOrientation.portraitDown,
                     ]);
+                    widget.onExit();
+                    if (!context.mounted) return;
                     Navigator.of(context)
                         .pushReplacementNamed(HomeScreen.route);
                   },

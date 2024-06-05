@@ -344,6 +344,12 @@ class GrpcServerConnection extends AbstractServerConnection {
   }
 
   @override
+  Future<void> closeStackStream() async {
+    await stackStream?.cancel();
+    stackStream = null;
+  }
+
+  @override
   Future<int> requestCard(String token, int gameId) async {
     if (!hasStackStream) {
       debugPrint('User status stream not established');
@@ -595,4 +601,17 @@ class GrpcServerConnection extends AbstractServerConnection {
 
   @override
   bool get hasNotificationStream => notificationStream != null;
+
+  @override
+  Future<void> closeGameStream() async {
+    gameStream?.cancel();
+    gameStream = null;
+  }
+
+  @override
+  Future<void> closePlayerStream() {
+    playerStream?.cancel();
+    playerStream = null;
+    return Future.value();
+  }
 }

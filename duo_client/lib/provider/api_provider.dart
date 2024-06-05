@@ -6,12 +6,12 @@ import 'package:duo_client/pb/lobby.pb.dart';
 import 'package:duo_client/pb/game.pb.dart';
 import 'package:duo_client/provider/friend_provider.dart';
 import 'package:duo_client/provider/notification_provider.dart';
+import 'package:duo_client/utils/connection/grpc_server_connection.dart';
 import 'package:duo_client/utils/connection/server_events.dart';
 import 'package:flutter/widgets.dart';
 
 import 'storage_provider.dart';
 import '../utils/connection/abstract_connection.dart';
-import '../utils/connection/grpc_server_connection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -24,6 +24,7 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
   final StorageProvider _storageProvider;
   final FriendProvider _friendProvider;
   final NotificationProvider _notificationProvider;
+  late final AbstractServerConnection _serverConnection;
 
   StreamSubscription? _eventStreamSubscription;
 
@@ -48,8 +49,8 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
 
   ApiProvider(
       this._storageProvider, this._notificationProvider, this._friendProvider) {
-    GrpcServerConnection serverConnection = getIt.get<GrpcServerConnection>();
-    _eventStreamSubscription = serverConnection.eventStream.listen((event) {
+    _serverConnection = getIt.get<GrpcServerConnection>();
+    _eventStreamSubscription = _serverConnection.eventStream.listen((event) {
       switch (event.runtimeType) {
         case RegisterUserEvent:
           {
@@ -167,26 +168,13 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
     await _eventStreamSubscription?.cancel();
     super.dispose();
   }
-  // void init(ServerConnectionType type) {
-  //   _storageProvider.setLastSelectedConnectionType(type);
-  //   switch (type) {
-  //     case ServerConnectionType.grpc:
-  //       _serverConnection = GrpcServerConnection(_storageProvider,
-  //           _notificationProvider, _friendProvider, notifyListeners);
-  //       break;
-  //     case ServerConnectionType.bluetooth:
-  //       //maybe implement bluetooth connection
-  //       break;
-  //   }
-  //   notifyListeners();
-  // }
 
   Future<String> getToken() async {
     if (_storageProvider.expireDate
             ?.isBefore(DateTime.now().subtract(const Duration(minutes: 2))) ??
         false) {
       await getIt
-          .get<GrpcServerConnection>()
+          .get<AbstractServerConnection>()
           .loginUser(_storageProvider.userId, _storageProvider.privateKey);
       return _storageProvider.accessToken;
     }
@@ -195,47 +183,52 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
 
   @override
   Future<int> createLobby(String token, int maxPlayers) {
-    return getIt.get<GrpcServerConnection>().createLobby(token, maxPlayers);
+    return _serverConnection.createLobby(token, maxPlayers);
   }
 
   @override
   Future<int> disconnectLobby(String token, int lobbyId) {
-    return getIt.get<GrpcServerConnection>().disconnectLobby(token, lobbyId);
+    return _serverConnection.disconnectLobby(token, lobbyId);
   }
 
   @override
   Future<int> joinLobby(String token, int lobbyId) {
-    return getIt.get<GrpcServerConnection>().joinLobby(token, lobbyId);
+    return _serverConnection.joinLobby(token, lobbyId);
   }
 
   @override
   Future<int> loginUser(String uuid, String privateKey) {
-    return getIt.get<GrpcServerConnection>().loginUser(uuid, privateKey);
+    return _serverConnection.loginUser(uuid, privateKey);
   }
 
   @override
   Future<int> registerUser(String username) {
-    return getIt.get<GrpcServerConnection>().registerUser(username);
+    return _serverConnection.registerUser(username);
   }
 
   @override
   Future<int> startGame(String token) {
-    return getIt.get<GrpcServerConnection>().startGame(token);
+    return _serverConnection.startGame(token);
   }
 
   @override
   Future<int> getPlayerStream(String token, int gameId) {
-    return getIt.get<GrpcServerConnection>().getPlayerStream(token, gameId);
+    return _serverConnection.getPlayerStream(token, gameId);
   }
 
   @override
   Future<int> changeStackDevice(String token, String deviceId) {
-    return getIt.get<GrpcServerConnection>().changeStackDevice(token, deviceId);
+    return _serverConnection.changeStackDevice(token, deviceId);
   }
 
   @override
   Future<int> getStackStream(String token, int gameId) {
-    return getIt.get<GrpcServerConnection>().getStackStream(token, gameId);
+    return _serverConnection.getStackStream(token, gameId);
+  }
+
+  @override
+  Future<void> closeStackStream() async {
+    await _serverConnection.closeStackStream();
   }
 
   @override
@@ -245,7 +238,7 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
       final statusCode = await getStackStream(token, gameId);
       if (statusCode != 0) return statusCode;
     }
-    return getIt.get<GrpcServerConnection>().requestCard(token, gameId);
+    return _serverConnection.requestCard(token, gameId);
   }
 
   @override
@@ -255,25 +248,24 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
       final statusCode = await getStackStream(token, gameId);
       if (statusCode != 0) return statusCode;
     }
-    return getIt.get<GrpcServerConnection>().stackInit(token, gameId);
+    return _serverConnection.stackInit(token, gameId);
   }
 
   @override
   Future<int> streamPlayerAction(PlayerAction action) {
-    return getIt.get<GrpcServerConnection>().streamPlayerAction(action);
+    return _serverConnection.streamPlayerAction(action);
   }
 
   @override
   Future<int> getGameStateStream(String token, int gameId) {
     debugPrint('called getGameStateStream');
-    return getIt.get<GrpcServerConnection>().getGameStateStream(token, gameId);
+    return _serverConnection.getGameStateStream(token, gameId);
   }
 
   @override
   Future<int> initUserStatusStream() async {
     debugPrint('Init User Status Stream');
-    final response =
-        await getIt.get<GrpcServerConnection>().initUserStatusStream();
+    final response = await _serverConnection.initUserStatusStream();
     debugPrint('User Status Stream: $hasUserStatusStream');
     // notifyListeners();
     return response;
@@ -285,66 +277,60 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
       debugPrint('No User Status Stream');
       await initUserStatusStream();
     }
-    getIt.get<GrpcServerConnection>().sendUserstatusUpdate(token, state);
+    _serverConnection.sendUserstatusUpdate(token, state);
   }
 
   @override
   Future<int> answerFriendRequest(
       String token, String requesterId, bool accept) {
-    return getIt
-        .get<GrpcServerConnection>()
-        .answerFriendRequest(token, requesterId, accept);
+    return _serverConnection.answerFriendRequest(token, requesterId, accept);
   }
 
   @override
   Future<int> deleteFriend(String token, String friendId) async {
-    await getIt.get<GrpcServerConnection>().deleteFriend(token, friendId);
-    getIt.get<GrpcServerConnection>().getFriends(token);
+    await _serverConnection.deleteFriend(token, friendId);
+    _serverConnection.getFriends(token);
     return Future(() => 0);
   }
 
   @override
   Future<List<FriendRequest>> getFriendRequests(String token) {
-    return getIt.get<GrpcServerConnection>().getFriendRequests(token);
+    return _serverConnection.getFriendRequests(token);
   }
 
   @override
   Future<List<Friend>> getFriends(String token) {
-    return getIt.get<GrpcServerConnection>().getFriends(token);
+    return _serverConnection.getFriends(token);
   }
 
   @override
   Future<int> sendFriendRequest(
       String token, String username, String friendId) {
-    return getIt
-        .get<GrpcServerConnection>()
-        .sendFriendRequest(token, username, friendId);
+    return _serverConnection.sendFriendRequest(token, username, friendId);
   }
 
   @override
   Future<int> getNotificationStream(String token) {
-    return getIt.get<GrpcServerConnection>().getNotificationStream(token);
+    return _serverConnection.getNotificationStream(token);
   }
 
   @override
-  bool get hasGameStream => getIt.get<GrpcServerConnection>().hasGameStream;
+  bool get hasGameStream => _serverConnection.hasGameStream;
 
   @override
-  bool get hasLobbyStream => getIt.get<GrpcServerConnection>().hasLobbyStream;
+  bool get hasLobbyStream => _serverConnection.hasLobbyStream;
 
   @override
-  bool get hasUserStatusStream =>
-      getIt.get<GrpcServerConnection>().hasUserStatusStream;
+  bool get hasUserStatusStream => _serverConnection.hasUserStatusStream;
 
   @override
-  bool get hasPlayerStream => getIt.get<GrpcServerConnection>().hasPlayerStream;
+  bool get hasPlayerStream => _serverConnection.hasPlayerStream;
 
   @override
-  bool get hasStackStream => getIt.get<GrpcServerConnection>().hasStackStream;
+  bool get hasStackStream => _serverConnection.hasStackStream;
 
   @override
-  bool get hasNotificationStream =>
-      getIt.get<GrpcServerConnection>().hasNotificationStream;
+  bool get hasNotificationStream => _serverConnection.hasNotificationStream;
 
   @override
   Stream<ServerEvent> get eventStream => throw UnimplementedError(
@@ -354,6 +340,16 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
   @override
   StreamController<ServerEvent> get eventController => throw UnimplementedError(
       "Event controller should not be accessed from apiProvider");
+
+  @override
+  Future<void> closeGameStream() {
+    return _serverConnection.closeGameStream();
+  }
+
+  @override
+  Future<void> closePlayerStream() {
+    return _serverConnection.closePlayerStream();
+  }
 }
 
 final apiProvider = ChangeNotifierProvider<ApiProvider>((ref) {

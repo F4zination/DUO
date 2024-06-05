@@ -60,15 +60,13 @@ class _CardScrollViewState extends ConsumerState<CardScrollView> {
         scrollDirection: Axis.horizontal,
         itemCount: cards.length,
         itemBuilder: (context, index) {
-          return Dismissible(
+          return GestureDetector(
             key: UniqueKey(),
-            direction: DismissDirection.up,
-            onDismissed: (direction) {
-              debugPrint('Removing card with value ${cards[index].cardName}');
+            onTap: () {
               setState(() {
-                cards.removeAt(index);
+                debugPrint('Removing card with value ${cards[index].cardName}');
                 playCard(index);
-                print('Removing card with value ${cards[index].cardName}');
+                cards.removeAt(index);
               });
             },
             child: Padding(
