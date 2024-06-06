@@ -15,16 +15,15 @@ class GameStacks extends ConsumerStatefulWidget {
 class _GameStacksState extends ConsumerState<GameStacks> {
   @override
   Widget build(BuildContext context) {
-    ApiProvider _apiProvider = ref.watch(apiProvider);
-    StackState stackState = _apiProvider.stackState ??
-        StackState(
-          drawStack: DrawStackState(
-              cardIds:
-                  _apiProvider.stackState?.drawStack.cardIds ?? ['green_1']),
-          placeStack: PlaceStackState(
-              cardIdOnTop:
-                  _apiProvider.stackState?.placeStack.cardIdOnTop ?? 'green_1'),
-        );
+    StackState stackState = StackState(
+      drawStack: DrawStackState(
+          cardIds: ref.watch(apiProvider).stackState?.drawStack.cardIds ??
+              ['green_1']),
+      placeStack: PlaceStackState(
+          cardIdOnTop:
+              ref.watch(apiProvider).stackState?.placeStack.cardIdOnTop ??
+                  'back'),
+    );
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
