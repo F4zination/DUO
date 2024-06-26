@@ -36,9 +36,3 @@ func NewServer(store db.Store, config util.Config) *Server {
 		UserNotificationHandler: *NewUserNotificationManager(store),
 	}
 }
-
-func (server *Server) OnError(err error) {
-	if err != nil {
-		log.Printf("An error occurred: %s", err)
-	}
-}

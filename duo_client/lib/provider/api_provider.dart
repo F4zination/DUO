@@ -173,9 +173,8 @@ class ApiProvider extends ChangeNotifier implements AbstractServerConnection {
     if (_storageProvider.expireDate
             ?.isBefore(DateTime.now().subtract(const Duration(minutes: 2))) ??
         false) {
-      await getIt
-          .get<AbstractServerConnection>()
-          .loginUser(_storageProvider.userId, _storageProvider.privateKey);
+      await _serverConnection.loginUser(
+          _storageProvider.userId, _storageProvider.privateKey);
       return _storageProvider.accessToken;
     }
     return _storageProvider.accessToken;

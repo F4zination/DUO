@@ -82,6 +82,12 @@ class _DuoAppState extends ConsumerState<DuoApp> {
                 ));
                 // you can register other apis here (e.g. bluetooth)
 
+                if (getIt.isRegistered<GrpcServerConnection>()) {
+                  debugPrint('GrpcServerConnection is registered');
+                } else {
+                  debugPrint('GrpcServerConnection is not registered');
+                }
+
                 await ref.read(apiProvider).initUserStatusStream();
                 ref.read(apiProvider).sendUserstatusUpdate(
                     await ref.read(apiProvider).getToken(), FriendState.online);
