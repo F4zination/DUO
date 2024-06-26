@@ -487,8 +487,34 @@ func (gm *GameManager) SetStackStream(gameId int, userId uuid.UUID, initMsg *pb.
 
 			log.Printf("[stack stream] Received message from stack %v: %v", userId, msg)
 
+			if msg.DrawingCard == true {
+				card, getCardErr := gm.DrawCardsFromStack(gameId, 1)
+				if getCardErr != nil {
+					log.Printf("[stack stream] error drawing card from stack: %v", getCardErr)
+					return getCardErr
+				}
+
+				game.Mu.RLock()
+				positionOfCurrentPlayer := -1
+				for i, user := range game.UserStreams {
+					if user.UserId == game.CurrentPlayerID {
+						positionOfCurrentPlayer = i
+						break
+					}
+				}
+				game.Mu.RUnlock()
+
+				//Get current players cards
+				game.Mu.Lock()
+				playersCards := game.UserStreams[positionOfCurrentPlayer].PlayersCards
+				game.Mu.Unlock()
+
+				//Add card to current player's hand
+				playersCards = append(playersCards, card[0])
+				gm.UpdatePlayersCards(gameId, game.UserStreams[positionOfCurrentPlayer].UserId.String(), playersCards)
+
+			}
 			//CARD DRAW MESSAGE
-			//TODO
 
 		}
 	}
