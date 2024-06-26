@@ -703,6 +703,9 @@ func (gm *GameManager) AddPlayerStream(gameId int, userId uuid.UUID, stream pb.D
 			//TODO: Check for special cards
 			game.Mu.Unlock()
 
+			gm.UpdatePlayersCards(gameId, userId.String(), game.UserStreams[playerIndex].PlayersCards)
+			log.Printf("[Player stream] player %v has following cards left: %v", userId, game.UserStreams[playerIndex].PlayersCards)
+
 			nextPlayerUuid, nextPlayerName, nextPlayerErr := gm.GetNextPlayer(gameId, game.Direction == pb.Direction_CLOCKWISE, 1)
 			if nextPlayerErr != nil {
 				log.Printf("[Player stream] error getting next player: %v", nextPlayerErr)

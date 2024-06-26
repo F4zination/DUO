@@ -21,13 +21,13 @@ func (server *Server) Register(ctx context.Context, req *pb.RegisterRequest) (*p
 		PublicKey: req.PublicKey,
 	})
 	if createErr != nil {
-		server.OnError(createErr)
+		log.Printf("[Register] Error creating user: %s", createErr)
 		return nil, status.Errorf(codes.Internal, "An error occurred while creating the user")
 	}
 
 	accessToken, _, tokenErr := server.Maker.CreateToken(dbUser.Uuid, dbUser.Username, server.Config.AccessTokenDuration)
 	if tokenErr != nil {
-		server.OnError(tokenErr)
+		log.Printf("[Register] Error creating token: %s", tokenErr)
 		return nil, status.Errorf(codes.Internal, "An error occurred while creating the access token")
 	}
 
@@ -40,13 +40,13 @@ func (server *Server) Register(ctx context.Context, req *pb.RegisterRequest) (*p
 func (server *Server) RequestLoginChallenge(ctx context.Context, req *pb.LoginRequest) (*pb.LoginChallengeRequest, error) {
 	actualUUID, uuidErr := uuid.Parse(req.Uuid)
 	if uuidErr != nil {
-		server.OnError(uuidErr)
+		log.Printf("[Request Login Challenge] Error parsing UUID: %s", uuidErr)
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid UUID")
 	}
 
 	dbUser, getErr := server.Store.GetUserByUUID(ctx, actualUUID)
 	if getErr != nil {
-		server.OnError(getErr)
+		log.Printf("[Request Login Challenge] Error getting user by uuid: %s", getErr)
 		if getErr == sql.ErrNoRows {
 			return nil, status.Errorf(codes.NotFound, "User not found")
 		}
@@ -58,7 +58,7 @@ func (server *Server) RequestLoginChallenge(ctx context.Context, req *pb.LoginRe
 	log.Printf("Created Challenge Encrypted: %s", encryptedChallenge)
 
 	if encryptErr != nil {
-		server.OnError(encryptErr)
+		log.Printf("[Request Login Challenge] Error creating login challenge: %s", encryptErr)
 		return nil, status.Errorf(codes.Internal, "An error occurred while creating the login challenge")
 	}
 
@@ -67,7 +67,7 @@ func (server *Server) RequestLoginChallenge(ctx context.Context, req *pb.LoginRe
 		Challenge: plainChallenge,
 	})
 	if createErr != nil {
-		server.OnError(createErr)
+		log.Printf("[Request Login Challenge] Error creating user login: %s", createErr)
 		return nil, status.Errorf(codes.Internal, "An error occurred while creating the user login")
 	}
 
@@ -79,13 +79,13 @@ func (server *Server) RequestLoginChallenge(ctx context.Context, req *pb.LoginRe
 func (server *Server) SubmitLoginChallenge(ctx context.Context, req *pb.LoginChallengeResponse) (*pb.LoginResponse, error) {
 	actualUUID, uuidErr := uuid.Parse(req.Uuid)
 	if uuidErr != nil {
-		server.OnError(uuidErr)
+		log.Printf("[Submit Login Challenge] Error parsing UUID: %s", uuidErr)
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid UUID")
 	}
 
 	dbUserLogin, getErr := server.Store.DeleteUserLoginByUUID(ctx, actualUUID)
 	if getErr != nil {
-		server.OnError(getErr)
+		log.Printf("[Submit Login Challenge] Error getting user login: %s", getErr)
 		if getErr == sql.ErrNoRows {
 			return nil, status.Errorf(codes.NotFound, "User login not found")
 		}
@@ -94,7 +94,7 @@ func (server *Server) SubmitLoginChallenge(ctx context.Context, req *pb.LoginCha
 
 	dbUser, getErr := server.Store.GetUserByUUID(ctx, actualUUID)
 	if getErr != nil {
-		server.OnError(getErr)
+		log.Printf("[Submit Login Challenge] Error getting user by uuid: %s", getErr)
 		if getErr == sql.ErrNoRows {
 			return nil, status.Errorf(codes.NotFound, "User not found")
 		}
@@ -102,12 +102,13 @@ func (server *Server) SubmitLoginChallenge(ctx context.Context, req *pb.LoginCha
 	}
 
 	if dbUserLogin.Challenge != req.DecryptedChallenge {
+		log.Printf("[Submit Login Challenge] Challenge mismatch: %s != %s", dbUserLogin.Challenge, req.DecryptedChallenge)
 		return nil, status.Errorf(codes.PermissionDenied, "Invalid challenge")
 	}
 
 	accessToken, _, tokenErr := server.Maker.CreateToken(dbUser.Uuid, dbUser.Username, server.Config.AccessTokenDuration)
 	if tokenErr != nil {
-		server.OnError(tokenErr)
+		log.Printf("[Submit Login Challenge] Error creating token: %s", tokenErr)
 		return nil, status.Errorf(codes.Internal, "An error occurred while creating the access token")
 	}
 

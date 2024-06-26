@@ -42,32 +42,31 @@ class _CardScrollViewState extends ConsumerState<CardScrollView> {
     isTurn = _apiProvider.gameState == null
         ? false
         : _apiProvider.gameState!.currentPlayerUuid == _storageProvider.userId;
+    debugPrint('Current hand: ${_apiProvider.playerState?.hand}');
     return Padding(
       padding: const EdgeInsets.only(bottom: Constants.defaultPadding, top: 70),
-      child: ReorderableListView.builder(
-        onReorderStart: (index) => {
-          HapticFeedback.lightImpact(),
-        },
-        onReorder: (oldIndex, newIndex) {
-          setState(() {
-            if (newIndex > oldIndex) {
-              newIndex -= 1;
-            }
-            final card = cards.removeAt(oldIndex);
-            cards.insert(newIndex, card);
-          });
-        },
+      child: ListView.builder(
+        // onReorderStart: (index) => {
+        //   HapticFeedback.lightImpact(),
+        // },
+        // onReorder: (oldIndex, newIndex) {
+        //   setState(() {
+        //     if (newIndex > oldIndex) {
+        //       newIndex -= 1;
+        //     }
+        //     final card = cards.removeAt(oldIndex);
+        //     cards.insert(newIndex, card);
+        //   });
+        // },
         scrollDirection: Axis.horizontal,
         itemCount: cards.length,
         itemBuilder: (context, index) {
-          return GestureDetector(
+          return Dismissible(
             key: UniqueKey(),
-            onTap: () {
-              setState(() {
-                debugPrint('Removing card with value ${cards[index].cardName}');
-                playCard(index);
-                cards.removeAt(index);
-              });
+            direction: DismissDirection.up,
+            onDismissed: (direction) {
+              playCard(index);
+              setState(() => cards.removeAt(index));
             },
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -80,6 +79,7 @@ class _CardScrollViewState extends ConsumerState<CardScrollView> {
   }
 
   void playCard(int index) {
+    debugPrint('Playing card with value ${cards[index].cardName}');
     ref.read(apiProvider).streamPlayerAction(PlayerAction(
           action: PlayerAction_ActionType.PLACE,
           cardId: cards[index].cardName,
