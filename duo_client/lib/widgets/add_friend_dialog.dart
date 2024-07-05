@@ -12,6 +12,8 @@ class AddFriendDialog extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    String qrText =
+        'Scan this QR code to send a FriendRequest to: ${ref.read(storageProvider).username}';
     return Dialog(
       backgroundColor: Constants.secondaryColorDark,
       insetPadding: const EdgeInsets.all(20),
@@ -58,8 +60,7 @@ class AddFriendDialog extends ConsumerWidget {
                       onPressed: () => showDialog(
                           context: context,
                           builder: (context) => QrJoinDialog(
-                                title:
-                                    'Scan this QR code with the DUO app to join the group:',
+                                title: qrText,
                                 data: ref.read(storageProvider).userId,
                               )),
                       icon: const Icon(

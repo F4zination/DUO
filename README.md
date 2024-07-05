@@ -5,7 +5,7 @@ Welcome to **DUO**, a groundbreaking mobile card game app developed as part of a
 ## Key Features
 
 ### Individual Card Display
-- **Personal Card Interface**: Each player's phone displays only their own card, ensuring privacy and adding a layer of strategy to the game.
+- **Personal Cards Interface**: Each player's phone displays only their own cards, ensuring privacy and adding a layer of strategy to the game.
 
 ### Central Stack Device
 - **Shared Game Dynamics**: An additional device serves as the "Stack," centralizing play and making the game experience more engaging and interactive.
