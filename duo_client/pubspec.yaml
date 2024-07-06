@@ -86,6 +86,7 @@ flutter:
     - res/images/
     - res/icons/
     - assets/game/
+    - assets/
     - assets/game/duo_cards/
     - .env
   #   - images/a_dot_ham.jpeg

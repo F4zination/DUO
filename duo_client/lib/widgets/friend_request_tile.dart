@@ -15,12 +15,13 @@ class FriendRequestTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return DuoContainer(
+      height: 56,
       child: Row(
         children: [
           Helpers.getCircleAvatar(text: friendRequest.requesterName),
           const SizedBox(width: Constants.defaultPadding / 2),
           Text(
-            'Freundschaftsanfrage von ${friendRequest.requesterName}',
+            'Freundschaftsanfrage von \n${friendRequest.requesterName}',
             style: const TextStyle(
                 color: Colors.white70, fontWeight: FontWeight.bold),
           ),
