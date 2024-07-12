@@ -29,9 +29,20 @@ class _SplasScreenState<T> extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: SpinKitFadingCube(
-          color: Theme.of(context).colorScheme.primary,
-          size: 50.0,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              'assets/Logo.png',
+              width: 100.0,
+              height: 100.0,
+            ),
+            const SizedBox(height: 40.0),
+            SpinKitFadingCube(
+              color: Theme.of(context).colorScheme.primary,
+              size: 50.0,
+            ),
+          ],
         ),
       ),
     );

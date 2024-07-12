@@ -154,7 +154,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   onPressed: () {
                     showDialog(
                       context: context,
-                      builder: (context) => const AddFriendDialog(),
+                      builder: (context) => AddFriendDialog(),
                     );
                   },
                 ),

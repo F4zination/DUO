@@ -358,6 +358,7 @@ class GrpcServerConnection extends AbstractServerConnection {
     stackRequestStreamController!.add(StackRequest(
       token: token,
       gameId: gameId,
+      drawingCard: true,
     ));
     return 0;
   }
