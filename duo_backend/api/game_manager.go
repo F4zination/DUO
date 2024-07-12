@@ -143,7 +143,7 @@ type Game struct {
 	CardsOnPlaceStack   []string //last card is on top
 	UserStreams         []GameUserStreams
 	CurrentPlayerID     uuid.UUID
-	WaitingForDrawCount int32 //How many cards need to be drawn, before the next player can play
+	WaitingForDrawCount int32 //How many cards need to be drawn, before the next player can play [NOT IMPLEMENTED YET]
 	Direction           pb.Direction
 	Mu                  sync.RWMutex
 }

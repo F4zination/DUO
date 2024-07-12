@@ -105,9 +105,6 @@ func (server *Server) ChangeStackDevice(ctx context.Context, req *pb.ChangeStack
 	return &pb.Void{}, nil
 }
 
-//07542 4254 ZinsiBinsi Festnetz
-//0160 91182690 Handy
-
 func (server *Server) DisconnectLobby(ctx context.Context, req *pb.DisconnectLobbyRequest) (*pb.DisconnectLobbyResponse, error) {
 	payload, tokenErr := server.Maker.VerifyToken(req.Token)
 	if tokenErr != nil {

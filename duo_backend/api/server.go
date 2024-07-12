@@ -11,10 +11,9 @@ import (
 
 type Server struct {
 	pb.UnimplementedDUOServiceServer
-	Config util.Config
-	Store  db.Store
-	Maker  token.Maker
-	// SessionHandler SessionManager
+	Config                  util.Config
+	Store                   db.Store
+	Maker                   token.Maker
 	LobbyHandler            LobbyManager
 	GameHandler             GameManager
 	UserNotificationHandler UserNotificationManager
